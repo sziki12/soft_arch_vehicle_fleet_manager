@@ -1,4 +1,6 @@
-﻿namespace SoftArchVehicleFleetManager.Models
+﻿using System.Text.Json.Serialization;
+
+namespace SoftArchVehicleFleetManager.Models
 {
     public class Manufacturer
     {
@@ -7,5 +9,8 @@
 
         // Properties
         public string Name { get; set; }
+
+        // Navigation Properties
+        [JsonIgnore] public List<Interface> Interfaces { get; set; } = new();
     }
 }

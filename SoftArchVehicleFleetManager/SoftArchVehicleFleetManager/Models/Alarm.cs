@@ -1,4 +1,6 @@
-﻿namespace SoftArchVehicleFleetManager.Models
+﻿using System.Text.Json.Serialization;
+
+namespace SoftArchVehicleFleetManager.Models
 {
     public class Alarm
     {
@@ -6,6 +8,6 @@
         public string Description { get; set; }
         public string SettingsJSON { get; set; }
 
-        public Fleet Fleet { get; set; }
+        [JsonIgnore] public Fleet Fleet { get; set; }
     }
 }

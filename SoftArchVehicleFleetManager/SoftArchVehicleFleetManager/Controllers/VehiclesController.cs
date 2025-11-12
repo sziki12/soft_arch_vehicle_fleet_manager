@@ -53,8 +53,7 @@ namespace SoftArchVehicleFleetManager.Controllers
         public async Task<ActionResult<VehicleDto>> Create(VehicleCreateDto createDto)
         {
             // Validate foreign keys
-            if (createDto.FleetId is int fid &&
-                !await _db.Fleets.AsNoTracking().AnyAsync(m => m.Id == fid))
+            if (!await _db.Fleets.AsNoTracking().AnyAsync(m => m.Id == createDto.FleetId))
                 return BadRequest(new { error = "Invalid FleetId." });
 
             var vehicle = new Vehicle
@@ -108,8 +107,7 @@ namespace SoftArchVehicleFleetManager.Controllers
 
             if (updateDto.FleetId is not null)
             {
-                if (updateDto.FleetId is int fid &&
-                    !await _db.Fleets.AsNoTracking().AnyAsync(f => f.Id == fid))
+                if (!await _db.Fleets.AsNoTracking().AnyAsync(f => f.Id == updateDto.FleetId))
                     return BadRequest(new { error = "Invalid FleetId." });
 
                 vehicle.FleetId = (int)updateDto.FleetId;

@@ -1,4 +1,6 @@
-﻿namespace SoftArchVehicleFleetManager.Models
+﻿using System.Text.Json.Serialization;
+
+namespace SoftArchVehicleFleetManager.Models
 {
     public class Report
     {
@@ -6,7 +8,7 @@
         public DateTime Date { get; set; }
         public string Data { get; set; }
 
-        public Vehicle Vehicle { get; set; }
-        public Module Module { get; set; }
+        [JsonIgnore] public Vehicle Vehicle { get; set; }
+        [JsonIgnore] public Module Module { get; set; }
     }
 }

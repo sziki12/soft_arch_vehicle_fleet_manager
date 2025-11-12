@@ -1,4 +1,6 @@
-﻿namespace SoftArchVehicleFleetManager.Models
+﻿using System.Text.Json.Serialization;
+
+namespace SoftArchVehicleFleetManager.Models
 {
     public class Vehicle
     {
@@ -15,6 +17,6 @@
         public int FleetId { get; set; }
 
         // Navigation Properties
-        public Fleet Fleet { get; set; } = default!;
+        [JsonIgnore] public Fleet Fleet { get; set; } = default!;
     }
 }
