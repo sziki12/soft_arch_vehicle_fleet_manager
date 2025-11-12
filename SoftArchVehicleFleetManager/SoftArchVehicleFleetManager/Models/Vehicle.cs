@@ -18,5 +18,6 @@ namespace SoftArchVehicleFleetManager.Models
 
         // Navigation Properties
         [JsonIgnore] public Fleet Fleet { get; set; } = default!;
+        [JsonIgnore] public List<Module> Modules { get; set; } = new();
     }
 }

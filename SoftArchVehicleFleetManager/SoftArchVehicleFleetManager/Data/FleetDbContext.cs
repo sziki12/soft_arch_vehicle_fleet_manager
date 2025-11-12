@@ -12,6 +12,7 @@ namespace SoftArchVehicleFleetManager.Data
         public DbSet<Fleet> Fleets => Set<Fleet>();
         public DbSet<Vehicle> Vehicles => Set<Vehicle>();
         public DbSet<Interface> Interfaces => Set<Interface>();
+        public DbSet<Module> Modules => Set<Module>();
 
         protected override void OnModelCreating(ModelBuilder b)
         {
@@ -39,6 +40,28 @@ namespace SoftArchVehicleFleetManager.Data
              .OnDelete(DeleteBehavior.Restrict);
 
             b.Entity<Interface>().HasIndex(i => i.ManufacturerId);
+
+
+            // Module / Manufacturer: Many-to-One
+            b.Entity<Module>()
+             .HasOne(m => m.Manufacturer)
+             .WithMany(m => m.Modules)
+             .HasForeignKey(i => i.ManufacturerId)
+             .IsRequired()
+             .OnDelete(DeleteBehavior.Restrict);
+
+            b.Entity<Module>().HasIndex(i => i.ManufacturerId);
+            b.Entity<Module>().HasIndex(i => i.InterfaceId);
+            b.Entity<Module>().HasIndex(i => i.VehicleId);
+
+
+            // Module / Vehicle: Many-to-One
+            b.Entity<Module>()
+             .HasOne(m => m.Vehicle)
+             .WithMany(v => v.Modules)
+             .HasForeignKey(m => m.VehicleId)
+             .IsRequired()
+             .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

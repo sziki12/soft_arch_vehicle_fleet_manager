@@ -12,5 +12,6 @@ namespace SoftArchVehicleFleetManager.Models
 
         // Navigation Properties
         [JsonIgnore] public List<Interface> Interfaces { get; set; } = new();
+        [JsonIgnore] public List<Module> Modules { get; set; } = new();
     }
 }

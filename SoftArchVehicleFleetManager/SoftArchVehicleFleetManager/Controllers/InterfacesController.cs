@@ -92,7 +92,7 @@ namespace SoftArchVehicleFleetManager.Controllers
 
             if (updateDto.ManufacturerId is not null)
             {
-                if (!await _db.Fleets.AsNoTracking().AnyAsync(f => f.Id == updateDto.ManufacturerId))
+                if (!await _db.Manufacturers.AsNoTracking().AnyAsync(f => f.Id == updateDto.ManufacturerId))
                     return BadRequest(new { error = "Invalid ManufacturerId." });
 
                 interface_.ManufacturerId = (int)updateDto.ManufacturerId;

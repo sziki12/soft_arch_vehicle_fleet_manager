@@ -7,8 +7,14 @@ namespace SoftArchVehicleFleetManager.Models
         public int Id { get; set; }
         public string HardwareId { get; set; }
 
-        [JsonIgnore] public Manufacturer Manufacturer { get; set; }
-        [JsonIgnore] public Interface Interface { get; set; }
-        [JsonIgnore] public Vehicle? Vehicle { get; set; }
+        // Foreign Keys
+        public int ManufacturerId { get; set; }
+        public int InterfaceId { get; set; }
+        public int VehicleId { get; set; }
+
+        // Navigation Properties
+        [JsonIgnore] public Manufacturer Manufacturer { get; set; } = default!;
+        [JsonIgnore] public Interface Interface { get; set; } = default!;
+        [JsonIgnore] public Vehicle Vehicle { get; set; } = default!;
     }
 }
