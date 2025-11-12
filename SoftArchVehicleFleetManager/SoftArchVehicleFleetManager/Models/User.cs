@@ -4,6 +4,7 @@ namespace SoftArchVehicleFleetManager.Models
 {
     public class User
     {
+        // Primary Key
         public int Id { get; set; }
 
         // Properties
