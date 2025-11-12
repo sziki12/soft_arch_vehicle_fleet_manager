@@ -7,5 +7,8 @@
 
         // Properties
         public string Name { get; set; }
+
+        // Navigation Properties
+        public List<Vehicle> Vehicles { get; set; } = new();
     }
 }
