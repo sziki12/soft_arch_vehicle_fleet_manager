@@ -1,2 +1,3 @@
-/SoftArchVehicleFleetManager/.vs
-/SoftArchVehicleFleetManager/SoftArchVehicleFleetManager/obj
+**/.vs/
+**/obj/
+**/bin/
