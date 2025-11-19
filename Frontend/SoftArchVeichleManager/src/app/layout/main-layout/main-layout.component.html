@@ -1,1 +1,15 @@
-<p>main-layout works!</p>
+<div class="app-container">
+    <header class="top-bar">
+        <h1>Fleet App</h1>
+    </header>
+
+    <div class="content-grid">
+        <div class="left-panel">
+            <ng-content select="[left-side]"></ng-content>
+        </div>
+
+        <div class="right-panel">
+            <ng-content select="[right-side]"></ng-content>
+        </div>
+    </div>
+</div>

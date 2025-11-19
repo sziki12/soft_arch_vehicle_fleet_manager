@@ -1,0 +1,53 @@
+.app-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-app);
+}
+
+.top-bar {
+    background: white;
+    color: var(--text-main);
+    padding: 0 30px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    z-index: 10;
+}
+
+.top-bar h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--primary);
+}
+
+
+.content-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 2fr 3fr;
+    gap: 20px;
+    padding: 20px;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.left-panel {
+    overflow-y: auto;
+    padding-right: 8px;
+    max-width: 600px;
+}
+
+.right-panel {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 30px;
+    box-shadow: var(--shadow-md);
+    overflow-y: auto;
+    height: 100%;
+    box-sizing: border-box;
+}

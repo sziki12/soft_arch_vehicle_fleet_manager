@@ -1,1 +1,32 @@
-<p>vehicle-form works!</p>
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <h2>{{ vehicle.vehicleId ? 'Jármű Szerkesztése' : 'Új Jármű Rögzítése' }}</h2>
+
+    <div class="form-grid">
+
+        <div class="form-group full-width">
+            <label>Jármű Neve</label>
+            <input formControlName="vehicleName" type="text" placeholder="pl. Igazgatói Audi">
+        </div>
+
+        <div class="form-group">
+            <label>Modell</label>
+            <input formControlName="vehicleModel" type="text" placeholder="pl. A6 Avant">
+        </div>
+
+        <div class="form-group">
+            <label>Évjárat</label>
+            <input formControlName="vehicleYear" type="number">
+        </div>
+
+        <div class="form-group">
+            <label>Flotta Azonosító</label>
+            <input formControlName="fleetId" type="number">
+        </div>
+
+    </div>
+
+    <div class="actions">
+        <button type="button" (click)="cancel.emit()">Mégse</button>
+        <button type="submit" [disabled]="form.invalid">Mentés</button>
+    </div>
+</form>

@@ -1,0 +1,49 @@
+<app-main-layout>
+
+    <div left-side>
+        <button (click)="createNew()" class="create-btn">
+            + ÚJ JÁRMŰ
+        </button>
+
+        <div *ngIf="loading">Betöltés...</div>
+
+        <app-card *ngFor="let v of vehicles" [isActive]="selectedVehicle?.vehicleId === v.vehicleId"
+            (click)="selectVehicle(v)">
+
+            <div class="card-header">
+                <h3 class="card-title">{{ v.vehicleName }}</h3>
+
+                <div class="card-actions">
+                    <button (click)="onGenerateReport(v.vehicleId, $event)" class="btn-icon btn-report"
+                        title="Riport Generálása">
+                        📊
+                    </button>
+
+                    <button (click)="onDelete(v.vehicleId, $event)" class="btn-icon btn-delete" title="Törlés">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+
+            <p class="card-subtitle">
+                {{ v.vehicleModel }}
+            </p>
+
+            <small class="card-meta">
+                {{ v.vehicleYear }} | Flotta: #{{ v.fleetId }}
+            </small>
+
+        </app-card>
+    </div>
+
+    <div right-side>
+        <app-vehicle-form *ngIf="selectedVehicle" [vehicle]="selectedVehicle" (save)="onSave($event)"
+            (cancel)="selectedVehicle = null">
+        </app-vehicle-form>
+
+        <div *ngIf="!selectedVehicle" class="empty-state">
+            <h2>Válassz egy járművet</h2>
+        </div>
+    </div>
+
+</app-main-layout>
