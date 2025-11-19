@@ -1,6 +1,9 @@
 <div class="app-container">
     <header class="top-bar">
-        <h1>Fleet App</h1>
+        <div class="title-group">
+            <h1>{{ title }}</h1>
+            <small *ngIf="subtitle">{{ subtitle }}</small>
+        </div>
     </header>
 
     <div class="content-grid">

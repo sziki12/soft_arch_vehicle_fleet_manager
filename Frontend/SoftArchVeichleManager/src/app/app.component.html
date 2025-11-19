@@ -1,1 +1,23 @@
-<app-fleet-manager-page></app-fleet-manager-page>
+<div class="app-shell">
+
+    <header class="app-header">
+        <div class="brand">
+            <div class="brand-title">Fleet Platform</div>
+            <div class="brand-caption">Mock data playground</div>
+        </div>
+
+        <div class="view-toggle">
+            <button type="button" [class.active]="activeScreen === 'fleet'" (click)="setScreen('fleet')">
+                Vehicles
+            </button>
+            <button type="button" [class.active]="activeScreen === 'alarm'" (click)="setScreen('alarm')">
+                Alarms
+            </button>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <app-fleet-manager-page *ngIf="activeScreen === 'fleet'"></app-fleet-manager-page>
+        <app-alarm-manager-page *ngIf="activeScreen === 'alarm'"></app-alarm-manager-page>
+    </main>
+</div>

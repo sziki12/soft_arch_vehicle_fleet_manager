@@ -1,0 +1,49 @@
+<app-main-layout title="Alarm center" subtitle="Latest alerts per fleet">
+
+    <div left-side>
+        <button (click)="createNew()" class="create-btn">
+            + New Alarm
+        </button>
+
+        <div *ngIf="loading">Loading...</div>
+
+        <app-card *ngFor="let alarm of alarms" [isActive]="selectedAlarm?.alarmId === alarm.alarmId"
+            (click)="selectAlarm(alarm)">
+
+            <div class="card-header">
+                <h3 class="card-title">Alarm #{{ alarm.alarmId || 'new' }}</h3>
+
+                <div class="card-actions">
+                    <button (click)="onDelete(alarm.alarmId, $event)" class="btn-icon btn-delete" title="Delete">
+                        ×
+                    </button>
+                </div>
+            </div>
+
+            <p class="card-subtitle">
+                Fleet: #{{ alarm.alarmFleet }}
+            </p>
+
+            <dl class="json-list">
+                <div class="json-list-row" *ngFor="let entry of getAlarmEntries(alarm)">
+                    <dt>{{ entry.key }}</dt>
+                    <dd>{{ entry.value }}</dd>
+                </div>
+            </dl>
+
+        </app-card>
+
+    </div>
+
+    <div right-side>
+        <app-alarm-form *ngIf="selectedAlarm" [alarm]="selectedAlarm" (save)="onSave($event)"
+            (cancel)="selectedAlarm = null">
+        </app-alarm-form>
+
+        <div *ngIf="!selectedAlarm" class="empty-state">
+            <h2>Select an alarm</h2>
+            <p>Or create a fresh one with the button on the left.</p>
+        </div>
+    </div>
+
+</app-main-layout>

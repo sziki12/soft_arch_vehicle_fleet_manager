@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-main-layout',
@@ -9,5 +9,6 @@ import { Component } from '@angular/core';
   styleUrl: './main-layout.component.css'
 })
 export class MainLayoutComponent {
-
+  @Input() title = 'Fleet App';
+  @Input() subtitle = '';
 }
