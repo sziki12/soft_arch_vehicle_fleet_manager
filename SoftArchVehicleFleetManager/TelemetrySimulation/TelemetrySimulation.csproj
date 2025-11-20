@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HiveMQtt" Version="0.35.3" />
+    <ProjectReference Include="..\TelemetryService\TelemetryService.csproj" />
   </ItemGroup>
 
 </Project>
