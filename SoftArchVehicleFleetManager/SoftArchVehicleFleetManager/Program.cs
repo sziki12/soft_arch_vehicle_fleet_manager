@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using SoftArchVehicleFleetManager.Converters;
 using SoftArchVehicleFleetManager.Data;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,15 @@ builder.Services.AddSwaggerGen();
 var dbPath = Path.Combine(AppContext.BaseDirectory, "app.db");
 builder.Services.AddDbContext<FleetDbContext>(opts =>
     opts.UseSqlite($"Data Source={dbPath}"));
+
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new UserRoleJsonConverter());
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter(namingPolicy: null, allowIntegerValues: false));
+    });
 
 var app = builder.Build();
 

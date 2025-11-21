@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using SoftArchVehicleFleetManager.Enums;
+using System.Text.Json.Serialization;
 
 namespace SoftArchVehicleFleetManager.Models
 {
@@ -8,6 +9,7 @@ namespace SoftArchVehicleFleetManager.Models
         public int Id { get; set; }
 
         // Properties
+        public UserRole Role { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
 

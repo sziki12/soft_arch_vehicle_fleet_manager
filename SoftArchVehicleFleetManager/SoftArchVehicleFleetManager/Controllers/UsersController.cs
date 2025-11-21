@@ -23,6 +23,7 @@ namespace SoftArchVehicleFleetManager.Controllers
                 .Select(u => new UserDto(
                     u.Id,
                     u.Username,
+                    u.Role,
                     u.ManufacturerId,
                     u.FleetId
                 ))
@@ -40,6 +41,7 @@ namespace SoftArchVehicleFleetManager.Controllers
                 : new UserDto(
                     user.Id,
                     user.Username,
+                    user.Role,
                     user.ManufacturerId,
                     user.FleetId
                 );
@@ -48,28 +50,20 @@ namespace SoftArchVehicleFleetManager.Controllers
         [HttpPost]
         public async Task<ActionResult<UserDto>> Create(UserCreateDto createDto)
         {
-            // Validate foreign keys
-            if (createDto.ManufacturerId is int mid &&
-                !await _db.Manufacturers.AsNoTracking().AnyAsync(m => m.Id == mid))
-                return BadRequest(new { error = "Invalid ManufacturerId." });
-
-            if (createDto.FleetId is int fid &&
-                !await _db.Fleets.AsNoTracking().AnyAsync(f => f.Id == fid))
-                return BadRequest(new { error = "Invalid FleetId." });
-
             var user = new User
             {
                 Username = createDto.Username,
+                Role = createDto.Role,
                 // TODO: Hash password before storing
                 Password = createDto.Password,
-                ManufacturerId = createDto.ManufacturerId,
-                FleetId = createDto.FleetId
+                ManufacturerId = null,
+                FleetId = null
             };
 
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
 
-            var result = new UserDto(user.Id, user.Username, user.ManufacturerId, user.FleetId);
+            var result = new UserDto(user.Id, user.Username, user.Role, user.ManufacturerId, user.FleetId);
             return CreatedAtAction(nameof(GetOne), new { id = user.Id }, result);
         }
 
@@ -84,6 +78,12 @@ namespace SoftArchVehicleFleetManager.Controllers
             {
                 // TODO: Hash password before storing
                 user.Password = updateDto.Password;
+            }
+
+            if (updateDto.Role is not null)
+            {
+                // TODO: Hash password before storing
+                user.Role = (Enums.UserRole)updateDto.Role;
             }
 
             if (updateDto.ManufacturerId != user.ManufacturerId)
