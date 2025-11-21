@@ -4,7 +4,7 @@ using HiveMQtt.MQTT5.ReasonCodes;
 using HiveMQtt.MQTT5.Types;
 using System.Security;
 
-namespace TelemetryService
+namespace TelemetryServiceLib
 {
     public class HiveClient
     {

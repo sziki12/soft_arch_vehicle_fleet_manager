@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TelemetryService\TelemetryService.csproj" />
+    <ProjectReference Include="..\TelemetryServiceLib\TelemetryServiceLib.csproj" />
   </ItemGroup>
 
 </Project>

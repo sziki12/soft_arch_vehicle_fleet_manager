@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoftArchVehicleFleetManager
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelemetrySimulation", "TelemetrySimulation\TelemetrySimulation.csproj", "{1069DAB7-C1C3-4219-AC77-7641FA2B60AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelemetryService", "TelemetryService\TelemetryService.csproj", "{D7C3E5BA-DF72-4CA0-9A79-6041D022C9E4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelemetryServiceLib", "TelemetryServiceLib\TelemetryServiceLib.csproj", "{50E6D4B4-47B9-4F64-B67E-F249CFA93040}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{1069DAB7-C1C3-4219-AC77-7641FA2B60AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1069DAB7-C1C3-4219-AC77-7641FA2B60AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1069DAB7-C1C3-4219-AC77-7641FA2B60AE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D7C3E5BA-DF72-4CA0-9A79-6041D022C9E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D7C3E5BA-DF72-4CA0-9A79-6041D022C9E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D7C3E5BA-DF72-4CA0-9A79-6041D022C9E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D7C3E5BA-DF72-4CA0-9A79-6041D022C9E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50E6D4B4-47B9-4F64-B67E-F249CFA93040}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50E6D4B4-47B9-4F64-B67E-F249CFA93040}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50E6D4B4-47B9-4F64-B67E-F249CFA93040}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50E6D4B4-47B9-4F64-B67E-F249CFA93040}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
