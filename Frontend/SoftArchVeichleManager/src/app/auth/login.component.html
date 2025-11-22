@@ -1,1 +1,59 @@
-<p>login works!</p>
+<div class="login-shell">
+    <div class="login-card">
+        <div class="login-head">
+            <h2>{{ mode === 'login' ? 'Sign in' : 'Create account' }}</h2>
+            <p>Choose your role and access the right workspace.</p>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" class="login-form">
+            <div *ngIf="mode === 'register'" class="form-field">
+                <label>Name</label>
+                <input type="text" formControlName="name" placeholder="Your name">
+                <small class="field-error" *ngIf="submitted && mode === 'register' && form.controls['name'].invalid">
+                    Name is required for registration.
+                </small>
+            </div>
+
+            <div class="form-field">
+                <label>Email</label>
+                <input type="email" formControlName="email" placeholder="you@example.com">
+                <small class="field-error" *ngIf="submitted && form.controls['email'].invalid">
+                    Enter a valid email.
+                </small>
+            </div>
+
+            <div class="form-field">
+                <label>Password</label>
+                <input type="password" formControlName="password" placeholder="••••••••">
+                <small class="field-error" *ngIf="submitted && form.controls['password'].invalid">
+                    Password must be at least 4 characters.
+                </small>
+            </div>
+
+            <div class="form-field">
+                <label>Role</label>
+                <div class="role-toggle">
+                    <button type="button" [class.active]="form.value.role === 'manager'" (click)="form.patchValue({ role: 'manager' })">
+                        Fleet manager
+                    </button>
+                    <button type="button" [class.active]="form.value.role === 'admin'" (click)="form.patchValue({ role: 'admin' })">
+                        Admin
+                    </button>
+                </div>
+            </div>
+
+            <div class="error" *ngIf="error">{{ error }}</div>
+
+            <button type="submit" [disabled]="loading">
+                {{ loading ? 'Please wait...' : (mode === 'login' ? 'Sign in' : 'Register') }}
+            </button>
+        </form>
+
+        <div class="switch">
+            <span>{{ mode === 'login' ? "Don't have an account?" : 'Already have an account?' }}</span>
+            <button type="button" (click)="toggleMode()">
+                {{ mode === 'login' ? 'Register' : 'Back to login' }}
+            </button>
+        </div>
+    </div>
+</div>
