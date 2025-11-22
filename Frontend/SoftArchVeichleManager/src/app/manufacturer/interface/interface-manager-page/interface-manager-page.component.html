@@ -1,0 +1,42 @@
+<app-main-layout title="Interface manager" subtitle="Interfaces">
+
+    <div left-side>
+        <button (click)="createNew()" class="create-btn">
+            + ÚJ INTERFACE
+        </button>
+
+        <div *ngIf="loading">Betöltés...</div>
+
+        <app-card *ngFor="let i of interfaces" [isActive]="selectedInterface?.interfaceId === i.interfaceId"
+            (click)="selectInterface(i)">
+
+            <div class="interfaceId">
+                <h3 class="interface-title">{{ i.interfaceName }}</h3>
+
+                <div class="card-actions">
+                    <button (click)="onDelete(i.interfaceId, $event)" class="btn-icon btn-delete" title="Törlés">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+
+            <p class="interface-subtitle">
+                {{ i.interfaceName }}
+            </p>
+
+        </app-card>
+    </div>
+
+    <div right-side>
+        <app-interface-form *ngIf="selectedInterface" [interface]="selectedInterface!" (save)="onSave($event)"
+            (cancel)="selectedInterface = null">
+        </app-interface-form>
+
+        <div *ngIf="!selectedInterface" class="empty-state">
+            <h2>Válassz egy interface-t</h2>
+        </div>
+    </div>
+
+</app-main-layout>
+
+

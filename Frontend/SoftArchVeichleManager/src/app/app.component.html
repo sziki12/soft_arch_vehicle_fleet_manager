@@ -20,6 +20,12 @@
                     <button type="button" [class.active]="activeScreen === 'alarm'" (click)="setScreen('alarm')">
                         Alarms
                     </button>
+                    <button type="button" [class.active]="activeScreen === 'interface'" (click)="setScreen('interface')">
+                        Interfaces
+                    </button>
+                    <button type="button" [class.active]="activeScreen === 'module'" (click)="setScreen('module')">
+                        Modules
+                    </button>
                 </div>
 
                 <button class="logout-btn" (click)="logout()">Logout</button>
@@ -30,6 +36,8 @@
             <ng-container *ngIf="currentRole === 'manager'; else adminView">
                 <app-fleet-manager-page *ngIf="activeScreen === 'fleet'"></app-fleet-manager-page>
                 <app-alarm-manager-page *ngIf="activeScreen === 'alarm'"></app-alarm-manager-page>
+                <app-interface-manager-page *ngIf="activeScreen === 'interface'"></app-interface-manager-page>
+                <app-module-manager-page *ngIf="activeScreen === 'module'"></app-module-manager-page>
             </ng-container>
             <ng-template #adminView>
                 <app-admin-dashboard></app-admin-dashboard>
