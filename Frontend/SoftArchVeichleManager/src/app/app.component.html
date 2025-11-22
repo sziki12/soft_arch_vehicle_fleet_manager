@@ -6,18 +6,34 @@
             <div class="brand-caption">Mock data playground</div>
         </div>
 
-        <div class="view-toggle">
-            <button type="button" [class.active]="activeScreen === 'fleet'" (click)="setScreen('fleet')">
-                Vehicles
-            </button>
-            <button type="button" [class.active]="activeScreen === 'alarm'" (click)="setScreen('alarm')">
-                Alarms
-            </button>
+        <div class="header-actions">
+            <div class="role-toggle">
+                <button type="button" [class.active]="currentRole === 'manager'" (click)="setRole('manager')">
+                    Fleet manager
+                </button>
+                <button type="button" [class.active]="currentRole === 'admin'" (click)="setRole('admin')">
+                    Admin
+                </button>
+            </div>
+
+            <div class="view-toggle" *ngIf="currentRole === 'manager'">
+                <button type="button" [class.active]="activeScreen === 'fleet'" (click)="setScreen('fleet')">
+                    Vehicles
+                </button>
+                <button type="button" [class.active]="activeScreen === 'alarm'" (click)="setScreen('alarm')">
+                    Alarms
+                </button>
+            </div>
         </div>
     </header>
 
     <main class="app-main">
-        <app-fleet-manager-page *ngIf="activeScreen === 'fleet'"></app-fleet-manager-page>
-        <app-alarm-manager-page *ngIf="activeScreen === 'alarm'"></app-alarm-manager-page>
+        <ng-container *ngIf="currentRole === 'manager'; else adminView">
+            <app-fleet-manager-page *ngIf="activeScreen === 'fleet'"></app-fleet-manager-page>
+            <app-alarm-manager-page *ngIf="activeScreen === 'alarm'"></app-alarm-manager-page>
+        </ng-container>
+        <ng-template #adminView>
+            <app-admin-dashboard></app-admin-dashboard>
+        </ng-template>
     </main>
 </div>

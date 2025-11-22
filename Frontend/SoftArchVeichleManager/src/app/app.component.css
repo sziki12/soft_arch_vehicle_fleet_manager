@@ -39,6 +39,42 @@
     margin: 4px 0 0 0;
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.role-toggle {
+    display: inline-flex;
+    background-color: #0f172a;
+    border-radius: 999px;
+    padding: 4px;
+    gap: 4px;
+}
+
+.role-toggle button {
+    border: none;
+    background: transparent;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #cbd5e1;
+    transition: all 0.2s ease;
+}
+
+.role-toggle button.active {
+    background-color: #0ea5e9;
+    color: #0b1220;
+    box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.35);
+}
+
+.role-toggle button:not(.active):hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+}
+
 .view-toggle {
     display: inline-flex;
     background-color: var(--bg-app);
