@@ -1,1 +1,21 @@
-<p>interface-form works!</p>
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <h2>{{ interface.interfaceId ? 'Interface Szerkesztése' : 'Új Interface Rögzítése' }}</h2>
+
+    <div class="form-grid">
+
+        <div class="form-group full-width">
+            <label>Interface Neve</label>
+            <input formControlName="interfaceName" type="text" placeholder="pl. Speed Meter Interface">
+        </div>
+
+        <div class="form-group">
+            <label>Interface Json</label>
+            <input formControlName="interfaceJson" type="text" placeholder='{"speed":"[integer, km/h]","rpm":"[integer, rpm]"}'>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button type="button" (click)="cancel.emit()">Mégse</button>
+        <button type="submit" [disabled]="form.invalid">Mentés</button>
+    </div>
+</form>
