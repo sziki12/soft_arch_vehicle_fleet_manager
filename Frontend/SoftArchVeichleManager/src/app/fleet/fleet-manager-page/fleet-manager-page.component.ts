@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { finalize } from 'rxjs/operators';
 import { Vehicle } from '../../models/vehicle.model';
 import { VehicleService } from '../../services/vehicle.service';
-import { CommonModule } from '@angular/common';
 import { MainLayoutComponent } from '../../layout/main-layout/main-layout.component';
 import { CardComponent } from '../../../shared/card/card.component';
 import { VehicleFormComponent } from '../vehicle-form/vehicle-form.component';
-
 
 @Component({
   selector: 'app-fleet-manager-page',
@@ -17,13 +17,16 @@ import { VehicleFormComponent } from '../vehicle-form/vehicle-form.component';
     VehicleFormComponent
   ],
   templateUrl: './fleet-manager-page.component.html',
-
   styleUrls: ['./fleet-manager-page.component.css']
 })
 export class FleetManagerPageComponent implements OnInit {
   vehicles: Vehicle[] = [];
   selectedVehicle: Vehicle | null = null;
   loading = false;
+  reportLoadingId: number | null = null;
+  reportPayloadEntries: Array<{ key: string; value: string }> = [];
+  reportVehicleId: number | null = null;
+  reportHeaderDate: Date | null = null;
 
   constructor(private vehicleService: VehicleService) { }
 
@@ -31,7 +34,7 @@ export class FleetManagerPageComponent implements OnInit {
     this.loadData();
   }
 
-  loadData() {
+  loadData(): void {
     this.loading = true;
     this.vehicleService.getVehicles().subscribe(data => {
       this.vehicles = data;
@@ -39,13 +42,11 @@ export class FleetManagerPageComponent implements OnInit {
     });
   }
 
-  selectVehicle(v: Vehicle) {
-
+  selectVehicle(v: Vehicle): void {
     this.selectedVehicle = { ...v };
   }
 
-  createNew() {
-
+  createNew(): void {
     this.selectedVehicle = {
       vehicleId: 0,
       vehicleName: '',
@@ -55,15 +56,14 @@ export class FleetManagerPageComponent implements OnInit {
     };
   }
 
-  onDelete(id: number, event: Event) {
+  onDelete(id: number, event: Event): void {
     event.stopPropagation();
-    if (confirm('Biztos törlöd?')) {
-
+    if (confirm('Are you sure you want to delete this vehicle?')) {
       this.vehicleService.deleteVehicle(id).subscribe(() => this.loadData());
     }
   }
 
-  onSave(vehicle: Vehicle) {
+  onSave(vehicle: Vehicle): void {
     this.loading = true;
     this.vehicleService.saveVehicle(vehicle).subscribe(() => {
       this.selectedVehicle = null;
@@ -71,10 +71,36 @@ export class FleetManagerPageComponent implements OnInit {
     });
   }
 
-  onGenerateReport(id: number, event: Event) {
+  onGenerateReport(id: number, event: Event): void {
     event.stopPropagation();
-    alert(`📊 Riport generálása elindítva a(z) #${id} járműhöz...`);
+    this.reportLoadingId = id;
+
+    this.vehicleService.generateVehicleReport(id)
+      .pipe(finalize(() => this.reportLoadingId = null))
+      .subscribe({
+        next: report => {
+          this.reportVehicleId = report.vehicleId;
+          this.reportHeaderDate = new Date();
+          this.reportPayloadEntries = this.getReportEntries(report.payload);
+        },
+        error: () => alert('Report generation failed. Please try again.')
+      });
   }
 
+  closeReport(): void {
+    this.reportVehicleId = null;
+    this.reportHeaderDate = null;
+    this.reportPayloadEntries = [];
+  }
 
+  private getReportEntries(payload: unknown): Array<{ key: string; value: string }> {
+    if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+      return Object.entries(payload as Record<string, unknown>).map(([key, value]) => ({
+        key,
+        value: typeof value === 'object' ? JSON.stringify(value) : String(value)
+      }));
+    }
+
+    return [{ key: 'data', value: String(payload) }];
+  }
 }

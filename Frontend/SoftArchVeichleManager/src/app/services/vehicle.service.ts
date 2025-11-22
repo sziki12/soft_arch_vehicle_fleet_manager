@@ -50,4 +50,20 @@ export class VehicleService {
             }, 400);
         });
     }
+
+    generateVehicleReport(vehicleId: number): Observable<{ vehicleId: number; generatedAt: string; payload: unknown }> {
+        const mockPayload = {
+            status: 'OK',
+            mileageKm: 128430,
+            fuelLevelPercent: 62,
+            tirePressurePsi: { frontLeft: 33, frontRight: 33, rearLeft: 34, rearRight: 34 },
+            lastService: '2024-04-12T09:30:00Z'
+        };
+
+        return of({
+            vehicleId,
+            generatedAt: new Date().toISOString(),
+            payload: mockPayload
+        }).pipe(delay(500));
+    }
 }

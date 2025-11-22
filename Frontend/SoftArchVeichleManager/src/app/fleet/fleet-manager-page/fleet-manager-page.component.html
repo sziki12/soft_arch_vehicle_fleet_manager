@@ -2,10 +2,10 @@
 
     <div left-side>
         <button (click)="createNew()" class="create-btn">
-            + ÚJ JÁRMŰ
+            + New Vehicle
         </button>
 
-        <div *ngIf="loading">Betöltés...</div>
+        <div *ngIf="loading">Loading...</div>
 
         <app-card *ngFor="let v of vehicles" [isActive]="selectedVehicle?.vehicleId === v.vehicleId"
             (click)="selectVehicle(v)">
@@ -15,12 +15,12 @@
 
                 <div class="card-actions">
                     <button (click)="onGenerateReport(v.vehicleId, $event)" class="btn-icon btn-report"
-                        title="Riport Generálása">
-                        📊
+                        [disabled]="reportLoadingId === v.vehicleId" title="Generate report">
+                        {{ reportLoadingId === v.vehicleId ? 'Generating...' : 'Report' }}
                     </button>
 
-                    <button (click)="onDelete(v.vehicleId, $event)" class="btn-icon btn-delete" title="Törlés">
-                        🗑️
+                    <button (click)="onDelete(v.vehicleId, $event)" class="btn-icon btn-delete" title="Delete">
+                        Delete
                     </button>
                 </div>
             </div>
@@ -30,7 +30,7 @@
             </p>
 
             <small class="card-meta">
-                {{ v.vehicleYear }} | Flotta: #{{ v.fleetId }}
+                {{ v.vehicleYear }} | Fleet: #{{ v.fleetId }}
             </small>
 
         </app-card>
@@ -42,8 +42,36 @@
         </app-vehicle-form>
 
         <div *ngIf="!selectedVehicle" class="empty-state">
-            <h2>Válassz egy járművet</h2>
+            <h2>Select a vehicle</h2>
         </div>
     </div>
 
 </app-main-layout>
+
+<div class="report-modal-backdrop" *ngIf="reportVehicleId" (click)="closeReport()">
+    <div class="report-modal" (click)="$event.stopPropagation()">
+        <div class="report-modal__header">
+            <div>
+                <p class="report-modal__eyebrow">Vehicle report</p>
+                <h3>Vehicle #{{ reportVehicleId }}</h3>
+                <small>{{ reportHeaderDate | date: 'medium' }}</small>
+            </div>
+            <button class="report-modal__close" (click)="closeReport()">×</button>
+        </div>
+
+        <table class="report-table" *ngIf="reportPayloadEntries.length">
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let entry of reportPayloadEntries">
+                    <td>{{ entry.key }}</td>
+                    <td>{{ entry.value }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
