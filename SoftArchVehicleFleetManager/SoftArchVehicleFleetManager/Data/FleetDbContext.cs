@@ -13,6 +13,7 @@ namespace SoftArchVehicleFleetManager.Data
         public DbSet<Vehicle> Vehicles => Set<Vehicle>();
         public DbSet<Interface> Interfaces => Set<Interface>();
         public DbSet<Module> Modules => Set<Module>();
+        public DbSet<Alarm> Alarms => Set<Alarm>();
 
         protected override void OnModelCreating(ModelBuilder b)
         {
@@ -62,6 +63,15 @@ namespace SoftArchVehicleFleetManager.Data
              .HasForeignKey(m => m.VehicleId)
              .IsRequired()
              .OnDelete(DeleteBehavior.Restrict);
+
+            // Alarm / Fleet: Many-to-One
+            b.Entity<Alarm>()
+             .HasOne(m => m.Fleet)
+             .WithMany(m => m.Alarms)
+             .HasForeignKey(i => i.FleetId)
+             .IsRequired()
+             .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

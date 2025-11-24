@@ -12,5 +12,6 @@ namespace SoftArchVehicleFleetManager.Models
 
         // Navigation Properties
         [JsonIgnore] public List<Vehicle> Vehicles { get; set; } = new();
+        [JsonIgnore] public List<Alarm> Alarms { get; set; } = new();
     }
 }

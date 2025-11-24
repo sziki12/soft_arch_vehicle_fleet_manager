@@ -2,67 +2,67 @@
 using Microsoft.EntityFrameworkCore;
 
 using SoftArchVehicleFleetManager.Data;
-using SoftArchVehicleFleetManager.Dtos.Fleets;
+using SoftArchVehicleFleetManager.Dtos.Manufacturers;
 using SoftArchVehicleFleetManager.Models;
 
 namespace SoftArchVehicleFleetManager.Controllers
 {
     [ApiController]
-    [Route("api/fleets")]
-    public class FleetsController : ControllerBase
+    [Route("api/manufacturers")]
+    public class ManufacturersController : ControllerBase
     {
         private readonly FleetDbContext _db;
-        public FleetsController(FleetDbContext db) => _db = db;
+        public ManufacturersController(FleetDbContext db) => _db = db;
 
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<FleetDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<ManufacturerDto>>> GetAll()
         {
-            var fleets = await _db.Fleets
+            var manufacturers = await _db.Manufacturers
                 .AsNoTracking()
-                .Select(f => new FleetDto(
-                    f.Id,
-                    f.Name
+                .Select(m => new ManufacturerDto(
+                    m.Id,
+                    m.Name
                 ))
                 .ToListAsync();
 
-            return Ok(fleets);
+            return Ok(manufacturers);
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<FleetDto>> GetOne(int id)
+        public async Task<ActionResult<ManufacturerDto>> GetOne(int id)
         {
-            var manufacturer = await _db.Fleets.FindAsync(id);
+            var manufacturer = await _db.Manufacturers.FindAsync(id);
             return manufacturer is null
                 ? NotFound()
-                : new FleetDto(
+                : new ManufacturerDto(
                     manufacturer.Id,
                     manufacturer.Name
                 );
         }
 
         [HttpPost]
-        public async Task<ActionResult<FleetDto>> Create(FleetCreateDto createDto)
+        public async Task<ActionResult<ManufacturerDto>> Create(ManufacturerCreateDto createDto)
         {
-            var fleet = new Fleet
+            var manufacturer = new Manufacturer
             {
                 Name = createDto.Name
             };
 
-            await _db.Fleets.AddAsync(fleet);
+            await _db.Manufacturers.AddAsync(manufacturer);
             await _db.SaveChangesAsync();
 
-            var result = new FleetDto(fleet.Id, fleet.Name);
-            return CreatedAtAction(nameof(GetOne), new { id = fleet.Id }, result);
+            var result = new ManufacturerDto(manufacturer.Id, manufacturer.Name);
+            return CreatedAtAction(nameof(GetOne), new { id = manufacturer.Id }, result);
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, FleetUpdateDto updateDto)
+        public async Task<IActionResult> Update(int id, ManufacturerUpdateDto updateDto)
         {
-            var fleet = await _db.Fleets.FindAsync(id);
-            if (fleet is null) return NotFound();
+            var manufacturer = await _db.Manufacturers.FindAsync(id);
+            if (manufacturer is null) return NotFound();
 
-            fleet.Name = updateDto.Name;
+            manufacturer.Name = updateDto.Name;
 
             await _db.SaveChangesAsync();
             return NoContent();
@@ -71,10 +71,10 @@ namespace SoftArchVehicleFleetManager.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var fleet = await _db.Fleets.FindAsync(id);
-            if (fleet is null) return NotFound();
+            var manufacturer = await _db.Manufacturers.FindAsync(id);
+            if (manufacturer is null) return NotFound();
 
-            _db.Fleets.Remove(fleet);
+            _db.Manufacturers.Remove(manufacturer);
             await _db.SaveChangesAsync();
             return NoContent();
         }
