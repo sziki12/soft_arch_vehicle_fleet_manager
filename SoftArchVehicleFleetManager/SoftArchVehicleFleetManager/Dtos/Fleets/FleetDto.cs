@@ -1,7 +1,9 @@
-﻿namespace SoftArchVehicleFleetManager.Dtos.Fleets
+﻿using System.Text.Json.Serialization;
+
+namespace SoftArchVehicleFleetManager.Dtos.Fleets
 {
     public record FleetDto(
-        int Id,
-        string Name
+        [property: JsonPropertyName("FLEET_ID")] int Id,
+        [property: JsonPropertyName("FLEET_NAME")] string Name
     );
 }
