@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using SoftArchVehicleFleetManager.Data;
+using SoftArchVehicleFleetManager.Dtos.Alarms;
 using SoftArchVehicleFleetManager.Dtos.Vehicles;
 using SoftArchVehicleFleetManager.Models;
 
@@ -16,8 +17,25 @@ namespace SoftArchVehicleFleetManager.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<VehicleDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<VehicleDto>>> Get([FromQuery(Name = "fleet_id")] int? fleetId)
         {
+            if (fleetId is not null)
+            {
+                var fleetVehicles = await _db.Fleets
+                      .Where(f => f.Id == fleetId)
+                      .SelectMany(f => f.Vehicles)
+                      .ToListAsync();
+
+                return Ok(fleetVehicles.Select(v => new VehicleDto(
+                    v.Id,
+                    v.Name,
+                    v.LicensePlate,
+                    v.Model,
+                    v.Year,
+                    v.FleetId
+                )));
+            }
+
             var vehicles = await _db.Vehicles
                 .AsNoTracking()
                 .Select(v => new VehicleDto(
