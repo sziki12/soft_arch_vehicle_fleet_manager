@@ -6,22 +6,19 @@ namespace TelemetrySimulation
 {
     internal class SimulatedModule
     {
-        public string HardwareAddress { get; set; }
-
-        public string OperatorName { get; set; }
+        public string FleetName { get; set; }
 
         public string ModulManufacturer { get; set; }
 
-        public string PlateNumber { get; set; }
+        public string HardwareAddress { get; set; }
 
         private HiveClient hiveClient;
 
-        public SimulatedModule(string hardwareAddress, string operatorName, string modulManufacturer, string plateNumber)
+        public SimulatedModule(string fleetName, string modulManufacturer, string hardwareAddress)
         {
-            HardwareAddress = hardwareAddress;
-            OperatorName = operatorName;
+            FleetName = fleetName;
             ModulManufacturer = modulManufacturer;
-            PlateNumber = plateNumber;
+            HardwareAddress = hardwareAddress;
 
             try
             {
@@ -44,13 +41,10 @@ namespace TelemetrySimulation
         {
             var messageJson = new JsonObject
             {
-                ["header"] = new JsonObject() 
+                ["header"] = new JsonObject()
                 {
                     ["hardware"] = HardwareAddress,
-                    ["operator"] = OperatorName,
                     ["manufacturer"] = ModulManufacturer,
-                    ["plate"] = PlateNumber
-
                 },
                 ["data"] = new JsonObject()
                 {
@@ -63,10 +57,10 @@ namespace TelemetrySimulation
 
             if (printMessage) 
             {
-                Console.WriteLine($"Modul {HardwareAddress} publishing payload:\n {message}\n\n\n");
+                Console.WriteLine($"Modul {HardwareAddress} publishing payload:\n {message} \n\n\n");
             }
 
-            string topic = $"telemetry/{OperatorName}/{PlateNumber}/{ModulManufacturer}/{HardwareAddress}";
+            string topic = $"telemetry/{FleetName}/{ModulManufacturer}/{HardwareAddress}";
             hiveClient.PublishToTopic(topic, message);
         }
     }

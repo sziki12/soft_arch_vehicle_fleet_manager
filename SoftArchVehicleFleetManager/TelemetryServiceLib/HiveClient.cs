@@ -6,6 +6,8 @@ using System.Security;
 
 namespace TelemetryServiceLib
 {
+
+
     public class HiveClient
     {
         public string ClientName { get; set; }
@@ -22,40 +24,42 @@ namespace TelemetryServiceLib
             SecureString secure = new SecureString();
 
             foreach (char c in value)
+            {
                 secure.AppendChar(c);
+            }
 
             secure.MakeReadOnly();
             return secure;
         }
 
-        private HiveMQClient? MakeBrokerConnection()
+        private HiveMQClient MakeBrokerConnection()
         {
+            string? password = Environment.GetEnvironmentVariable("HIVEMQ_PASSWORD");
+
+            if (string.IsNullOrEmpty(password))
+            {
+                throw new Exception("HIVEMQ_PASSWORD environment variable is not set");
+            }
+
             var options = new HiveMQClientOptions
             {
                 Host = "61c51e819d6b4c39a8461d79c104c9e7.s1.eu.hivemq.cloud",
                 Port = 8883,
                 UseTLS = true,
                 UserName = "simulationUser",
-                Password = CreateSecureString("MatiszNagypapa67")
+                Password = CreateSecureString(password)
             };
 
             var client = new HiveMQClient(options);
 
-            try
+            var connectionResult = client.ConnectAsync().GetAwaiter().GetResult();
+            if (connectionResult.ReasonCode == ConnAckReasonCode.Success)
             {
-                var connectionResult = client.ConnectAsync().GetAwaiter().GetResult();
-                if (connectionResult.ReasonCode == ConnAckReasonCode.Success)
-                {
-                    return client;
-                }
-                else
-                {
-                    return null;
-                }
+                return client;
             }
-            catch
+            else
             {
-                return null;
+                throw new Exception($"MQTT broker connection failed with reason code: {connectionResult.ReasonCode}");
             }
         }
 
@@ -63,8 +67,15 @@ namespace TelemetryServiceLib
         {
             ClientName = clientName;
 
-            ClientInstance = MakeBrokerConnection() ??
-                throw new ArgumentNullException($"MQTT broker connection failed for {clientName}");
+            try
+            {
+                ClientInstance = MakeBrokerConnection();
+            }
+            catch (Exception exception)
+            {
+                var error = $"Error initializing HiveClient {ClientName}: {exception.Message}";
+                throw new Exception(error);
+            }
         }
 
         public void SubscribeToTopic(string topic)
