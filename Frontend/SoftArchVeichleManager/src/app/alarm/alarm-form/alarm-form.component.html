@@ -8,9 +8,36 @@
             <input formControlName="alarmFleet" type="number" placeholder="e.g. 101">
         </div>
 
+        <div class="form-group">
+            <label>Interface</label>
+            <select #interfaceSelect formControlName="interfaceName"
+                (change)="onInterfaceSelect(interfaceSelect.value)">
+                <option value="">Select an interface</option>
+                <option *ngFor="let interfaceName of interfaces" [value]="interfaceName">
+                    {{ interfaceName }}
+                </option>
+            </select>
+            <small class="hint">Select to fetch properties and build the JSON automatically.</small>
+        </div>
+
         <div class="form-group full-width">
-            <label>Alarm JSON</label>
-            <textarea formControlName="alarmJson" rows="6" placeholder='{"type":"Battery","level":"Critical"}'></textarea>
+            <label>Interface properties</label>
+            <div *ngIf="interfaceProperties.length; else chooseInterface" class="property-grid">
+                <div class="property-row" *ngFor="let prop of interfaceProperties">
+                    <span class="prop-name">{{ prop }}</span>
+                    <input [value]="propertyValues[prop] || ''"
+                        (input)="onPropertyInput(prop, $event)"
+                        placeholder="Enter value for {{ prop }}">
+                </div>
+            </div>
+            <ng-template #chooseInterface>
+                <div class="empty-hint">Select an interface above to load its fields.</div>
+            </ng-template>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Generated Alarm JSON</label>
+            <textarea formControlName="alarmJson" rows="6" readonly></textarea>
         </div>
 
     </div>

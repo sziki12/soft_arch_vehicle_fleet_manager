@@ -45,7 +45,7 @@ export class AlarmManagerPageComponent implements OnInit {
     this.selectedAlarm = {
       alarmId: 0,
       alarmFleet: 0,
-      alarmJson: '{\n  "type": "",\n  "level": ""\n}'
+      alarmJson: '{}'
     };
   }
 

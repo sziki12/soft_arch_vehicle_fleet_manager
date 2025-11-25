@@ -1,9 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, catchError, of } from 'rxjs';
 import { Alarm } from '../models/alarm.model';
 
 @Injectable({ providedIn: 'root' })
 export class AlarmService {
+
+    constructor(private http: HttpClient) { }
 
     private mockData: Alarm[] = [
         {
@@ -30,6 +33,20 @@ export class AlarmService {
                 observer.complete();
             }, 400);
         });
+    }
+
+    getAlarmInterfaces(): Observable<string[]> {
+        // TODO: replace empty URL with real endpoint when available
+        return this.http.get<string[]>('', { params: {} }).pipe(
+            catchError(() => of(['BatteryInterface', 'EngineInterface', 'MaintenanceInterface']))
+        );
+    }
+
+    getInterfaceProperties(interfaceName: string): Observable<string[]> {
+        // TODO: replace empty URL with real endpoint when available
+        return this.http.get<string[]>('', { params: { interfaceName } }).pipe(
+            catchError(() => of(['type', 'level', 'detail']))
+        );
     }
 
     saveAlarm(alarm: Alarm): Observable<Alarm> {
