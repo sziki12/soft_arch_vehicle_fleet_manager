@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SoftArchVehicleFleetManager.Data;
+using SoftArchVehicleFleetManager.Models;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -23,18 +26,26 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        string? password = await _db.Users
+        User? user = await _db.Users
             .Where(u => u.Username == request.Username)
-            .Select(u => u.Password).FirstOrDefaultAsync();
+            .FirstOrDefaultAsync();
 
-        if (password == null)
+        if (user == null)
         {
             return NotFound();
         }
 
-        if (password != request.Password)
+        var result = new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, request.Password);
+        if (result == PasswordVerificationResult.Failed)
         {
             return Unauthorized();
+        }
+
+        if (result == PasswordVerificationResult.SuccessRehashNeeded)
+        {
+            user.PasswordHash = new PasswordHasher<User>().HashPassword(user, request.Password);
+            _db.Users.Update(user);
+            await _db.SaveChangesAsync();
         }
 
         var token = GenerateToken(request.Username);

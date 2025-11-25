@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SoftArchVehicleFleetManager.Data;
 using SoftArchVehicleFleetManager.Enums;
 using SoftArchVehicleFleetManager.Models;
@@ -35,8 +36,10 @@ public static class SeedData
         {
             Username = "admin",
             Role = UserRole.Admin,
-            Password = "admin"
         };
+
+        user.PasswordHash = new PasswordHasher<User>().HashPassword(user, "admin");
+
         db.Users.Add(user);
         db.SaveChanges();
     }
