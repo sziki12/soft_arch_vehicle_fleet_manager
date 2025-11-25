@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using SoftArchVehicleFleetManager.Data;
@@ -10,6 +11,7 @@ namespace SoftArchVehicleFleetManager.Controllers
 {
     [ApiController]
     [Route("api/vehicles")]
+    [Authorize]
     public class VehiclesController : ControllerBase
     {
         private readonly FleetDbContext _db;

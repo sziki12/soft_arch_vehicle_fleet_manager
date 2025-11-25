@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using SoftArchVehicleFleetManager.Data;
 using SoftArchVehicleFleetManager.Dtos.Alarms;
-using SoftArchVehicleFleetManager.Dtos.Manufacturers;
 using SoftArchVehicleFleetManager.Models;
 
 namespace SoftArchVehicleFleetManager.Controllers
 {
     [ApiController]
     [Route("api/alarms")]
+    [Authorize]
     public class AlarmsController : ControllerBase
     {
         private readonly FleetDbContext _db;
