@@ -1,23 +1,51 @@
-<div class="app-shell">
+<ng-container *ngIf="session; else loginView">
+    <div class="app-shell">
 
-    <header class="app-header">
-        <div class="brand">
-            <div class="brand-title">Fleet Platform</div>
-            <div class="brand-caption">Mock data playground</div>
-        </div>
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-title">Fleet Platform</div>
+                <div class="brand-caption">Mock data playground</div>
+            </div>
 
-        <div class="view-toggle">
-            <button type="button" [class.active]="activeScreen === 'fleet'" (click)="setScreen('fleet')">
-                Vehicles
-            </button>
-            <button type="button" [class.active]="activeScreen === 'alarm'" (click)="setScreen('alarm')">
-                Alarms
-            </button>
-        </div>
-    </header>
+            <div class="header-actions">
+                <div class="user-chip">
+                    <div class="user-name">{{ session?.name }}</div>
+                    <small>{{ session?.email }} &mdash; {{ session?.role }}</small>
+                </div>
 
-    <main class="app-main">
-        <app-fleet-manager-page *ngIf="activeScreen === 'fleet'"></app-fleet-manager-page>
-        <app-alarm-manager-page *ngIf="activeScreen === 'alarm'"></app-alarm-manager-page>
-    </main>
-</div>
+                <div class="view-toggle" *ngIf="currentRole === 'manager'">
+                    <button type="button" [class.active]="activeScreen === 'fleet'" (click)="setScreen('fleet')">
+                        Vehicles
+                    </button>
+                    <button type="button" [class.active]="activeScreen === 'alarm'" (click)="setScreen('alarm')">
+                        Alarms
+                    </button>
+                    <button type="button" [class.active]="activeScreen === 'interface'" (click)="setScreen('interface')">
+                        Interfaces
+                    </button>
+                    <button type="button" [class.active]="activeScreen === 'module'" (click)="setScreen('module')">
+                        Modules
+                    </button>
+                </div>
+
+                <button class="logout-btn" (click)="logout()">Logout</button>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <ng-container *ngIf="currentRole === 'manager'; else adminView">
+                <app-fleet-manager-page *ngIf="activeScreen === 'fleet'"></app-fleet-manager-page>
+                <app-alarm-manager-page *ngIf="activeScreen === 'alarm'"></app-alarm-manager-page>
+                <app-interface-manager-page *ngIf="activeScreen === 'interface'"></app-interface-manager-page>
+                <app-module-manager-page *ngIf="activeScreen === 'module'"></app-module-manager-page>
+            </ng-container>
+            <ng-template #adminView>
+                <app-admin-dashboard></app-admin-dashboard>
+            </ng-template>
+        </main>
+    </div>
+</ng-container>
+
+<ng-template #loginView>
+    <app-login></app-login>
+</ng-template>

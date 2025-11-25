@@ -1,0 +1,45 @@
+<app-main-layout title="Module manager" subtitle="Modules">
+
+    <div left-side>
+        <button (click)="createNew()" class="create-btn">
+            + ÚJ MODUL
+        </button>
+
+        <div *ngIf="loading">Betöltés...</div>
+
+        <app-card *ngFor="let m of modules" [isActive]="selectedModule?.moduleId === m.moduleId"
+            (click)="selectModule(m)">
+
+            <div class="moduleId">
+                <h3 class="module-title">{{ m.moduleName }}</h3>
+
+                <div class="card-actions">
+                    <button (click)="onDelete(m.moduleId, $event)" class="btn-icon btn-delete" title="Törlés">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+
+            <p class="module-subtitle">
+                {{ m.moduleName }}
+            </p>
+
+            <small class="card-meta">
+                HWD ID: {{ m.hardwareId}}
+            </small>
+
+        </app-card>
+    </div>
+
+    <div right-side>
+        <app-module-form *ngIf="selectedModule" [module]="selectedModule!" (save)="onSave($event)"
+            (cancel)="selectedModule = null">
+        </app-module-form>
+
+        <div *ngIf="!selectedModule" class="empty-state">
+            <h2>Válassz egy moudlt</h2>
+        </div>
+    </div>
+
+</app-main-layout>
+
