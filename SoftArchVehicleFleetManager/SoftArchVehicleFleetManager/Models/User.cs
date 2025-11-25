@@ -11,7 +11,7 @@ namespace SoftArchVehicleFleetManager.Models
         // Properties
         public UserRole Role { get; set; }
         public string Username { get; set; }
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
 
         // Foreign Keys
         public int? ManufacturerId { get; set; }

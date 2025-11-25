@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using SoftArchVehicleFleetManager.Data;
@@ -9,6 +12,7 @@ namespace SoftArchVehicleFleetManager.Controllers
 {
     [ApiController]
     [Route("api/users")]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly FleetDbContext _db;
@@ -54,11 +58,11 @@ namespace SoftArchVehicleFleetManager.Controllers
             {
                 Username = createDto.Username,
                 Role = createDto.Role,
-                // TODO: Hash password before storing
-                Password = createDto.Password,
                 ManufacturerId = null,
                 FleetId = null
             };
+
+            user.PasswordHash = new PasswordHasher<User>().HashPassword(user, createDto.Password);
 
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
@@ -76,13 +80,11 @@ namespace SoftArchVehicleFleetManager.Controllers
             if (updateDto.Username is not null) user.Username = updateDto.Username;
             if (updateDto.Password is not null)
             {
-                // TODO: Hash password before storing
-                user.Password = updateDto.Password;
+                user.PasswordHash = new PasswordHasher<User>().HashPassword(user, updateDto.Password);
             }
 
             if (updateDto.Role is not null)
             {
-                // TODO: Hash password before storing
                 user.Role = (Enums.UserRole)updateDto.Role;
             }
 
