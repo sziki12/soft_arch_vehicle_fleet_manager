@@ -18,7 +18,7 @@ import { ModuleManagerPageComponent } from './manufacturer/module/module-manager
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'SoftArchVeichleManager';
-  currentRole: 'manager' | 'admin' = 'manager';
+  currentRole: 'manager' | 'admin' | 'manufacturer' = 'manager';
   activeScreen: 'fleet' | 'alarm' | 'interface' | 'module' = 'fleet';
   session: UserSession | null = null;
   private sub?: Subscription;
@@ -30,6 +30,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.session = session;
       if (session) {
         this.currentRole = session.role;
+        this.activeScreen = session.role === 'manufacturer' ? 'interface' : 'fleet';
       }
     });
   }

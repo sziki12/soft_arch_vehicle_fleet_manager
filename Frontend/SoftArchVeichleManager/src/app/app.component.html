@@ -20,6 +20,8 @@
                     <button type="button" [class.active]="activeScreen === 'alarm'" (click)="setScreen('alarm')">
                         Alarms
                     </button>
+                </div>
+                <div class="view-toggle" *ngIf="currentRole === 'manufacturer'">
                     <button type="button" [class.active]="activeScreen === 'interface'" (click)="setScreen('interface')">
                         Interfaces
                     </button>
@@ -33,14 +35,18 @@
         </header>
 
         <main class="app-main">
-            <ng-container *ngIf="currentRole === 'manager'; else adminView">
+            <ng-container *ngIf="currentRole === 'manager'; else adminOrManufacturer">
                 <app-fleet-manager-page *ngIf="activeScreen === 'fleet'"></app-fleet-manager-page>
                 <app-alarm-manager-page *ngIf="activeScreen === 'alarm'"></app-alarm-manager-page>
-                <app-interface-manager-page *ngIf="activeScreen === 'interface'"></app-interface-manager-page>
-                <app-module-manager-page *ngIf="activeScreen === 'module'"></app-module-manager-page>
             </ng-container>
-            <ng-template #adminView>
-                <app-admin-dashboard></app-admin-dashboard>
+            <ng-template #adminOrManufacturer>
+                <ng-container *ngIf="currentRole === 'manufacturer'; else adminView">
+                    <app-interface-manager-page *ngIf="activeScreen === 'interface'"></app-interface-manager-page>
+                    <app-module-manager-page *ngIf="activeScreen === 'module'"></app-module-manager-page>
+                </ng-container>
+                <ng-template #adminView>
+                    <app-admin-dashboard></app-admin-dashboard>
+                </ng-template>
             </ng-template>
         </main>
     </div>
