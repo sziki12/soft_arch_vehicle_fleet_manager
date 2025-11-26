@@ -45,6 +45,7 @@ builder.Services.AddScoped<UsersService>();
 builder.Services.AddScoped<AlarmsService>();
 builder.Services.AddScoped<FleetsService>();
 builder.Services.AddScoped<InterfacesService>();
+builder.Services.AddScoped<ManufacturersService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
