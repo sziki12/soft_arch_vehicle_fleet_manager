@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SoftArchVehicleFleetManager.Converters;
 using SoftArchVehicleFleetManager.Data;
+using SoftArchVehicleFleetManager.Models;
+using SoftArchVehicleFleetManager.Services;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -35,6 +38,11 @@ builder.Services.AddAuthorization();
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+// Register services
+builder.Services.AddScoped<UsersService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
