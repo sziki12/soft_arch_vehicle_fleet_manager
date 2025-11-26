@@ -45,19 +45,14 @@ namespace SoftArchVehicleFleetManager.Controllers
         {
             var updateResult = await _usersService.UpdateAsync(id, updateDto);
 
-            switch (updateResult)
+            return updateResult switch
             {
-                case UserUpdateResult.Success:
-                    return NoContent();
-                case UserUpdateResult.NotFound:
-                    return NotFound();
-                case UserUpdateResult.InvalidManufacturerId:
-                    return BadRequest(new { error = "Invalid ManufacturerId" });
-                case UserUpdateResult.InvalidFleetId:
-                    return BadRequest(new { error = "Invalid FleetId" });
-                default:
-                    return BadRequest(new { error = "Unknown error" });
-            }
+                UserUpdateResult.Success => NoContent(),
+                UserUpdateResult.NotFound => NotFound(),
+                UserUpdateResult.InvalidManufacturerId => BadRequest(new { error = "Invalid ManufacturerId" }),
+                UserUpdateResult.InvalidFleetId => BadRequest(new { error = "Invalid FleetId" }),
+                _ => StatusCode(StatusCodes.Status500InternalServerError, new { error = "Unknown error" })
+            };
         }
 
         [HttpDelete("{id:int}")]

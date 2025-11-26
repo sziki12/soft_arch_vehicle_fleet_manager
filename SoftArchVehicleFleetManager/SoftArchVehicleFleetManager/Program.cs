@@ -43,6 +43,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<UsersService>();
 builder.Services.AddScoped<AlarmsService>();
+builder.Services.AddScoped<FleetsService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

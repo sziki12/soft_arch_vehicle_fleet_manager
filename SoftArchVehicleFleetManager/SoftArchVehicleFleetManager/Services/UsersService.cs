@@ -6,6 +6,14 @@ using SoftArchVehicleFleetManager.Models;
 
 namespace SoftArchVehicleFleetManager.Services
 {
+    public enum UserUpdateResult
+    {
+        Success,
+        NotFound,
+        InvalidManufacturerId,
+        InvalidFleetId
+    }
+
     public class UsersService
     {
         private readonly FleetDbContext _db;
@@ -61,14 +69,6 @@ namespace SoftArchVehicleFleetManager.Services
             await _db.SaveChangesAsync();
 
             return new UserDto(user.Id, user.Username, user.Role, user.ManufacturerId, user.FleetId);
-        }
-
-        public enum UserUpdateResult
-        {
-            Success,
-            NotFound,
-            InvalidManufacturerId,
-            InvalidFleetId
         }
 
         public async Task<UserUpdateResult> UpdateAsync(int id, UserUpdateDto updateDto)

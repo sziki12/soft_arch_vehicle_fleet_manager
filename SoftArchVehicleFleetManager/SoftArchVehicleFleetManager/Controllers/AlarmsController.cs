@@ -42,7 +42,7 @@ namespace SoftArchVehicleFleetManager.Controllers
                 AlarmCreateResult.Success => CreatedAtAction(nameof(GetOne), new { id = result!.id }, result),
                 AlarmCreateResult.InvalidFleetId => BadRequest(new { error = "Invalid FleetId." }),
                 AlarmCreateResult.InvalidInterfaceId => BadRequest(new { error = "Invalid InterfaceId." }),
-                _ => StatusCode(500)
+                _ => StatusCode(StatusCodes.Status500InternalServerError, new { error = "Unknown error" })
             };
         }
 
@@ -57,7 +57,7 @@ namespace SoftArchVehicleFleetManager.Controllers
                 AlarmUpdateResult.NotFound => NotFound(),
                 AlarmUpdateResult.InvalidFleetId => BadRequest(new { error = "Invalid FleetId." }),
                 AlarmUpdateResult.InvalidInterfaceId => BadRequest(new { error = "Invalid InterfaceId." }),
-                _ => StatusCode(500)
+                _ => StatusCode(StatusCodes.Status500InternalServerError, new { error = "Unknown error" })
             };
         }
 
