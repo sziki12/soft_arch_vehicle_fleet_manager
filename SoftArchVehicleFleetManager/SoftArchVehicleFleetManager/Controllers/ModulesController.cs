@@ -43,7 +43,7 @@ namespace SoftArchVehicleFleetManager.Controllers
                 ModuleCreateResult.InvalidManufacturerId => BadRequest(new { error = "Invalid ManufacturerId." }),
                 ModuleCreateResult.InvalidInterfaceId => BadRequest(new { error = "Invalid InterfaceId." }),
                 ModuleCreateResult.InvalidVehicleId => BadRequest(new { error = "Invalid VehicleId." }),
-                _ => StatusCode(StatusCodes.Status500InternalServerError, new { error = "Unknown error" })
+                _ => StatusCode(StatusCodes.Status500InternalServerError)
             };
         }
 
@@ -59,7 +59,7 @@ namespace SoftArchVehicleFleetManager.Controllers
                 ModuleUpdateResult.InvalidManufacturerId => BadRequest(new { error = "Invalid ManufacturerId." }),
                 ModuleUpdateResult.InvalidInterfaceId => BadRequest(new { error = "Invalid InterfaceId." }),
                 ModuleUpdateResult.InvalidVehicleId => BadRequest(new { error = "Invalid VehicleId." }),
-                _ => StatusCode(StatusCodes.Status500InternalServerError, new { error = "Unknown error" })
+                _ => StatusCode(StatusCodes.Status500InternalServerError)
             };
         }
 

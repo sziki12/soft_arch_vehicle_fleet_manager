@@ -42,7 +42,7 @@ namespace SoftArchVehicleFleetManager.Controllers
             {
                 VehicleCreateResult.Success => CreatedAtAction(nameof(GetOne), new { id = vehicle!.Id }, vehicle),
                 VehicleCreateResult.InvalidFleetId => BadRequest(new { error = "Invalid FleetId." }),
-                _ => StatusCode(StatusCodes.Status500InternalServerError, new { error = "Unknown error" })
+                _ => StatusCode(StatusCodes.Status500InternalServerError)
             };
         }
 
@@ -56,7 +56,7 @@ namespace SoftArchVehicleFleetManager.Controllers
                 VehicleUpdateResult.Success => NoContent(),
                 VehicleUpdateResult.NotFound => NotFound(),
                 VehicleUpdateResult.InvalidFleetId => BadRequest(new { error = "Invalid FleetId." }),
-                _ => StatusCode(StatusCodes.Status500InternalServerError, new { error = "Unknown error" })
+                _ => StatusCode(StatusCodes.Status500InternalServerError)
             };
         }
 

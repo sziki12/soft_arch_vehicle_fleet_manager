@@ -51,7 +51,7 @@ namespace SoftArchVehicleFleetManager.Controllers
                 UserUpdateResult.NotFound => NotFound(),
                 UserUpdateResult.InvalidManufacturerId => BadRequest(new { error = "Invalid ManufacturerId" }),
                 UserUpdateResult.InvalidFleetId => BadRequest(new { error = "Invalid FleetId" }),
-                _ => StatusCode(StatusCodes.Status500InternalServerError, new { error = "Unknown error" })
+                _ => StatusCode(StatusCodes.Status500InternalServerError)
             };
         }
 
