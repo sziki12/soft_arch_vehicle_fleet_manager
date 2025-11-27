@@ -18,8 +18,16 @@ namespace SoftArchVehicleFleetManager.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ModuleDto>>> GetAll()
+        public async Task<ActionResult<IEnumerable<ModuleDto>>> GetAll([FromQuery(Name = "hwid")] string? hwid)
         {
+            if (hwid is not null)
+            {
+                var moduleByHWID = await _modulesService.GetByHWIDAsync(hwid);
+                if (moduleByHWID is null) return NotFound();
+
+                return Ok(moduleByHWID);
+            }
+
             var modules = await _modulesService.GetAllAsync();
             return Ok(modules);
         }
@@ -43,6 +51,7 @@ namespace SoftArchVehicleFleetManager.Controllers
                 ModuleCreateResult.InvalidManufacturerId => BadRequest(new { error = "Invalid ManufacturerId." }),
                 ModuleCreateResult.InvalidInterfaceId => BadRequest(new { error = "Invalid InterfaceId." }),
                 ModuleCreateResult.InvalidVehicleId => BadRequest(new { error = "Invalid VehicleId." }),
+                ModuleCreateResult.HWIDAlreadyExists => BadRequest(new { error = "A module with the same HardwareId already exists." }),
                 _ => StatusCode(StatusCodes.Status500InternalServerError)
             };
         }
@@ -59,6 +68,7 @@ namespace SoftArchVehicleFleetManager.Controllers
                 ModuleUpdateResult.InvalidManufacturerId => BadRequest(new { error = "Invalid ManufacturerId." }),
                 ModuleUpdateResult.InvalidInterfaceId => BadRequest(new { error = "Invalid InterfaceId." }),
                 ModuleUpdateResult.InvalidVehicleId => BadRequest(new { error = "Invalid VehicleId." }),
+                ModuleUpdateResult.HWIDAlreadyExists => BadRequest(new { error = "A module with the same HardwareId already exists." }),
                 _ => StatusCode(StatusCodes.Status500InternalServerError)
             };
         }

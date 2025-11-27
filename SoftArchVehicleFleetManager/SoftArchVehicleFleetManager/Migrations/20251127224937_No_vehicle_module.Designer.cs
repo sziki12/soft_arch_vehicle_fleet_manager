@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SoftArchVehicleFleetManager.Data;
 
@@ -10,9 +11,11 @@ using SoftArchVehicleFleetManager.Data;
 namespace SoftArchVehicleFleetManager.Migrations
 {
     [DbContext(typeof(FleetDbContext))]
-    partial class FleetDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251127224937_No_vehicle_module")]
+    partial class No_vehicle_module
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.22");
