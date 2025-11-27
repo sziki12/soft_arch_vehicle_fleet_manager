@@ -18,6 +18,8 @@ public static class SeedData
 
         AddSeedUsers(db);
         AddSeedFleets(db);
+        AddSeedManufacturers(db);
+        AddSeedInterfaces(db);
     }
 
     private static void AddSeedFleets(FleetDbContext db)
@@ -26,7 +28,32 @@ public static class SeedData
         {
             Name = "Fleet numero uno"
         };
+
         db.Fleets.Add(fleet);
+        db.SaveChanges();
+    }
+
+    private static void AddSeedInterfaces(FleetDbContext db)
+    {
+        var _interface = new Interface
+        {
+            Name = "Interface numero uno",
+            InterfaceJSON = "{ }",
+            ManufacturerId = db.Manufacturers.Single().Id,
+        };
+
+        db.Interfaces.Add(_interface);
+        db.SaveChanges();
+    }
+
+    private static void AddSeedManufacturers(FleetDbContext db)
+    {
+        var manufacturer = new Manufacturer
+        {
+            Name = "Manufactorer numero uno",
+        };
+
+        db.Manufacturers.Add(manufacturer);
         db.SaveChanges();
     }
 

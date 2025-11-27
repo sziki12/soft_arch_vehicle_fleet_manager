@@ -1,6 +1,8 @@
-﻿namespace SoftArchVehicleFleetManager.Dtos.Manufacturers
+﻿using System.Text.Json.Serialization;
+
+namespace SoftArchVehicleFleetManager.Dtos.Manufacturers
 {
     public record ManufacturerCreateDto(
-        string Name
+        [property: JsonPropertyName("MANUFACTURER_NAME")] string Name
     );
 }
