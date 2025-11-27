@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SoftArchVehicleFleetManager.Data;
 using SoftArchVehicleFleetManager.Enums;
+using SoftArchVehicleFleetManager.Migrations;
 using SoftArchVehicleFleetManager.Models;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -49,11 +50,11 @@ public class AuthController : ControllerBase
             await _db.SaveChangesAsync();
         }
 
-        var token = GenerateToken(request.Username, user.Role);
+        var token = GenerateToken(user);
         return Ok(new { token });
     }
 
-    private string GenerateToken(string username, UserRole role)
+    private string GenerateToken(User user)
     {
         var jwtKey = _config["Jwt:Key"];
         var jwtIssuer = _config["Jwt:Issuer"];
@@ -63,8 +64,9 @@ public class AuthController : ControllerBase
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, username),
-            new Claim("role", role.ToString())
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim("id", user.Id.ToString()),
+            new Claim("role", user.Role.ToString())
         };
 
         var token = new JwtSecurityToken(

@@ -6,6 +6,7 @@ import { UserSession } from '../models/auth-user.model';
 
 interface LoginResponse {
     token: string;
+    userId?: number;
     username?: string;
     email?: string;
     name?: string;
@@ -25,7 +26,8 @@ export class AuthService {
 
         if (storedToken && storedUser) {
             const derivedRole = this.parseRoleFromToken(storedToken);
-            this.sessionSubject.next(this.buildSession(storedUser, storedToken, derivedRole));
+            const derivedId = this.parseIdFromToken(storedToken);
+            this.sessionSubject.next(this.buildSession(derivedId, storedUser, storedToken, derivedRole));
         }
     }
 
@@ -38,7 +40,9 @@ export class AuthService {
         return this.http.post<LoginResponse>(`${this.apiBase}/auth/login`, payload).pipe(
             map(response => {
                 const role = this.parseRoleFromToken(response.token);
+                const userId = this.parseIdFromToken(response.token);
                 return this.buildSession(
+                    userId,
                     response.username ?? credentials.username,
                     response.token,
                     role,
@@ -66,9 +70,9 @@ export class AuthService {
         return this.sessionSubject.value;
     }
 
-    private buildSession(username: string, token: string, role: AppRole, name?: string, email?: string): UserSession {
+    private buildSession(userId: number, username: string, token: string, role: AppRole, name?: string, email?: string): UserSession {
         return {
-            userId: 0,
+            userId: userId,
             name: name ?? username,
             email: email ?? username,
             role,
@@ -90,6 +94,17 @@ export class AuthService {
             console.warn('Failed to parse role from token', err);
         }
         return 'manager';
+    }
+
+    private parseIdFromToken(token: string): number {
+        try {
+            const payload = JSON.parse(this.decodeBase64Url(token.split('.')[1] || '')) as Record<string, unknown>;
+            const pardedId = payload['id'] as number | undefined;
+            return pardedId ?? 0;
+        } catch (err) {
+            console.warn('Failed to parse role from token', err);
+        }
+        return 0;
     }
 
     private decodeBase64Url(input: string): string {
