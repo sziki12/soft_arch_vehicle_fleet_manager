@@ -80,10 +80,10 @@ export class AuthService {
         try {
             const payload = JSON.parse(this.decodeBase64Url(token.split('.')[1] || '')) as Record<string, unknown>;
             const roleClaim = payload['role'] as string | undefined;
-            if (roleClaim === 'admin') {
+            if (roleClaim === 'Admin') {
                 return 'admin';
             }
-            if (roleClaim === 'manufacturer') {
+            if (roleClaim === 'Manufacturer') {
                 return 'manufacturer';
             }
         } catch (err) {
