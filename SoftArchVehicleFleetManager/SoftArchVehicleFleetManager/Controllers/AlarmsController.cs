@@ -24,6 +24,14 @@ namespace SoftArchVehicleFleetManager.Controllers
             return Ok(alarms);
         }
 
+        [HttpGet("byuser")]
+        public async Task<ActionResult<IEnumerable<AlarmDto>>> GetAllByUserId(
+            [FromQuery(Name = "user_id")] int userId)
+        {
+            var alarms = await _alarmsService.GetAllByUserIdAsync(userId);
+            return Ok(alarms);
+        }
+
         [HttpGet("{id:int}")]
         public async Task<ActionResult<AlarmDto>> GetOne(int id)
         {

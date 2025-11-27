@@ -83,7 +83,8 @@ export class AuthService {
     private parseRoleFromToken(token: string): AppRole {
         try {
             const payload = JSON.parse(this.decodeBase64Url(token.split('.')[1] || '')) as Record<string, unknown>;
-            const roleClaim = payload['role'] as string | undefined;
+            const roleClaim = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string | undefined;
+            console.log('Parsed role from token:', roleClaim);
             if (roleClaim === 'Admin') {
                 return 'admin';
             }

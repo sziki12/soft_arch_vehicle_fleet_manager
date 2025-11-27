@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SoftArchVehicleFleetManager.Data;
 using SoftArchVehicleFleetManager.Dtos.Alarms;
+using SoftArchVehicleFleetManager.Dtos.Vehicles;
 using SoftArchVehicleFleetManager.Models;
 
 namespace SoftArchVehicleFleetManager.Services
@@ -23,10 +24,12 @@ namespace SoftArchVehicleFleetManager.Services
     public class AlarmsService
     {
         private readonly FleetDbContext _db;
+        private readonly UsersService _usersService;
 
-        public AlarmsService(FleetDbContext db)
+        public AlarmsService(FleetDbContext db, UsersService usersService)
         {
             _db = db;
+            _usersService = usersService;
         }
 
         public async Task<List<AlarmDto>> GetAsync(int? fleetId = null)
@@ -68,6 +71,23 @@ namespace SoftArchVehicleFleetManager.Services
                 alarm.FleetId,
                 alarm.InterfaceId
             );
+        }
+        public async Task<List<AlarmDto>> GetAllByUserIdAsync(int userId)
+        {
+            var user = await _usersService.GetOneAsync(userId);
+            if (user is null)
+                return [];
+            if (user.Role == Enums.UserRole.FleetOperator && user.FleetId != null)
+            {
+                var alarms = await GetAsync(user.FleetId);
+                var resultAlarms = alarms.Where(m => m.fleetId == user.FleetId.Value).ToList();
+                return resultAlarms;
+            }
+            else if (user.Role == Enums.UserRole.Admin)
+            {
+                return await GetAsync(null);
+            }
+            return [];
         }
 
         public async Task<(AlarmCreateResult Result, AlarmDto? Alarm)> CreateAsync(AlarmCreateDto createDto)

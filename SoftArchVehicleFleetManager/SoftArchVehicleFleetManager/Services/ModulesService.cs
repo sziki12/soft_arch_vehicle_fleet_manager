@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SoftArchVehicleFleetManager.Data;
+using SoftArchVehicleFleetManager.Dtos.Manufacturers;
 using SoftArchVehicleFleetManager.Dtos.Modules;
 using SoftArchVehicleFleetManager.Models;
 
@@ -25,10 +26,12 @@ namespace SoftArchVehicleFleetManager.Services
     public class ModulesService
     {
         private readonly FleetDbContext _db;
+        private readonly UsersService _usersService;
 
-        public ModulesService(FleetDbContext db)
+        public ModulesService(FleetDbContext db, UsersService usersService)
         {
             _db = db;
+            _usersService = usersService;
         }
 
         public async Task<List<ModuleDto>> GetAllAsync()
@@ -60,6 +63,23 @@ namespace SoftArchVehicleFleetManager.Services
                 module.InterfaceId,
                 module.VehicleId
             );
+        }
+        public async Task<List<ModuleDto>> GetAllByUserIdAsync(int userId)
+        {
+            var user = await _usersService.GetOneAsync(userId);
+            if (user is null)
+                return [];
+            if (user.Role == Enums.UserRole.Manufacturer && user.ManufacturerId != null)
+            {
+                var modules = await GetAllAsync();
+                var resultInterfaces = modules.Where(m => m.ManufacturerId == user.ManufacturerId.Value).ToList();
+                return resultInterfaces;
+            }
+            else if (user.Role == Enums.UserRole.Admin)
+            {
+                return await GetAllAsync();
+            }
+            return [];
         }
 
         public async Task<(ModuleCreateResult Status, ModuleDto? Module)> CreateAsync(ModuleCreateDto createDto)
