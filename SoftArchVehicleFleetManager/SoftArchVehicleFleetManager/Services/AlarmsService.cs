@@ -83,11 +83,10 @@ namespace SoftArchVehicleFleetManager.Services
                 var resultAlarms = alarms.Where(m => m.fleetId == user.FleetId.Value).ToList();
                 return resultAlarms;
             }
-            else if (user.Role == Enums.UserRole.Admin)
+            else
             {
                 return await GetAsync(null);
             }
-            return [];
         }
 
         public async Task<(AlarmCreateResult Result, AlarmDto? Alarm)> CreateAsync(AlarmCreateDto createDto)

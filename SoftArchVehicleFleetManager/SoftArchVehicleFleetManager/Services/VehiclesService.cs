@@ -93,11 +93,10 @@ namespace SoftArchVehicleFleetManager.Services
                 var resultVehicles = vehicles.Where(m => m.FleetId == user.FleetId.Value).ToList();
                 return resultVehicles;
             }
-            else if (user.Role == Enums.UserRole.Admin)
+            else
             {
                 return await GetAsync(null);
             }
-            return [];
         }
 
         public async Task<(VehicleCreateResult Result, VehicleDto? Vehicle)> CreateAsync(

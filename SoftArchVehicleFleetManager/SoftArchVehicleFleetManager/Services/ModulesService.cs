@@ -75,7 +75,7 @@ namespace SoftArchVehicleFleetManager.Services
                 var resultInterfaces = modules.Where(m => m.ManufacturerId == user.ManufacturerId.Value).ToList();
                 return resultInterfaces;
             }
-            else if (user.Role == Enums.UserRole.Admin)
+            else
             {
                 return await GetAllAsync();
             }

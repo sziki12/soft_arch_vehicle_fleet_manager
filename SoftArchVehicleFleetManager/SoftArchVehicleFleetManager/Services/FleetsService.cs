@@ -58,11 +58,10 @@ namespace SoftArchVehicleFleetManager.Services
                 var fleet = await GetOneAsync(user.FleetId.Value);
                 return [fleet];
             }
-            else if (user.Role == Enums.UserRole.Admin)
+            else
             {
                 return await GetAllAsync();
             }
-            return [];
         }
 
         public async Task<FleetDto> CreateAsync(FleetCreateDto createDto)

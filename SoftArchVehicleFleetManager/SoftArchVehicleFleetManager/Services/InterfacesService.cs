@@ -70,11 +70,10 @@ namespace SoftArchVehicleFleetManager.Services
                 var resultInterfaces = interfaces.Where(i => i.ManufacturerId == user.ManufacturerId.Value).ToList();
                 return resultInterfaces;
             }
-            else if(user.Role == Enums.UserRole.Admin)
+            else
             {
                 return await GetAllAsync();
             }
-            return [];
         }
 
         public async Task<(InterfaceCreateResult status, InterfaceDto? result)> CreateAsync(InterfaceCreateDto createDto)
