@@ -26,8 +26,15 @@ export class AuthService {
 
         if (storedToken && storedUser) {
             const derivedRole = this.parseRoleFromToken(storedToken);
-            const derivedId = this.parseIdFromToken(storedToken);
-            this.sessionSubject.next(this.buildSession(derivedId, storedUser, storedToken, derivedRole));
+            const derivedId = this.parseUserIdFromToken(storedToken);
+            const derivedManufacturerId = this.parseManufacturerIdFromToken(storedToken);
+            const derivedFleetId = this.parseFleetIdFromToken(storedToken);
+            this.sessionSubject.next(this.buildSession(derivedId, storedUser, storedToken, derivedRole, 
+                {
+                    manufacturerId: derivedManufacturerId,
+                    fleetId: derivedFleetId
+                }
+            ));
         }
     }
 
@@ -40,14 +47,20 @@ export class AuthService {
         return this.http.post<LoginResponse>(`${this.apiBase}/auth/login`, payload).pipe(
             map(response => {
                 const role = this.parseRoleFromToken(response.token);
-                const userId = this.parseIdFromToken(response.token);
+                const userId = this.parseUserIdFromToken(response.token);
+                const manufacturerId = this.parseManufacturerIdFromToken(response.token);
+                const fleetId = this.parseFleetIdFromToken(response.token);
                 return this.buildSession(
                     userId,
                     response.username ?? credentials.username,
                     response.token,
                     role,
-                    response.name ?? response.username ?? credentials.username,
-                    response.email ?? credentials.username
+                    {
+                        name : response.name ?? response.username ?? credentials.username,
+                        email : response.email ?? credentials.username,
+                        manufacturerId,
+                        fleetId
+                    }
                 );
             }),
             tap(session => {
@@ -70,13 +83,15 @@ export class AuthService {
         return this.sessionSubject.value;
     }
 
-    private buildSession(userId: number, username: string, token: string, role: AppRole, name?: string, email?: string): UserSession {
+    private buildSession(userId: number, username: string, token: string, role: AppRole, optional: { name?: string, email?: string, manufacturerId?: number, fleetId?: number}): UserSession {
         return {
             userId: userId,
-            name: name ?? username,
-            email: email ?? username,
+            name: optional.name ?? username,
+            email: optional.email ?? username,
             role,
-            token
+            token,
+            manufacturerId: optional.manufacturerId,
+            fleetId: optional.fleetId
         };
     }
 
@@ -97,11 +112,33 @@ export class AuthService {
         return 'manager';
     }
 
-    private parseIdFromToken(token: string): number {
+    private parseUserIdFromToken(token: string): number {
         try {
             const payload = JSON.parse(this.decodeBase64Url(token.split('.')[1] || '')) as Record<string, unknown>;
-            const pardedId = payload['id'] as number | undefined;
-            return pardedId ?? 0;
+            const parsedId = payload['id'] as number | undefined;
+            return parsedId ?? 0;
+        } catch (err) {
+            console.warn('Failed to parse role from token', err);
+        }
+        return 0;
+    }
+
+    private parseManufacturerIdFromToken(token: string): number {
+        try {
+            const payload = JSON.parse(this.decodeBase64Url(token.split('.')[1] || '')) as Record<string, unknown>;
+            const parsedId = payload['manufacturer_id'] as number | undefined;
+            return parsedId ?? 0;
+        } catch (err) {
+            console.warn('Failed to parse role from token', err);
+        }
+        return 0;
+    }
+
+    private parseFleetIdFromToken(token: string): number {
+        try {
+            const payload = JSON.parse(this.decodeBase64Url(token.split('.')[1] || '')) as Record<string, unknown>;
+            const parsedId = payload['fleet_id'] as number | undefined;
+            return parsedId ?? 0;
         } catch (err) {
             console.warn('Failed to parse role from token', err);
         }
