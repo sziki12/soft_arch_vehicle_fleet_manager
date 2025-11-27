@@ -7,23 +7,21 @@
 
         <div *ngIf="loading">Betöltés...</div>
 
-        <app-card *ngFor="let i of interfaces" [isActive]="selectedInterface?.interfaceId === i.interfaceId"
+        <app-card *ngFor="let i of interfaces" [isActive]="selectedInterface?.id === i.id"
             (click)="selectInterface(i)">
 
-            <div class="interfaceId">
-                <h3 class="interface-title">{{ i.interfaceName }}</h3>
+            <div class="Id">
+                <h3 class="interface-title">{{ i.name }}</h3>
 
                 <div class="card-actions">
-                    <button (click)="onDelete(i.interfaceId, $event)" class="btn-icon btn-delete" title="Törlés">
-                        🗑️
+                    <button (click)="onDelete(i.id, $event)" class="btn-icon btn-delete" title="Delete">
+                        Delete
                     </button>
                 </div>
+                <small class="card-meta">
+                Used in: {{ countModules(i) }} modules
+            </small>
             </div>
-
-            <p class="interface-subtitle">
-                {{ i.interfaceName }}
-            </p>
-
         </app-card>
     </div>
 

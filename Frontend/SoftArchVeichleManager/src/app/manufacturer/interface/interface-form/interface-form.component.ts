@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core
 import { Interface } from '../../../models/interface.model';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-interface-form',
@@ -17,14 +18,14 @@ export class InterfaceFormComponent implements OnChanges {
 
   form!: FormGroup;
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder, private authService: AuthService) { }
 
   ngOnChanges(): void {
     this.form = this.fb.group({
-      interfaceId: [this.interface.interfaceId],
-      interfaceName: [this.interface.interfaceName, Validators.required],
-      interfaceJson: [this.interface.interfaceJson, [Validators.required, Validators.min(1)]],
-      manufacturerId: [this.interface.manufacturerId, Validators.required],
+      id: [this.interface.id],
+      name: [this.interface.name, Validators.required],
+      interfaceJSON: [this.interface.interfaceJSON, [Validators.required, Validators.min(1)]],
+      manufacturerId: [this.authService.currentUser?.manufacturerId]
     });
   }
 

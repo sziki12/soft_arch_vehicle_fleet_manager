@@ -1,16 +1,47 @@
 <form [formGroup]="form" (ngSubmit)="submit()">
-    <h2>{{ module.moduleId ? 'Modul Szerkesztése' : 'Új Modul Rögzítése' }}</h2>
+    <h2>{{ module.id ? 'Modul Szerkesztése' : 'Új Modul Rögzítése' }}</h2>
 
     <div class="form-grid">
-
-        <div class="form-group full-width">
-            <label>Modul Neve</label>
-            <input formControlName="moduleName" type="text" placeholder="pl. Speed Meter Module">
-        </div>
 
         <div class="form-group">
             <label>Hardware Azonositó</label>
             <input formControlName="hardwareId" type="text" placeholder="pl.SPMD-559">
+            <label>
+            Interface:
+            <select
+                [(ngModel)]="selectedInterfaceId">
+                <option [ngValue]="null" disabled selected>-- Select interface --</option>
+                <option *ngFor="let i of interfaces" [ngValue]="i.id">
+                {{ i.name }}
+                </option>
+            </select>
+            </label>
+
+            <label>
+            Fleet:
+            <select
+                [(ngModel)]="selectedFleetId"
+                (change)="onFleetChange()">
+                <option [ngValue]="null" disabled selected>-- Select fleet --</option>
+                <option *ngFor="let f of fleets" [ngValue]="f.id">
+                {{ f.name }}
+                </option>
+            </select>
+            </label>
+
+            <br /><br />
+
+            <label>
+            Vehicle:
+            <select
+                [(ngModel)]="selectedVehicleId"
+                [disabled]="!selectedFleetId || availableVehicles.length === 0">
+                <option [ngValue]="null" disabled selected>-- Select Vehicle --</option>
+                <option *ngFor="let vehicle of availableVehicles" [ngValue]="vehicle.id">
+                {{ vehicle.name }}
+                </option>
+            </select>
+            </label>
         </div>
     </div>
 

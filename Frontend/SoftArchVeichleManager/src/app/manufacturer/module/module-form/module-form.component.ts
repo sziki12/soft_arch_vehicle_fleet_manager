@@ -1,33 +1,54 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { Module } from '../../../models/module.model';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../services/auth.service';
+import { Manifacturer } from '../../../models/manufacturer.model';
+import { Vehicle } from '../../../models/vehicle.model';
+import { Fleet } from '../../../models/fleet.model';
+import { Interface } from '../../../models/interface.model';
 
 @Component({
   selector: 'app-module-form',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './module-form.component.html',
   standalone: true,
   styleUrl: './module-form.component.css',
 })
 export class ModuleFormComponent implements OnChanges {
   @Input() module!: Module;
+  @Input() fleets!: Fleet[];
+  @Input() vehicles!: Vehicle[];
+  @Input() interfaces!: Interface[];
   @Output() save = new EventEmitter<Module>();
   @Output() cancel = new EventEmitter<void>();
 
   form!: FormGroup;
+  public selectedFleetId: number | null = null;
+  public selectedVehicleId: number | null = null;
+  public selectedInterfaceId: number | null = null;
+  public availableVehicles: Vehicle[] = [];
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder, private authService: AuthService) {
+
+
+   }
 
   ngOnChanges(): void {
     this.form = this.fb.group({
-      moduleId: [this.module.moduleId],
-      moduleName: [this.module.moduleName, Validators.required],
-      hardwareId: [this.module.hardwareId, [Validators.required, Validators.min(1)]],
-      manufacturerId: [this.module.manufacturerId, Validators.required],
-      interfaceId: [this.module.interfaceId, Validators.required],
-      vehicleId: [this.module.vehicleId, Validators.required],
+      id: [this.module.id],
+      hardwareId: [this.module.hardwareId, [Validators.required]],
+      manufacturerId: [this.authService.currentUser?.manufacturerId],
+      interfaceId: [this?.selectedInterfaceId, [Validators.required, Validators.min(1)]],
+      vehicleId: [this?.selectedVehicleId, [Validators.required, Validators.min(1)]],
     });
+  }
+
+  onFleetChange() {
+    this.availableVehicles = this.vehicles.filter(
+      vehicle => vehicle.fleetId === this.selectedFleetId
+    );
+    this.selectedVehicleId = null;
   }
 
   submit() {

@@ -5,6 +5,8 @@ import { InterfaceFormComponent } from "../interface-form/interface-form.compone
 import { Interface } from '../../../models/interface.model';
 import { InterfaceService } from '../../../services/interface.serice';
 import { CommonModule } from '@angular/common';
+import { ModuleService } from '../../../services/module.service';
+import { Module } from '../../../models/module.model';
 
 @Component({
   selector: 'app-interface-manager-page',
@@ -15,10 +17,11 @@ import { CommonModule } from '@angular/common';
 })
 export class InterfaceManagerPageComponent implements OnInit {
   interfaces: Interface[] = [];
+  modules: Module[] = [];
   selectedInterface: Interface | null = null;
   loading = false;
 
-  constructor(private interfaceService: InterfaceService) { }
+  constructor(private interfaceService: InterfaceService, private moduleService: ModuleService) { }
 
   ngOnInit(): void {
     this.loadData();
@@ -30,6 +33,9 @@ export class InterfaceManagerPageComponent implements OnInit {
       this.interfaces = data;
       this.loading = false;
     });
+    this.moduleService.getModules().subscribe(data => {
+      this.modules = data;
+    });
   }
 
   selectInterface(i: Interface) {
@@ -37,12 +43,16 @@ export class InterfaceManagerPageComponent implements OnInit {
     this.selectedInterface = { ...i };
   }
 
+  countModules(i: Interface): number {
+    return this.modules.filter(m => m.interfaceId == i.id).length;
+  }
+
   createNew() {
 
     this.selectedInterface = {
-      interfaceId: 0,
-      interfaceName: "",
-      interfaceJson: "",
+      id: 0,
+      name: "",
+      interfaceJSON: "",
       manufacturerId: 0
     };
   }

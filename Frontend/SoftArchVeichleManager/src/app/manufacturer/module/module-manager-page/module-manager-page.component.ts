@@ -5,6 +5,12 @@ import { ModuleFormComponent } from "../module-form/module-form.component";
 import { Module } from '../../../models/module.model';
 import { ModuleService } from '../../../services/module.service';
 import { CommonModule } from '@angular/common';
+import { Interface } from '../../../models/interface.model';
+import { InterfaceService } from '../../../services/interface.serice';
+import { Vehicle } from '../../../models/vehicle.model';
+import { Fleet } from '../../../models/fleet.model';
+import { VehicleService } from '../../../services/vehicle.service';
+import { FleetService } from '../../../services/fleet.service';
 
 @Component({
   selector: 'app-module-manager-page',
@@ -15,10 +21,14 @@ import { CommonModule } from '@angular/common';
 })
 export class ModuleManagerPageComponent implements OnInit {
   modules: Module[] = [];
+  interfaces: Interface[] = [];
+  fleets: Fleet[] = [];
+  vehicles: Vehicle[] = [];
   selectedModule: Module | null = null;
   loading = false;
 
-  constructor(private moduleService: ModuleService) { }
+  constructor(private moduleService: ModuleService, private interfaceService: InterfaceService, 
+    private fleetService: FleetService, private vehicleService: VehicleService) { }
 
   ngOnInit(): void {
     this.loadData();
@@ -30,6 +40,15 @@ export class ModuleManagerPageComponent implements OnInit {
       this.modules = data;
       this.loading = false;
     });
+    this.interfaceService.getInterfaces().subscribe(data => {
+      this.interfaces = data;
+    });
+    this.vehicleService.getVehicles().subscribe(data => {
+      this.vehicles = data;
+    });
+    this.fleetService.getFleets().subscribe(data => {
+      this.fleets = data;
+    });
   }
 
   selectModule(m: Module) {
@@ -40,9 +59,8 @@ export class ModuleManagerPageComponent implements OnInit {
   createNew() {
 
     this.selectedModule = {
-      moduleId: 0,
+      id: 0,
       hardwareId: '',
-      moduleName: '',
       manufacturerId: 0,
       interfaceId: 0,
       vehicleId: 0
@@ -63,5 +81,10 @@ export class ModuleManagerPageComponent implements OnInit {
       this.selectedModule = null;
       this.loadData();
     });
+  }
+
+  findInterfaceName(interfaceId: number): string {
+    const i = this.interfaces.find(i => i.id === interfaceId);
+    return i ? i.name : 'N/A';
   }
 }

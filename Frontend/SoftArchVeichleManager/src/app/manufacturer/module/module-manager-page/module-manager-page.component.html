@@ -7,32 +7,33 @@
 
         <div *ngIf="loading">Betöltés...</div>
 
-        <app-card *ngFor="let m of modules" [isActive]="selectedModule?.moduleId === m.moduleId"
+        <app-card *ngFor="let m of modules" [isActive]="selectedModule?.id === m.id"
             (click)="selectModule(m)">
 
-            <div class="moduleId">
-                <h3 class="module-title">{{ m.moduleName }}</h3>
+            <div class="id">
+                <h3 class="module-title">{{ m.hardwareId }}</h3>
 
                 <div class="card-actions">
-                    <button (click)="onDelete(m.moduleId, $event)" class="btn-icon btn-delete" title="Törlés">
+                    <button (click)="onDelete(m.id, $event)" class="btn-icon btn-delete" title="Törlés">
                         🗑️
                     </button>
                 </div>
             </div>
 
             <p class="module-subtitle">
-                {{ m.moduleName }}
+                
             </p>
 
             <small class="card-meta">
-                HWD ID: {{ m.hardwareId}}
+                Interface Name: {{ findInterfaceName(m.interfaceId) }} <br>
+                Is Assigned To Vehicle: {{ (m.vehicleId == null)?('No'):(`Yes, with Id: ${m.vehicleId}`) }}
             </small>
 
         </app-card>
     </div>
 
     <div right-side>
-        <app-module-form *ngIf="selectedModule" [module]="selectedModule!" (save)="onSave($event)"
+        <app-module-form *ngIf="selectedModule" [module]="selectedModule!" [interfaces]="interfaces!" [fleets]="fleets!" [vehicles]="vehicles!" (save)="onSave($event)"
             (cancel)="selectedModule = null">
         </app-module-form>
 
