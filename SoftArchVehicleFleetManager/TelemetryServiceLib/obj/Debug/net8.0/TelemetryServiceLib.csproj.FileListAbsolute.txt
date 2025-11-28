@@ -1,0 +1,13 @@
+C:\MyFiles\BME\msc\2felev\szoftarch\hazi\soft_arch_vehicle_fleet_manager\SoftArchVehicleFleetManager\TelemetryServiceLib\obj\Debug\net8.0\TelemetryServiceLib.csproj.AssemblyReference.cache
+C:\MyFiles\BME\msc\2felev\szoftarch\hazi\soft_arch_vehicle_fleet_manager\SoftArchVehicleFleetManager\TelemetryServiceLib\obj\Debug\net8.0\TelemetryServiceLib.GeneratedMSBuildEditorConfig.editorconfig
+C:\MyFiles\BME\msc\2felev\szoftarch\hazi\soft_arch_vehicle_fleet_manager\SoftArchVehicleFleetManager\TelemetryServiceLib\obj\Debug\net8.0\TelemetryServiceLib.AssemblyInfoInputs.cache
+C:\MyFiles\BME\msc\2felev\szoftarch\hazi\soft_arch_vehicle_fleet_manager\SoftArchVehicleFleetManager\TelemetryServiceLib\obj\Debug\net8.0\TelemetryServiceLib.AssemblyInfo.cs
+C:\MyFiles\BME\msc\2felev\szoftarch\hazi\soft_arch_vehicle_fleet_manager\SoftArchVehicleFleetManager\TelemetryServiceLib\obj\Debug\net8.0\TelemetryServiceLib.csproj.CoreCompileInputs.cache
+C:\MyFiles\BME\msc\2felev\szoftarch\hazi\soft_arch_vehicle_fleet_manager\SoftArchVehicleFleetManager\TelemetryServiceLib\obj\Debug\net8.0\TelemetryServiceLib.sourcelink.json
+C:\MyFiles\BME\msc\2felev\szoftarch\hazi\soft_arch_vehicle_fleet_manager\SoftArchVehicleFleetManager\TelemetryServiceLib\bin\Debug\net8.0\TelemetryServiceLib.deps.json
+C:\MyFiles\BME\msc\2felev\szoftarch\hazi\soft_arch_vehicle_fleet_manager\SoftArchVehicleFleetManager\TelemetryServiceLib\bin\Debug\net8.0\TelemetryServiceLib.dll
+C:\MyFiles\BME\msc\2felev\szoftarch\hazi\soft_arch_vehicle_fleet_manager\SoftArchVehicleFleetManager\TelemetryServiceLib\bin\Debug\net8.0\TelemetryServiceLib.pdb
+C:\MyFiles\BME\msc\2felev\szoftarch\hazi\soft_arch_vehicle_fleet_manager\SoftArchVehicleFleetManager\TelemetryServiceLib\obj\Debug\net8.0\TelemetryServiceLib.dll
+C:\MyFiles\BME\msc\2felev\szoftarch\hazi\soft_arch_vehicle_fleet_manager\SoftArchVehicleFleetManager\TelemetryServiceLib\obj\Debug\net8.0\refint\TelemetryServiceLib.dll
+C:\MyFiles\BME\msc\2felev\szoftarch\hazi\soft_arch_vehicle_fleet_manager\SoftArchVehicleFleetManager\TelemetryServiceLib\obj\Debug\net8.0\TelemetryServiceLib.pdb
+C:\MyFiles\BME\msc\2felev\szoftarch\hazi\soft_arch_vehicle_fleet_manager\SoftArchVehicleFleetManager\TelemetryServiceLib\obj\Debug\net8.0\ref\TelemetryServiceLib.dll
