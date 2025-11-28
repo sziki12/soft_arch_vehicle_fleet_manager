@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using SoftArchVehicleFleetManager.Data;
 using SoftArchVehicleFleetManager.Dtos.Manufacturers;
 using SoftArchVehicleFleetManager.Dtos.Modules;
@@ -12,7 +13,8 @@ namespace SoftArchVehicleFleetManager.Services
         NotFound,
         InvalidManufacturerId,
         InvalidInterfaceId,
-        InvalidVehicleId
+        InvalidVehicleId,
+        HWIDAlreadyExists,
     }
 
     public enum ModuleCreateResult
@@ -20,7 +22,8 @@ namespace SoftArchVehicleFleetManager.Services
         Success,
         InvalidManufacturerId,
         InvalidInterfaceId,
-        InvalidVehicleId
+        InvalidVehicleId,
+        HWIDAlreadyExists,
     }
 
     public class ModulesService
@@ -46,6 +49,20 @@ namespace SoftArchVehicleFleetManager.Services
                     m.VehicleId
                 ))
                 .ToListAsync();
+        }
+
+        public async Task<ModuleDto?> GetByHWIDAsync(string HWID)
+        {
+            return await _db.Modules
+                .AsNoTracking()
+                .Where(m => m.HardwareId == HWID)
+                .Select(m => new ModuleDto(
+                    m.Id,
+                    m.HardwareId,
+                    m.ManufacturerId,
+                    m.InterfaceId,
+                    m.VehicleId
+                )).FirstOrDefaultAsync();
         }
 
         public async Task<ModuleDto?> GetOneAsync(int id)
@@ -91,8 +108,11 @@ namespace SoftArchVehicleFleetManager.Services
             if (!await _db.Interfaces.AsNoTracking().AnyAsync(i => i.Id == createDto.InterfaceId))
                 return (ModuleCreateResult.InvalidInterfaceId, null);
 
-            if (!await _db.Vehicles.AsNoTracking().AnyAsync(v => v.Id == createDto.VehicleId))
+            if (createDto.VehicleId != null && !await _db.Vehicles.AsNoTracking().AnyAsync(v => v.Id == createDto.VehicleId))
                 return (ModuleCreateResult.InvalidVehicleId, null);
+
+            if (await _db.Modules.AsNoTracking().AnyAsync(m => m.HardwareId == createDto.HardwareId))
+                return (ModuleCreateResult.HWIDAlreadyExists, null);
 
             var module = new Module
             {
@@ -123,6 +143,9 @@ namespace SoftArchVehicleFleetManager.Services
 
             if (updateDto.HardwareId is not null)
             {
+                if (await _db.Modules.AsNoTracking().AnyAsync(m => m.HardwareId == updateDto.HardwareId))
+                    return ModuleUpdateResult.HWIDAlreadyExists;
+
                 module.HardwareId = updateDto.HardwareId;
             }
 

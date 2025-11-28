@@ -1,8 +1,10 @@
-﻿namespace SoftArchVehicleFleetManager.Dtos.Interfaces
+﻿using System.Text.Json.Serialization;
+
+namespace SoftArchVehicleFleetManager.Dtos.Interfaces
 {
     public record InterfaceCreateDto(
-        string Name,
-        string InterfaceJSON,
-        int ManufacturerId
+        [property: JsonPropertyName("INTERFACE_NAME")] string Name,
+        [property: JsonPropertyName("INTERFACE_JSON")] string InterfaceJSON,
+        [property: JsonPropertyName("MANUFACTURER_ID")] int ManufacturerId
     );
 }

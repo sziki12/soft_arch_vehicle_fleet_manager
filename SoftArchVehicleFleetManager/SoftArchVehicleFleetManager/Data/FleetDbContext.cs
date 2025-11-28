@@ -61,7 +61,6 @@ namespace SoftArchVehicleFleetManager.Data
              .HasOne(m => m.Vehicle)
              .WithMany(v => v.Modules)
              .HasForeignKey(m => m.VehicleId)
-             .IsRequired()
              .OnDelete(DeleteBehavior.Restrict);
 
             // Alarm / Fleet: Many-to-One
