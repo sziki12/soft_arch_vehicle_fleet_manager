@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, of } from 'rxjs';
 import { Alarm } from '../models/alarm.model';
+import { DtoMappereService } from './dto-mapper.service';
 
 @Injectable({ providedIn: 'root' })
 export class AlarmService {
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient, private dtoMapperService: DtoMappereService) { }
 
     private mockData: Alarm[] = [
         {

@@ -50,7 +50,7 @@ export class FleetManagerPageComponent implements OnInit {
     this.selectedVehicle = {
       id: 0,
       name: '',
-      licansePlate: '',
+      licensePlate: '',
       fleetId: 0,
       year: new Date().getFullYear(),
       model: ''

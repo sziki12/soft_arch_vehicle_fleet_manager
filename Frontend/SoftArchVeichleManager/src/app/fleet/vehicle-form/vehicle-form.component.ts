@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Vehicle } from '../../models/vehicle.model';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 
 @Component({
@@ -19,16 +20,16 @@ export class VehicleFormComponent implements OnChanges {
 
   form!: FormGroup;
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder, private authService: AuthService) { }
 
   ngOnChanges(): void {
     this.form = this.fb.group({
-      vehicleId: [this.vehicle.id],
-      vehicleName: [this.vehicle.name, Validators.required],
-      licansePlate: [this.vehicle.licansePlate, Validators.required],
-      fleetId: [this.vehicle.fleetId, [Validators.required, Validators.min(1)]],
-      vehicleYear: [this.vehicle.year, [Validators.required, Validators.min(1900), Validators.max(new Date().getFullYear() + 1)]],
-      vehicleModel: [this.vehicle.model, Validators.required]
+      id: [this.vehicle.id],
+      name: [this.vehicle.name, Validators.required],
+      licensePlate: [this.vehicle.licensePlate, Validators.required],
+      fleetId: [this.authService.currentUser?.fleetId, [Validators.required, Validators.min(1)]],
+      year: [this.vehicle.year, [Validators.required, Validators.min(1900), Validators.max(new Date().getFullYear() + 1)]],
+      model: [this.vehicle.model, Validators.required]
     });
   }
 

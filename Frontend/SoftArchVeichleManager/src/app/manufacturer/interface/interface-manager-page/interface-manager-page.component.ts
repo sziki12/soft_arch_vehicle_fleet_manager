@@ -31,11 +31,12 @@ export class InterfaceManagerPageComponent implements OnInit {
     this.loading = true;
     this.interfaceService.getInterfaces().subscribe(data => {
       this.interfaces = data;
-      this.loading = false;
+      this.moduleService.getModules().subscribe(data => {
+        this.modules = data;
+        this.loading = false;
     });
-    this.moduleService.getModules().subscribe(data => {
-      this.modules = data;
     });
+    
   }
 
   selectInterface(i: Interface) {

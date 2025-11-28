@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Interface } from '../models/interface.model';
-import { BehaviorSubject, delay, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, delay, map, Observable, of, tap } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Fleet } from '../models/fleet.model';
+import { DtoMappereService } from './dto-mapper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ import { Fleet } from '../models/fleet.model';
 export class FleetService {
     private apiBase = 'https://localhost:7172/api/fleets';
     private headers: HttpHeaders;
-    constructor(private http: HttpClient, private authService: AuthService) { 
+    constructor(private http: HttpClient, private authService: AuthService, private dtoMapperService: DtoMappereService) { 
         this.headers = new HttpHeaders();
             this.headers = this.headers.set('Authorization', `Bearer ${authService.currentUser?.token}`);
     }
@@ -25,21 +26,28 @@ export class FleetService {
     getFleets(): Observable<Fleet[]> {
         //API
         if (this.apiBase) {
-            return this.http.get<Fleet[]>(`${this.apiBase}/byuser?user_id=${this.authService.currentUser?.userId}`, { headers: this.headers }).pipe(tap(data => this.fleets = data));
+           return this.http.get<any[]>(`${this.apiBase}/byuser?user_id=${this.authService.currentUser?.userId}`, { headers: this.headers }).pipe(
+                map(data => this.dtoMapperService.transformArray(
+                    data,
+                    this.dtoMapperService.dtoToFleet
+                )),
+                tap(transformed => this.fleets = transformed)
+                );
         }
         //Mock
         return of([...this.mockData]).pipe(delay(400));
     }
 
     saveFleet(fleet: Fleet): Observable<Fleet> {
+        var dto = this.dtoMapperService.fleetToDto(fleet);
         //API
         if (this.apiBase) {
             if (fleet.id && fleet.id > 0) {
                 // UPDATE
-                return this.http.put<Interface>(`${this.apiBase}/${fleet.id}`, fleet, { headers: this.headers });
+                return this.http.put<Interface>(`${this.apiBase}/${fleet.id}`, dto, { headers: this.headers });
             } else {
                 // CREATE
-                return this.http.post<Interface>(`${this.apiBase}`, fleet, { headers: this.headers });
+                return this.http.post<Interface>(`${this.apiBase}`, dto, { headers: this.headers });
             }
         }
         //Mock

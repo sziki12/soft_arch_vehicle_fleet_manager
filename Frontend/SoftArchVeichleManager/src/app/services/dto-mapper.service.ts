@@ -42,7 +42,7 @@ export class DtoMappereService {
         return {
             VEHICLE_ID: (vehilce.id > 0) ? vehilce.id : null,
             VEHICLE_NAME: vehilce.name,
-            VEHICLE_LICENSE_PLATE: vehilce.licansePlate,
+            VEHICLE_LICENSE_PLATE: vehilce.licensePlate,
             VEHICLE_MODEL: vehilce.model,
             VEHICLE_YEAR: vehilce.year,
             FLEET_ID: vehilce.fleetId
@@ -94,7 +94,7 @@ export class DtoMappereService {
         return {
             id: dto.VEHICLE_ID,
             name: dto.VEHICLE_NAME,
-            licansePlate: dto.VEHICLE_LICENSE_PLATE,
+            licensePlate: dto.VEHICLE_LICENSE_PLATE,
             model: dto.VEHICLE_MODEL,
             year: dto.VEHICLE_YEAR,
             fleetId: dto.FLEET_ID

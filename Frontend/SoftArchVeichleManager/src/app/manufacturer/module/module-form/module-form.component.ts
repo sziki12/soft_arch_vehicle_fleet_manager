@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { Module } from '../../../models/module.model';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -15,7 +15,7 @@ import { Interface } from '../../../models/interface.model';
   standalone: true,
   styleUrl: './module-form.component.css',
 })
-export class ModuleFormComponent implements OnChanges {
+export class ModuleFormComponent implements OnChanges, OnInit {
   @Input() module!: Module;
   @Input() fleets!: Fleet[];
   @Input() vehicles!: Vehicle[];
@@ -24,14 +24,14 @@ export class ModuleFormComponent implements OnChanges {
   @Output() cancel = new EventEmitter<void>();
 
   form!: FormGroup;
-  public selectedFleetId: number | null = null;
-  public selectedVehicleId: number | null = null;
   public selectedInterfaceId: number | null = null;
-  public availableVehicles: Vehicle[] = [];
 
   constructor(private fb: FormBuilder, private authService: AuthService) { 
     this.form = new FormGroup({selectedInterfaceId: new FormControl(null)
-});
+    });
+  }
+  ngOnInit(): void {
+    this.selectedInterfaceId = this.module.interfaceId;
   }
 
   ngOnChanges(): void {
