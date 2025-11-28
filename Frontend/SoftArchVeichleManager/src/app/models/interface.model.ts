@@ -1,6 +1,6 @@
 export interface Interface {
     id: number;
     name: string;
-    interfaceJSON: string;
+    interfaceJson: string;
     manufacturerId: number;
 }

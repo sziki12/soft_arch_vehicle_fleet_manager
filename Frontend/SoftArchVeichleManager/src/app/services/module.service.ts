@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Module } from '../models/module.model';
-import { delay, Observable, of, tap } from 'rxjs';
+import { delay, map, Observable, of, tap } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
+import { DtoMappereService } from './dto-mapper.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ModuleService {
 
-    constructor(private http: HttpClient, private authService: AuthService) {
+    constructor(private http: HttpClient, private authService: AuthService, private dtoMapperService: DtoMappereService) {
         this.headers = new HttpHeaders();
             this.headers = this.headers.set('Authorization', `Bearer ${authService.currentUser?.token}`);
      }
@@ -25,21 +26,29 @@ export class ModuleService {
     getModules(): Observable<Module[]> {
         //API
         if (this.apiBase) {
-             return this.http.get<Module[]>(`${this.apiBase}/byuser?user_id=${this.authService.currentUser?.userId}`, { headers: this.headers }).pipe(tap(data => this.modules = data));
+             return this.http.get<any[]>(`${this.apiBase}/byuser?user_id=${this.authService.currentUser?.userId}`, { headers: this.headers }).pipe(
+                map(data => this.dtoMapperService.transformArray(
+                    data,
+                    this.dtoMapperService.dtoToModule
+                )),
+                tap(transformed => this.modules = transformed)
+                );
         }
         //Mock
         return of([...this.mockData]).pipe(delay(400));
     }
 
     saveModule(module: Module): Observable<Module> {
+        var dto = this.dtoMapperService.moduleToDto(module);
+        console.log('Saving module DTO:', dto);
         //API
         if (this.apiBase) {
             if (module.id && module.id > 0) {
                 // UPDATE
-                return this.http.put<Module>(`${this.apiBase}/${module.id}`, this.moduleToDto(module), { headers: this.headers });
+                return this.http.put<Module>(`${this.apiBase}/${module.id}`, dto, { headers: this.headers });
             } else {
                 // CREATE
-                return this.http.post<Module>(`${this.apiBase}`, this.moduleToDto(module), { headers: this.headers });
+                return this.http.post<Module>(`${this.apiBase}`, dto, { headers: this.headers });
             }
         }
         //Mock

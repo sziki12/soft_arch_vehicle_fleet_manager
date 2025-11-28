@@ -7,21 +7,21 @@
 
         <div *ngIf="loading">Loading...</div>
 
-        <app-card *ngFor="let alarm of alarms" [isActive]="selectedAlarm?.alarmId === alarm.alarmId"
+        <app-card *ngFor="let alarm of alarms" [isActive]="selectedAlarm?.id === alarm.id"
             (click)="selectAlarm(alarm)">
 
             <div class="card-header">
-                <h3 class="card-title">Alarm #{{ alarm.alarmId || 'new' }}</h3>
+                <h3 class="card-title">Alarm #{{ alarm.id || 'new' }}</h3>
 
                 <div class="card-actions">
-                    <button (click)="onDelete(alarm.alarmId, $event)" class="btn-icon btn-delete" title="Delete">
+                    <button (click)="onDelete(alarm.id, $event)" class="btn-icon btn-delete" title="Delete">
                         ×
                     </button>
                 </div>
             </div>
 
             <p class="card-subtitle">
-                Fleet: #{{ alarm.alarmFleet }}
+                Fleet: #{{ alarm.fleetId }}
             </p>
 
             <dl class="json-list">

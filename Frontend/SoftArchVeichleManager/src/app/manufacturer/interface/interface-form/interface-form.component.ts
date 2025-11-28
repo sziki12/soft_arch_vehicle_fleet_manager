@@ -24,7 +24,7 @@ export class InterfaceFormComponent implements OnChanges {
     this.form = this.fb.group({
       id: [this.interface.id],
       name: [this.interface.name, Validators.required],
-      interfaceJSON: [this.interface.interfaceJSON, [Validators.required, Validators.min(1)]],
+      interfaceJSON: [this.interface.interfaceJson, [Validators.required, Validators.min(1)]],
       manufacturerId: [this.authService.currentUser?.manufacturerId]
     });
   }

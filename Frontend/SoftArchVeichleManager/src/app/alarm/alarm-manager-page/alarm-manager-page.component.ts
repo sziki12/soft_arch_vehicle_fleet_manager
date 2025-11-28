@@ -43,8 +43,9 @@ export class AlarmManagerPageComponent implements OnInit {
 
   createNew(): void {
     this.selectedAlarm = {
-      alarmId: 0,
-      alarmFleet: 0,
+      id: 0,
+      fleetId: 0,
+      interfaceId: 0,
       alarmJson: '{}'
     };
   }

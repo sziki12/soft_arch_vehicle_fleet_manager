@@ -10,18 +10,21 @@ export class AlarmService {
 
     private mockData: Alarm[] = [
         {
-            alarmId: 1,
-            alarmFleet: 101,
+            id: 1,
+            fleetId: 101,
+            interfaceId: 1,
             alarmJson: JSON.stringify({ type: 'Battery', level: 'Critical', lastUpdate: '2024-05-01T10:00:00Z' })
         },
         {
-            alarmId: 2,
-            alarmFleet: 102,
+            id: 2,
+            fleetId: 102,
+            interfaceId: 2,
             alarmJson: JSON.stringify({ type: 'Engine', level: 'Warning', temperature: 95 })
         },
         {
-            alarmId: 3,
-            alarmFleet: 101,
+            id: 3,
+            fleetId: 101,
+            interfaceId: 3,
             alarmJson: JSON.stringify({ type: 'Maintenance', dueInKm: 1500 })
         }
     ];
@@ -52,14 +55,14 @@ export class AlarmService {
     saveAlarm(alarm: Alarm): Observable<Alarm> {
         return new Observable(observer => {
             setTimeout(() => {
-                if (alarm.alarmId && alarm.alarmId > 0) {
-                    const index = this.mockData.findIndex(a => a.alarmId === alarm.alarmId);
+                if (alarm.id && alarm.id > 0) {
+                    const index = this.mockData.findIndex(a => a.id === alarm.id);
                     if (index > -1) {
                         this.mockData[index] = alarm;
                     }
                 } else {
-                    const maxId = this.mockData.length > 0 ? Math.max(...this.mockData.map(a => a.alarmId)) : 0;
-                    alarm.alarmId = maxId + 1;
+                    const maxId = this.mockData.length > 0 ? Math.max(...this.mockData.map(a => a.id)) : 0;
+                    alarm.id = maxId + 1;
                     this.mockData.push(alarm);
                 }
 
@@ -72,7 +75,7 @@ export class AlarmService {
     deleteAlarm(id: number): Observable<boolean> {
         return new Observable(observer => {
             setTimeout(() => {
-                const index = this.mockData.findIndex(a => a.alarmId === id);
+                const index = this.mockData.findIndex(a => a.id === id);
                 if (index > -1) {
                     this.mockData.splice(index, 1);
                     observer.next(true);

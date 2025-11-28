@@ -1,7 +1,8 @@
 export interface Vehicle {
     id: number;
     name: string;
+    licansePlate: string;
     fleetId: number;
-    vehicleYear: number;
-    vehicleModel: string;
+    year: number;
+    model: string;
 }

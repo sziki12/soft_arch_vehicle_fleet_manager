@@ -17,9 +17,9 @@ export class VehicleService {
     }
 
     private mockData: Vehicle[] = [
-        { id: 1, name: 'Főnöki Autó', fleetId: 101, vehicleYear: 2022, vehicleModel: 'Audi A6' },
-        { id: 2, name: 'Szerviz Furgon', fleetId: 101, vehicleYear: 2018, vehicleModel: 'Ford Transit' },
-        { id: 3, name: 'Tartalék Kocsi', fleetId: 102, vehicleYear: 2015, vehicleModel: 'Opel Astra' },
+        { id: 1, name: 'Főnöki Autó', fleetId: 101, year: 2022, model: 'Audi A6', licansePlate: 'ABC-123' },
+        { id: 2, name: 'Szerviz Furgon', fleetId: 101, year: 2018, model: 'Ford Transit', licansePlate: 'CDF-456' },
+        { id: 3, name: 'Tartalék Kocsi', fleetId: 102, year: 2015, model: 'Opel Astra', licansePlate: 'GHI-789' },
     ];
 
     private vehicles: Vehicle[] = [];

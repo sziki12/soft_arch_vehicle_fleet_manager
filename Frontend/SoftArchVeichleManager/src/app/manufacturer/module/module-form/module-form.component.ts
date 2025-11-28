@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { Module } from '../../../models/module.model';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { Manifacturer } from '../../../models/manufacturer.model';
@@ -29,26 +29,19 @@ export class ModuleFormComponent implements OnChanges {
   public selectedInterfaceId: number | null = null;
   public availableVehicles: Vehicle[] = [];
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
-
-
-   }
+  constructor(private fb: FormBuilder, private authService: AuthService) { 
+    this.form = new FormGroup({selectedInterfaceId: new FormControl(null)
+});
+  }
 
   ngOnChanges(): void {
     this.form = this.fb.group({
       id: [this.module.id],
       hardwareId: [this.module.hardwareId, [Validators.required]],
       manufacturerId: [this.authService.currentUser?.manufacturerId],
-      interfaceId: [this?.selectedInterfaceId, [Validators.required, Validators.min(1)]],
-      vehicleId: [this?.selectedVehicleId, [Validators.required, Validators.min(1)]],
+      interfaceId: [this.selectedInterfaceId],
+      vehicleId: [0],
     });
-  }
-
-  onFleetChange() {
-    this.availableVehicles = this.vehicles.filter(
-      vehicle => vehicle.fleetId === this.selectedFleetId
-    );
-    this.selectedVehicleId = null;
   }
 
   submit() {

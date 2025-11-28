@@ -1,5 +1,6 @@
 export interface Alarm {
-    alarmId: number;
-    alarmFleet: number;
+    id: number;
+    fleetId: number;
+    interfaceId: number;
     alarmJson: string;
 }

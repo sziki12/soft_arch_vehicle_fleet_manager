@@ -52,7 +52,7 @@ export class InterfaceManagerPageComponent implements OnInit {
     this.selectedInterface = {
       id: 0,
       name: "",
-      interfaceJSON: "",
+      interfaceJson: "",
       manufacturerId: 0
     };
   }

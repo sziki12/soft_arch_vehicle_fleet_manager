@@ -9,36 +9,10 @@
             <label>
             Interface:
             <select
-                [(ngModel)]="selectedInterfaceId">
-                <option [ngValue]="null" disabled selected>-- Select interface --</option>
+                formControlName="interfaceId">
+                <option [ngValue]="null" selected>-- Select interface --</option>
                 <option *ngFor="let i of interfaces" [ngValue]="i.id">
                 {{ i.name }}
-                </option>
-            </select>
-            </label>
-
-            <label>
-            Fleet:
-            <select
-                [(ngModel)]="selectedFleetId"
-                (change)="onFleetChange()">
-                <option [ngValue]="null" disabled selected>-- Select fleet --</option>
-                <option *ngFor="let f of fleets" [ngValue]="f.id">
-                {{ f.name }}
-                </option>
-            </select>
-            </label>
-
-            <br /><br />
-
-            <label>
-            Vehicle:
-            <select
-                [(ngModel)]="selectedVehicleId"
-                [disabled]="!selectedFleetId || availableVehicles.length === 0">
-                <option [ngValue]="null" disabled selected>-- Select Vehicle --</option>
-                <option *ngFor="let vehicle of availableVehicles" [ngValue]="vehicle.id">
-                {{ vehicle.name }}
                 </option>
             </select>
             </label>

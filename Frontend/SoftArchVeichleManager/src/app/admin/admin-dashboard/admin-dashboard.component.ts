@@ -195,7 +195,7 @@ export class AdminDashboardComponent implements OnInit {
   get filteredVehicles(): Vehicle[] {
     const term = this.vehicleSearch.toLowerCase();
     const filtered = this.vehicles
-      .filter(v => !term || v.name.toLowerCase().includes(term) || v.vehicleModel.toLowerCase().includes(term))
+      .filter(v => !term || v.name.toLowerCase().includes(term) || v.model.toLowerCase().includes(term))
       .filter(v => this.vehicleFleetFilter === 'all' || v.id === this.vehicleFleetFilter);
     return this.limitList(filtered, this.showAllVehicles ? undefined : 6);
   }
@@ -203,7 +203,7 @@ export class AdminDashboardComponent implements OnInit {
   get filteredAlarms(): Alarm[] {
     const term = this.alarmSearch.toLowerCase();
     const filtered = this.alarms
-      .filter(a => !term || a.alarmJson.toLowerCase().includes(term) || String(a.alarmId).includes(term) || String(a.alarmFleet).includes(term));
+      .filter(a => !term || a.alarmJson.toLowerCase().includes(term) || String(a.id).includes(term) || String(a.fleetId).includes(term));
     return this.limitList(filtered, this.showAllAlarms ? undefined : 5);
   }
 

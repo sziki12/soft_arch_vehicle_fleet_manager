@@ -178,7 +178,7 @@
             <li *ngFor="let vehicle of filteredVehicles">
                 <div>
                     <div class="text-strong">{{ vehicle.name }}</div>
-                    <small class="muted">{{ vehicle.vehicleModel }} &bull; {{ vehicle.vehicleYear }}</small>
+                    <small class="muted">{{ vehicle.model }} &bull; {{ vehicle.year }}</small>
                 </div>
                 <span class="fleet-chip">Fleet #{{ vehicle.id }}</span>
             </li>
@@ -204,8 +204,8 @@
         <ul class="list">
             <li *ngFor="let alarm of filteredAlarms">
                 <div>
-                    <div class="text-strong">Alarm #{{ alarm.alarmId }}</div>
-                    <small class="muted">Fleet #{{ alarm.alarmFleet }}</small>
+                    <div class="text-strong">Alarm #{{ alarm.id }}</div>
+                    <small class="muted">Fleet #{{ alarm.fleetId }}</small>
                 </div>
                 <pre class="alarm-json">{{ alarm.alarmJson }}</pre>
             </li>

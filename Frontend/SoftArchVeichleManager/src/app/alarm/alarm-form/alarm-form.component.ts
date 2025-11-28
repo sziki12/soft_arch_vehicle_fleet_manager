@@ -30,8 +30,8 @@ export class AlarmFormComponent implements OnInit, OnChanges {
 
   ngOnChanges(): void {
     this.form = this.fb.group({
-      alarmId: [this.alarm.alarmId],
-      alarmFleet: [this.alarm.alarmFleet, [Validators.required, Validators.min(1)]],
+      alarmId: [this.alarm.id],
+      alarmFleet: [this.alarm.fleetId, [Validators.required, Validators.min(1)]],
       interfaceName: [this.selectedInterface],
       alarmJson: [this.alarm.alarmJson || '{}', [Validators.required, Validators.minLength(2)]]
     });
@@ -148,8 +148,8 @@ export class AlarmFormComponent implements OnInit, OnChanges {
 
   submit() {
     if (this.form.valid) {
-      const { alarmId, alarmFleet, alarmJson } = this.form.value;
-      this.save.emit({ alarmId, alarmFleet, alarmJson });
+      const { id, fleetId, interfaceId, alarmJson } = this.form.value;
+      this.save.emit({ id, fleetId, interfaceId, alarmJson });
     }
   }
 }

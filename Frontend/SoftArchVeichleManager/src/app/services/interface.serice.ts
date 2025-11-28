@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Interface } from '../models/interface.model';
-import { BehaviorSubject, delay, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, delay, map, Observable, of, tap } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
+import { DtoMappereService } from './dto-mapper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,14 +11,14 @@ import { AuthService } from './auth.service';
 export class InterfaceService {
     private apiBase = 'https://localhost:7172/api/interfaces';
     private headers: HttpHeaders;
-    constructor(private http: HttpClient, private authService: AuthService) { 
+    constructor(private http: HttpClient, private authService: AuthService, private dtoMapperService: DtoMappereService) { 
         this.headers = new HttpHeaders();
             this.headers = this.headers.set('Authorization', `Bearer ${authService.currentUser?.token}`);
     }
     private mockData: Interface[] = [
-        { id: 1, name: 'Speed Meter Interface', interfaceJSON: "{}", manufacturerId: 1},
-        { id: 2, name: 'Distance Sensor Interface', interfaceJSON: "{}", manufacturerId: 1},
-        { id: 3, name: 'Temperature Meter Interface', interfaceJSON: "{}", manufacturerId: 2},
+        { id: 1, name: 'Speed Meter Interface', interfaceJson: "{}", manufacturerId: 1},
+        { id: 2, name: 'Distance Sensor Interface', interfaceJson: "{}", manufacturerId: 1},
+        { id: 3, name: 'Temperature Meter Interface', interfaceJson: "{}", manufacturerId: 2},
     ];
 
     private interfaces: Interface[] = [];
@@ -26,23 +27,30 @@ export class InterfaceService {
         //API
         if (this.apiBase) {
             //console.log(`API Call to: ${this.apiBase}/byuser?user_id=${this.authService.currentUser?.userId}, with token: ${this.authService.currentUser?.token}`);
-            return this.http.get<Interface[]>(`${this.apiBase}/byuser?user_id=${this.authService.currentUser?.userId}`, { headers: this.headers }).pipe(tap(data => this.interfaces = data));
+            return this.http.get<any[]>(`${this.apiBase}/byuser?user_id=${this.authService.currentUser?.userId}`, { headers: this.headers }).pipe(
+                map(data => this.dtoMapperService.transformArray(
+                    data,
+                    this.dtoMapperService.dtoToInterface
+                )),
+                tap(transformed => this.interfaces = transformed)
+                );
         }
         //Mock
         return of([...this.mockData]).pipe(delay(400));
     }
 
     saveInterface(interfaceModel: Interface): Observable<Interface> {
+        var dto = this.dtoMapperService.interfaceToDto(interfaceModel);
         //API
         if (this.apiBase) {
             if (interfaceModel.id && interfaceModel.id > 0) {
                 // UPDATE
-                return this.http.put<Interface>(`${this.apiBase}/${interfaceModel.id}`, interfaceModel, { headers: this.headers });
+                return this.http.put<Interface>(`${this.apiBase}/${interfaceModel.id}`, dto, { headers: this.headers });
             } else {
                 // CREATE
                 console.log(`interfaceModel`);
                 console.log(interfaceModel);
-                return this.http.post<Interface>(`${this.apiBase}`, interfaceModel, { headers: this.headers });
+                return this.http.post<Interface>(`${this.apiBase}`, dto, { headers: this.headers });
             }
         }
         //Mock
