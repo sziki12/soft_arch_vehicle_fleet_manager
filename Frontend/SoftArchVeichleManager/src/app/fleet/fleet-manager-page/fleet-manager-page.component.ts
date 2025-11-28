@@ -6,6 +6,8 @@ import { VehicleService } from '../../services/vehicle.service';
 import { MainLayoutComponent } from '../../layout/main-layout/main-layout.component';
 import { CardComponent } from '../../../shared/card/card.component';
 import { VehicleFormComponent } from '../vehicle-form/vehicle-form.component';
+import { Fleet } from '../../models/fleet.model';
+import { FleetService } from '../../services/fleet.service';
 
 @Component({
   selector: 'app-fleet-manager-page',
@@ -21,6 +23,7 @@ import { VehicleFormComponent } from '../vehicle-form/vehicle-form.component';
 })
 export class FleetManagerPageComponent implements OnInit {
   vehicles: Vehicle[] = [];
+  fleets: Fleet[] = [];
   selectedVehicle: Vehicle | null = null;
   loading = false;
   reportLoadingId: number | null = null;
@@ -28,7 +31,7 @@ export class FleetManagerPageComponent implements OnInit {
   reportVehicleId: number | null = null;
   reportHeaderDate: Date | null = null;
 
-  constructor(private vehicleService: VehicleService) { }
+  constructor(private vehicleService: VehicleService, private fleetService: FleetService) { }
 
   ngOnInit(): void {
     this.loadData();
@@ -38,7 +41,10 @@ export class FleetManagerPageComponent implements OnInit {
     this.loading = true;
     this.vehicleService.getVehicles().subscribe(data => {
       this.vehicles = data;
-      this.loading = false;
+      this.fleetService.getFleets().subscribe(data => {
+        this.fleets = data;
+        this.loading = false;
+      });
     });
   }
 
@@ -103,5 +109,10 @@ export class FleetManagerPageComponent implements OnInit {
     }
 
     return [{ key: 'data', value: String(payload) }];
+  }
+
+  getFleetNameByVehicle(vehicle: Vehicle): string {
+    const fleet = this.fleets.find(f => f.id === vehicle.fleetId);
+    return fleet ? fleet.name : 'Unknown Fleet';
   }
 }

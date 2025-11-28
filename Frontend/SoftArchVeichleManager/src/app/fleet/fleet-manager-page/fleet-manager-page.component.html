@@ -30,7 +30,7 @@
             </p>
 
             <small class="card-meta">
-                {{ v.year }} | Fleet: #{{ v.fleetId }}
+                {{ v.year }} | Fleet: {{ getFleetNameByVehicle(v) }}
             </small>
 
         </app-card>
