@@ -59,13 +59,13 @@ export class AdminDashboardComponent implements OnInit {
     private fb: FormBuilder
   ) {
     this.fleetForm = this.fb.group({
-      fleetName: ['', Validators.required],
+      name: ['', Validators.required],
       region: ['']
     });
 
     this.assignmentForm = this.fb.group({
       userId: [null, Validators.required],
-      fleetId: [null, Validators.required]
+      id: [null, Validators.required]
     });
   }
 
@@ -129,7 +129,7 @@ export class AdminDashboardComponent implements OnInit {
 
     this.adminService.createFleet(this.fleetForm.value).subscribe(newFleet => {
       this.fleets = [...this.fleets, newFleet];
-      this.fleetForm.reset({ fleetName: '', region: '' });
+      this.fleetForm.reset({ name: '', region: '' });
     });
   }
 
@@ -139,28 +139,28 @@ export class AdminDashboardComponent implements OnInit {
       return;
     }
 
-    const { userId, fleetId } = this.assignmentForm.value;
-    const normalizedFleetId = fleetId === 0 ? null : fleetId;
+    const { userId, id } = this.assignmentForm.value;
+    const normalizedFleetId = id === 0 ? null : id;
 
     this.adminService.assignUserToFleet(userId, normalizedFleetId).subscribe(updatedUser => {
       this.users = this.users.map(u => u.userId === updatedUser.userId ? updatedUser : u);
     });
   }
 
-  getFleetVehicleCount(fleetId: number): number {
-    return this.vehicles.filter(v => v.fleetId === fleetId).length;
+  getFleetVehicleCount(id: number): number {
+    return this.vehicles.filter(v => v.id === id).length;
   }
 
-  getUsersForFleet(fleetId: number): AdminUser[] {
-    return this.users.filter(u => u.fleetId === fleetId);
+  getUsersForFleet(id: number): AdminUser[] {
+    return this.users.filter(u => u.userId === id);
   }
 
-  getFleetName(fleetId: number | null | undefined): string {
-    if (fleetId == null) {
+  getFleetName(id: number | null | undefined): string {
+    if (id == null) {
       return 'Unassigned';
     }
-    const fleet = this.fleets.find(f => f.fleetId === fleetId);
-    return fleet ? fleet.fleetName : `#${fleetId}`;
+    const fleet = this.fleets.find(f => f.id === id);
+    return fleet ? fleet.name : `#${id}`;
   }
 
   statusBadgeClass(status: ReportSummary['status']): string {
@@ -173,7 +173,7 @@ export class AdminDashboardComponent implements OnInit {
     const term = this.fleetSearch.toLowerCase();
     const filtered = this.fleets.filter(f =>
       !term ||
-      f.fleetName.toLowerCase().includes(term) ||
+      f.name.toLowerCase().includes(term) ||
       (f.region || '').toLowerCase().includes(term)
     );
     return this.limitList(filtered, this.showAllFleets ? undefined : 4);
@@ -186,8 +186,8 @@ export class AdminDashboardComponent implements OnInit {
       .filter(u => this.userRoleFilter === 'all' || u.role === this.userRoleFilter)
       .filter(u => {
         if (this.userFleetFilter === 'all') return true;
-        if (this.userFleetFilter === 'unassigned') return !u.fleetId;
-        return u.fleetId === this.userFleetFilter;
+        if (this.userFleetFilter === 'unassigned') return !u.userId;
+        return u.userId === this.userFleetFilter;
       });
     return this.limitList(filtered, this.showAllUsers ? undefined : 6);
   }
@@ -195,8 +195,8 @@ export class AdminDashboardComponent implements OnInit {
   get filteredVehicles(): Vehicle[] {
     const term = this.vehicleSearch.toLowerCase();
     const filtered = this.vehicles
-      .filter(v => !term || v.vehicleName.toLowerCase().includes(term) || v.vehicleModel.toLowerCase().includes(term))
-      .filter(v => this.vehicleFleetFilter === 'all' || v.fleetId === this.vehicleFleetFilter);
+      .filter(v => !term || v.name.toLowerCase().includes(term) || v.vehicleModel.toLowerCase().includes(term))
+      .filter(v => this.vehicleFleetFilter === 'all' || v.id === this.vehicleFleetFilter);
     return this.limitList(filtered, this.showAllVehicles ? undefined : 6);
   }
 

@@ -1,6 +1,6 @@
 export interface Fleet {
-    fleetId: number;
-    fleetName: string;
+    id: number;
+    name: string;
     region?: string;
     vehicleCount?: number;
 }

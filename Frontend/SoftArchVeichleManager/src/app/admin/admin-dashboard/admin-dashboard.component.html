@@ -54,16 +54,16 @@
         <div class="fleet-grid">
             <div class="fleet-card" *ngFor="let fleet of filteredFleets">
                 <div class="fleet-card__header">
-                    <h4>{{ fleet.fleetName }}</h4>
-                    <span class="fleet-tag">#{{ fleet.fleetId }}</span>
+                    <h4>{{ fleet.name }}</h4>
+                    <span class="fleet-tag">#{{ fleet.id }}</span>
                 </div>
                 <p class="muted">{{ fleet.region || 'No region set' }}</p>
                 <div class="fleet-meta">
-                    <span>{{ getFleetVehicleCount(fleet.fleetId) }} vehicles</span>
-                    <span>{{ getUsersForFleet(fleet.fleetId).length }} managers</span>
+                    <span>{{ getFleetVehicleCount(fleet.id) }} vehicles</span>
+                    <span>{{ getUsersForFleet(fleet.id).length }} managers</span>
                 </div>
-                <div class="fleet-users" *ngIf="getUsersForFleet(fleet.fleetId).length">
-                    <span *ngFor="let user of getUsersForFleet(fleet.fleetId)">{{ user.name }}</span>
+                <div class="fleet-users" *ngIf="getUsersForFleet(fleet.id).length">
+                    <span *ngFor="let user of getUsersForFleet(fleet.id)">{{ user.name }}</span>
                 </div>
             </div>
         </div>
@@ -71,7 +71,7 @@
         <form class="inline-form" [formGroup]="fleetForm" (ngSubmit)="createFleet()">
             <div>
                 <label>Fleet name</label>
-                <input type="text" formControlName="fleetName" placeholder="e.g. West Coast Ops">
+                <input type="text" formControlName="name" placeholder="e.g. West Coast Ops">
             </div>
             <div>
                 <label>Region / site</label>
@@ -100,8 +100,8 @@
             <select [(ngModel)]="userFleetFilter">
                 <option value="all">Any fleet</option>
                 <option value="unassigned">Unassigned</option>
-                <option *ngFor="let fleet of fleets" [ngValue]="fleet.fleetId">
-                    {{ fleet.fleetName }} ({{ fleet.fleetId }})
+                <option *ngFor="let fleet of fleets" [ngValue]="fleet.id">
+                    {{ fleet.name }} ({{ fleet.id }})
                 </option>
             </select>
             <button type="button" class="ghost-btn" (click)="showAllUsers = !showAllUsers">
@@ -119,7 +119,7 @@
             <div class="table-row" *ngFor="let user of filteredUsers">
                 <span class="text-strong">{{ user.name }}</span>
                 <span class="badge">{{ user.role }}</span>
-                <span>{{ getFleetName(user.fleetId ?? null) }}</span>
+                <span>{{ getFleetName(user.userId ?? null) }}</span>
                 <span class="muted">{{ user.email }}</span>
             </div>
         </div>
@@ -139,10 +139,10 @@
 
                 <label>
                     Fleet
-                    <select formControlName="fleetId">
+                    <select formControlName="id">
                         <option [ngValue]="0">Unassigned</option>
-                        <option *ngFor="let fleet of fleets" [ngValue]="fleet.fleetId">
-                            {{ fleet.fleetName }} ({{ fleet.fleetId }})
+                        <option *ngFor="let fleet of fleets" [ngValue]="fleet.id">
+                            {{ fleet.name }} ({{ fleet.id }})
                         </option>
                     </select>
                 </label>
@@ -165,8 +165,8 @@
             <input type="search" placeholder="Search vehicle or model" [(ngModel)]="vehicleSearch">
             <select [(ngModel)]="vehicleFleetFilter">
                 <option value="all">Any fleet</option>
-                <option *ngFor="let fleet of fleets" [ngValue]="fleet.fleetId">
-                    {{ fleet.fleetName }} ({{ fleet.fleetId }})
+                <option *ngFor="let fleet of fleets" [ngValue]="fleet.id">
+                    {{ fleet.name }} ({{ fleet.id }})
                 </option>
             </select>
             <button type="button" class="ghost-btn" (click)="showAllVehicles = !showAllVehicles">
@@ -177,10 +177,10 @@
         <ul class="list">
             <li *ngFor="let vehicle of filteredVehicles">
                 <div>
-                    <div class="text-strong">{{ vehicle.vehicleName }}</div>
+                    <div class="text-strong">{{ vehicle.name }}</div>
                     <small class="muted">{{ vehicle.vehicleModel }} &bull; {{ vehicle.vehicleYear }}</small>
                 </div>
-                <span class="fleet-chip">Fleet #{{ vehicle.fleetId }}</span>
+                <span class="fleet-chip">Fleet #{{ vehicle.id }}</span>
             </li>
         </ul>
     </section>

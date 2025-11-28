@@ -48,8 +48,8 @@ export class FleetManagerPageComponent implements OnInit {
 
   createNew(): void {
     this.selectedVehicle = {
-      vehicleId: 0,
-      vehicleName: '',
+      id: 0,
+      name: '',
       fleetId: 0,
       vehicleYear: new Date().getFullYear(),
       vehicleModel: ''
@@ -79,7 +79,7 @@ export class FleetManagerPageComponent implements OnInit {
       .pipe(finalize(() => this.reportLoadingId = null))
       .subscribe({
         next: report => {
-          this.reportVehicleId = report.vehicleId;
+          this.reportVehicleId = report.id;
           this.reportHeaderDate = new Date();
           this.reportPayloadEntries = this.getReportEntries(report.payload);
         },

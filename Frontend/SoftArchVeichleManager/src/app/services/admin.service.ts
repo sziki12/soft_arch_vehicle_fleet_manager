@@ -15,8 +15,8 @@ export class AdminService {
     ];
 
     private fleets: Fleet[] = [
-        { fleetId: 101, fleetName: 'Central Ops', region: 'Budapest' },
-        { fleetId: 102, fleetName: 'Northern Logistics', region: 'Gyor' }
+        { id: 101, name: 'Central Ops', region: 'Budapest' },
+        { id: 102, name: 'Northern Logistics', region: 'Gyor' }
     ];
 
     private reports: ReportSummary[] = [
@@ -38,10 +38,10 @@ export class AdminService {
     }
 
     createFleet(payload: { fleetName: string; region?: string }): Observable<Fleet> {
-        const maxId = this.fleets.length ? Math.max(...this.fleets.map(f => f.fleetId)) : 100;
+        const maxId = this.fleets.length ? Math.max(...this.fleets.map(f => f.id)) : 100;
         const newFleet: Fleet = {
-            fleetId: maxId + 1,
-            fleetName: payload.fleetName,
+            id: maxId + 1,
+            name: payload.fleetName,
             region: payload.region || 'Unassigned'
         };
 

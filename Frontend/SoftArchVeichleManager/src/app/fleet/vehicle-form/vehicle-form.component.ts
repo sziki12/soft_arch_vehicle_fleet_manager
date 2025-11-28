@@ -23,8 +23,8 @@ export class VehicleFormComponent implements OnChanges {
 
   ngOnChanges(): void {
     this.form = this.fb.group({
-      vehicleId: [this.vehicle.vehicleId],
-      vehicleName: [this.vehicle.vehicleName, Validators.required],
+      vehicleId: [this.vehicle.id],
+      vehicleName: [this.vehicle.name, Validators.required],
       fleetId: [this.vehicle.fleetId, [Validators.required, Validators.min(1)]],
       vehicleYear: [this.vehicle.vehicleYear, [Validators.required, Validators.min(1900), Validators.max(new Date().getFullYear() + 1)]],
       vehicleModel: [this.vehicle.vehicleModel, Validators.required]

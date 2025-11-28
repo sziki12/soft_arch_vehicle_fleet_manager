@@ -7,19 +7,19 @@
 
         <div *ngIf="loading">Loading...</div>
 
-        <app-card *ngFor="let v of vehicles" [isActive]="selectedVehicle?.vehicleId === v.vehicleId"
+        <app-card *ngFor="let v of vehicles" [isActive]="selectedVehicle?.id === v.id"
             (click)="selectVehicle(v)">
 
             <div class="card-header">
-                <h3 class="card-title">{{ v.vehicleName }}</h3>
+                <h3 class="card-title">{{ v.name }}</h3>
 
                 <div class="card-actions">
-                    <button (click)="onGenerateReport(v.vehicleId, $event)" class="btn-icon btn-report"
-                        [disabled]="reportLoadingId === v.vehicleId" title="Generate report">
-                        {{ reportLoadingId === v.vehicleId ? 'Generating...' : 'Report' }}
+                    <button (click)="onGenerateReport(v.id, $event)" class="btn-icon btn-report"
+                        [disabled]="reportLoadingId === v.id" title="Generate report">
+                        {{ reportLoadingId === v.id ? 'Generating...' : 'Report' }}
                     </button>
 
-                    <button (click)="onDelete(v.vehicleId, $event)" class="btn-icon btn-delete" title="Delete">
+                    <button (click)="onDelete(v.id, $event)" class="btn-icon btn-delete" title="Delete">
                         Delete
                     </button>
                 </div>

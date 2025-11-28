@@ -1,6 +1,6 @@
 export interface Vehicle {
-    vehicleId: number;
-    vehicleName: string;
+    id: number;
+    name: string;
     fleetId: number;
     vehicleYear: number;
     vehicleModel: string;
