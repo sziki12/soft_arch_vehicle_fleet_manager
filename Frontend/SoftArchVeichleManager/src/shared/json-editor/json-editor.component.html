@@ -1,0 +1,38 @@
+ 
+<div class="json-editor">
+ <div
+    class="json-row"
+    *ngFor="let entry of entries; let i = index; trackBy: trackByIndex"
+  >
+    <!-- Key textbox -->
+    <input
+      type="text"
+      placeholder="Key"
+      [(ngModel)]="entry.key"
+      [ngModelOptions]="{ standalone: true }"
+    />
+
+    <!-- Value textbox -->
+    <input
+      type="text"
+      placeholder="Value"
+      [(ngModel)]="entry.value"
+      [ngModelOptions]="{ standalone: true }"
+    />
+
+    <!-- Remove button -->
+    <button type="button" (click)="removeEntry(i)">✕</button>
+  </div>
+
+  <!-- Add new key-value pair -->
+  <button type="button" (click)="addEntry()">
+    + Add key/value
+  </button>
+
+  <!-- Live JSON preview -->
+  <h4>Resulting JSON</h4>
+  <pre>{{ jsonObject | json }}</pre>
+  <button type="button" (click)="saveJson()">
+    Save Json
+  </button>
+</div>

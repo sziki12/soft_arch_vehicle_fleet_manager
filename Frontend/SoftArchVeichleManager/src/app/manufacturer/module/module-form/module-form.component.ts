@@ -24,7 +24,7 @@ export class ModuleFormComponent implements OnChanges, OnInit {
   @Output() cancel = new EventEmitter<void>();
 
   form!: FormGroup;
-  public selectedInterfaceId: number | null = null;
+  selectedInterfaceId: number | null = null;
 
   constructor(private fb: FormBuilder, private authService: AuthService) { 
     this.form = new FormGroup({selectedInterfaceId: new FormControl(null)

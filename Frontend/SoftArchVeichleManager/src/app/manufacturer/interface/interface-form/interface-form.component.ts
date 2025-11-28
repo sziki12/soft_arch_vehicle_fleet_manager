@@ -3,10 +3,11 @@ import { Interface } from '../../../models/interface.model';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
+import { JsonEditorComponent } from '../../../../shared/json-editor/json-editor.component';
 
 @Component({
   selector: 'app-interface-form',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, JsonEditorComponent],
   templateUrl: './interface-form.component.html',
   styleUrl: './interface-form.component.css',
   standalone: true,
@@ -24,7 +25,7 @@ export class InterfaceFormComponent implements OnChanges {
     this.form = this.fb.group({
       id: [this.interface.id],
       name: [this.interface.name, Validators.required],
-      interfaceJSON: [this.interface.interfaceJson, [Validators.required, Validators.min(1)]],
+      interfaceJson: [this.interface.interfaceJson, [Validators.required, Validators.min(1)]],
       manufacturerId: [this.authService.currentUser?.manufacturerId]
     });
   }
@@ -33,5 +34,9 @@ export class InterfaceFormComponent implements OnChanges {
     if (this.form.valid) {
       this.save.emit(this.form.value);
     }
+  }
+
+  saveJson(json: string) {
+    this.form.patchValue({ interfaceJson: json });
   }
 }

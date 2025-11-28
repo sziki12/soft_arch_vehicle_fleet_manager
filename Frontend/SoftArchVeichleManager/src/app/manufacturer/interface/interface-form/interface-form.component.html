@@ -10,7 +10,7 @@
 
         <div class="form-group">
             <label>Interface JSON</label>
-            <input formControlName="interfaceJSON" type="text" placeholder='{"speed":"[integer, km/h]","rpm":"[integer, rpm]"}'>
+            <app-json-editor [json]="interface.interfaceJson!" (save)="saveJson($event)" formControlName="interfaceJson"></app-json-editor>
         </div>
     </div>
 
