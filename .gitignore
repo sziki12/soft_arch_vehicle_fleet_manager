@@ -1,6 +1,7 @@
-/SoftArchVehicleFleetManager/.vs
-/SoftArchVehicleFleetManager/SoftArchVehicleFleetManager/obj
-/SoftArchVehicleFleetManager/SoftArchVehicleFleetManager/bin
+**/.vs/*
+**/bin/*
+**/obj/*
 
-/SoftArchVehicleFleetManager/SpeedTelemetryModul/obj
-/SoftArchVehicleFleetManager/SpeedTelemetryModul/bin
+*.dll
+*.pdb
+*.cache
