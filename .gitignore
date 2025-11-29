@@ -1,3 +1,10 @@
 /SoftArchVehicleFleetManager/.vs
 /SoftArchVehicleFleetManager/SoftArchVehicleFleetManager/obj
 /SoftArchVehicleFleetManager/SoftArchVehicleFleetManager/bin
+
+**/bin/*
+**/obj/*
+
+*.dll
+*.pdb
+*.cache
