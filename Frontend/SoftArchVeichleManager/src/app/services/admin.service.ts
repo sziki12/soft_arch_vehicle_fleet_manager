@@ -16,6 +16,7 @@ import { Interface } from '../models/interface.model';
 import { Module } from '../models/module.model';
 import { Vehicle } from '../models/vehicle.model';
 import { Alarm } from '../models/alarm.model';
+import { UserService } from './user.service';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -25,16 +26,19 @@ export class AdminService {
     constructor(private http: HttpClient, private authService: AuthService, 
         private dtoMapperService: DtoMappereService, private fleetService: FleetService,
         private vehicleService: VehicleService, private alarmService: AlarmService,
-        private interfaceService: InterfaceService, private moduleService: ModuleService) { 
+        private interfaceService: InterfaceService, private moduleService: ModuleService, 
+        private userService: UserService) { 
         this.headers = new HttpHeaders();
             this.headers = this.headers.set('Authorization', `Bearer ${authService.currentUser?.token}`);
     }
     
     private users: AdminUser[] = [
-        { userId: 1, name: 'Anna Admin', email: 'anna.admin@example.com', role: 'admin' },
-        { userId: 2, name: 'Milan Manager', email: 'milan.manager@example.com', role: 'manager', fleetId: 101 },
-        { userId: 3, name: 'Sara Supervisor', email: 'sara.supervisor@example.com', role: 'manager', fleetId: 102 },
-        { userId: 4, name: 'Peter Planner', email: 'peter.planner@example.com', role: 'manager', fleetId: null }
+        { id: 1, name: 'Anna Admin', role: 'admin' },
+        { id: 2, name: 'Milan Manager', role: 'manager', fleetId: 101 },
+        { id: 3, name: 'Sara Supervisor',  role: 'manager', fleetId: 102 },
+        { id: 4, name: 'Peter Planner', role: 'manager', fleetId: null },
+        { id: 4, name: 'Manufacturer Manuel',  role: 'manufacturer', manufacturerId: 1 },
+        { id: 4, name: 'Module Mark', role: 'manufacturer', fleetId: 2 }
     ];
 
     private fleets: Fleet[] = [
@@ -81,8 +85,15 @@ export class AdminService {
         return this.fleetService.saveFleet(newFleet);
     }
 
+    createUser(payload: { name: string; password: string, role: 'admin' | 'manager' | 'manufacturer' }): Observable<AdminUser> { 
+        var newUser: AdminUser = {id: 0, ...payload};
+        return this.userService.saveUser(newUser);
+    }
+
     assignUserToFleet(userId: number, fleetId: number | null): Observable<AdminUser> {
-        const idx = this.users.findIndex(u => u.userId === userId);
+        this.userService.saveUser({...this.users.find(u => u.id === userId)!, fleetId});
+
+        const idx = this.users.findIndex(u => u.id === userId);
         if (idx === -1) {
             throw new Error('User not found');
         }

@@ -3,7 +3,7 @@ import { Module } from '../../../models/module.model';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
-import { Manifacturer } from '../../../models/manufacturer.model';
+import { Manufacturer } from '../../../models/manufacturer.model';
 import { Vehicle } from '../../../models/vehicle.model';
 import { Fleet } from '../../../models/fleet.model';
 import { Interface } from '../../../models/interface.model';
