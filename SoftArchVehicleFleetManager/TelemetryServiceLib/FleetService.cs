@@ -1,21 +1,20 @@
 ﻿using System.Text.Json;
+using System.Collections.Concurrent;
 
 namespace TelemetryServiceLib
 {
-    // FLEET SERVICE CLASS
     // Manages a fleet of modules under a specific fleet name
     public class FleetService
     {
         public string FleetName { get; set; }
 
-        public List<FleetModul> FleetModules { get; set; } = new List<FleetModul>();
+        public ConcurrentDictionary<string, FleetModule> FleetModules { get; set; } = new ();
 
-        public List<FleetAlertConstraint> FleetAlertConstraints { get; set; } = new List<FleetAlertConstraint>();
+        public ConcurrentDictionary<string, FleetAlertConstraint> FleetAlertConstraints { get; set; } = new ();
 
         private HiveClient hiveClient;
 
-        private readonly object fleetModulesLock = new object();
-
+        // Constructor initializes HiveClient and sets up message handling
         public FleetService(string fleetName)
         {
             FleetName = fleetName;
@@ -33,31 +32,24 @@ namespace TelemetryServiceLib
                     JsonDocument json = JsonDocument.Parse(message);
 
                     string hardwareAddress = json.RootElement.GetProperty("header").GetProperty("hardware").GetString() ?? "N.A.";
-                    string modulManufacturer = json.RootElement.GetProperty("header").GetProperty("manufacturer").GetString() ?? "N.A.";
+                    string moduleManufacturer = json.RootElement.GetProperty("header").GetProperty("manufacturer").GetString() ?? "N.A.";
 
                     JsonElement element = json.RootElement.GetProperty("data");
 
-                    lock (fleetModulesLock)
-                    {
-                        foreach (var modul in FleetModules)
-                        {
-                            if (modul.HardwareAddress == hardwareAddress)
-                            {
-                                modul.ModulManufacturer = modulManufacturer;
-                                modul.TelemetryData = JsonDocument.Parse(element.GetRawText());
-                                return;
-                            }
-                        }
-
-                        FleetModul newFleetModul = new FleetModul
+                    FleetModules.AddOrUpdate(hardwareAddress,
+                        new FleetModule
                         {
                             HardwareAddress = hardwareAddress,
-                            ModulManufacturer = modulManufacturer,
-                            TelemetryData = JsonDocument.Parse(element.GetRawText())
-                        };
-
-                        FleetModules.Add(newFleetModul);
-                    }
+                            ModuleManufacturer = moduleManufacturer,
+                            TelemetryData = element.GetRawText()
+                        },
+                        (key, existingModule) =>
+                        {
+                            existingModule.ModuleManufacturer = moduleManufacturer;
+                            existingModule.TelemetryData = element.GetRawText();
+                            return existingModule;
+                        }
+                    );
                 };
             }
             catch (Exception exception)
@@ -67,12 +59,14 @@ namespace TelemetryServiceLib
             }
         }
 
+
         // Adds subscription for a specific module's telemetry topic
-        public void AddModulTelemetrySubscripition(string modulManufacturer, string hardwareAddress)
+        public void AddModuleTelemetrySubscripition(string moduleManufacturer, string hardwareAddress)
         {
-            string topic = $"telemetry/{FleetName}/{modulManufacturer}/{hardwareAddress}";
+            string topic = $"telemetry/{FleetName}/{moduleManufacturer}/{hardwareAddress}";
             hiveClient.SubscribeToTopic(topic);
         }
+
 
         // Gets data from DB as in memory Lists and adds subscriptions to handle MQTT
         public void AddModulTelemetrySubscripition(List<string> manufacturers, List<string> hardwares)
@@ -81,33 +75,129 @@ namespace TelemetryServiceLib
             {
                 foreach (var hardware in hardwares)
                 {
-                    AddModulTelemetrySubscripition(manufacturer, hardware);
+                    AddModuleTelemetrySubscripition(manufacturer, hardware);
                 }
             }
         }
 
+
         // Get specific module telemetry data
-        public JsonDocument? GetModulTelemetry(string hardwareAddress) { 
-           return FleetModules.Find(m => m.HardwareAddress == hardwareAddress)?.TelemetryData;
+        public string GetModuleTelemetry(string hardwareAddress) {
+            FleetModule? fleetModule = null;
+
+            FleetModules.TryGetValue(hardwareAddress, out fleetModule);
+
+            if(fleetModule != null) 
+            {
+                return fleetModule.TelemetryData;
+            }
+            else 
+            {
+                throw new ArgumentNullException($"No telemetry data found for hardware address: {hardwareAddress}");
+            }
         }
+
+
+        // Removes alert constraint from FleetAlertConstraints
+        public bool RemoveFleetAlertConstraint(string alertId)
+        {
+            return FleetAlertConstraints.TryRemove(alertId, out _);
+        }
+
 
         // Gets alert constraints from DB and adds them to FleetAlertConstraints
-        public void AddModulAlertConstraint(string modulManufacturer, string alertConstraint) 
-        { 
-            
-        }
-
-        // Parses alert constraints and checks if the given FleetModul is under alert
-        private bool ParseAlertConstraintsFor(FleetModul fleetModul, JsonDocument alertConstraint) 
+        public void AddModuleAlertConstraint(string alertId, string moduleManufacturer, string alertConstraint)
         {
-            bool hasAlert = false;
-            return hasAlert;
+            FleetAlertConstraints.AddOrUpdate(alertId,
+                new FleetAlertConstraint
+                {
+                    AlertId = alertId,
+                    ModuleManufacturer = moduleManufacturer,
+                    AlertConstraint = alertConstraint
+                },
+                (key, existingConstraint) =>
+                {
+                    existingConstraint.ModuleManufacturer = moduleManufacturer;
+                    existingConstraint.AlertConstraint = alertConstraint;
+                    return existingConstraint;
+                }
+            );
         }
 
-        // Returns a list of FleetModul instances so that web UI can display them
-        public List<FleetModul> GetModulesUnderAlert() 
-        { 
-            return new List<FleetModul>();
+
+        // Checks if the telemetry value meets the alert constraint
+        private bool AlertForTelemetry(string telemetryValue, string constraint)
+        {
+            string[] tokens = constraint.Split(' ');
+            double telemetryDouble = double.Parse(telemetryValue);
+            if (tokens[0] == "GT") { 
+                double constraintDouble = double.Parse(tokens[1]);
+                return telemetryDouble > constraintDouble;
+            }
+            if (tokens[0] == "LT") {
+                double constraintDouble = double.Parse(tokens[1]);
+                return telemetryDouble < constraintDouble;
+            }
+            return false;
+        }
+
+
+        // Parses alert constraints and checks if the given FleetModule is under alert
+        private bool ParseAlertConstraintsFor(FleetModule fleetModule, FleetAlertConstraint fleetAlertConstraint) 
+        {
+            JsonDocument? telemetryData = JsonDocument.Parse(fleetModule.TelemetryData);
+            if (telemetryData == null)
+            {
+                return false;
+            }
+
+            JsonDocument? alertConstraint = JsonDocument.Parse(fleetAlertConstraint.AlertConstraint);
+            if (alertConstraint == null) {
+                return false;
+            }
+
+            if (fleetModule.ModuleManufacturer != fleetAlertConstraint.ModuleManufacturer)
+            {
+                return false;
+            }
+
+            foreach (var telemetryElement in telemetryData.RootElement.EnumerateObject())
+            {
+                foreach (var constraintElement in alertConstraint.RootElement.EnumerateObject())
+                {
+                    if (telemetryElement.Name == constraintElement.Name)
+                    {
+                        string telemetryValue = telemetryElement.Value.ToString();
+                        string constraintValue = constraintElement.Value.ToString();
+                        if (AlertForTelemetry(telemetryValue, constraintValue))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+
+        // Returns a list of FleetModule instances so that web UI can display them
+        public List<FleetModule> GetModulesUnderAlert() 
+        {    
+            List<FleetModule> result = new List<FleetModule>();
+
+            foreach (var fleetModule in FleetModules)
+            {
+                foreach (var fleetAlertConstraint in FleetAlertConstraints)
+                {
+                    if (ParseAlertConstraintsFor(fleetModule.Value, fleetAlertConstraint.Value))
+                    {
+                        result.Add(fleetModule.Value);
+                        break;
+                    }
+                }
+            } 
+
+            return result;
         }
     }
 }

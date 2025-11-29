@@ -11,8 +11,8 @@ namespace TelemetryServiceLib
     {
         public string AlertId { get; set; } = "";
 
-        public string ModulManufacturer { get; set; } = "";
+        public string ModuleManufacturer { get; set; } = "";
 
-        public JsonDocument? AlertConstraint { get; set; }
+        public string AlertConstraint { get; set; } = "";
     }
 }

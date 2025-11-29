@@ -8,47 +8,49 @@ namespace TelemetrySimulation
     {
         public string FleetName { get; set; }
 
-        public string ModulManufacturer { get; set; }
+        public string ModuleManufacturer { get; set; }
 
         public string HardwareAddress { get; set; }
 
         private HiveClient hiveClient;
 
-        public SimulatedModule(string fleetName, string modulManufacturer, string hardwareAddress)
+        public SimulatedModule(string fleetName, string moduleManufacturer, string hardwareAddress)
         {
             FleetName = fleetName;
-            ModulManufacturer = modulManufacturer;
+            ModuleManufacturer = moduleManufacturer;
             HardwareAddress = hardwareAddress;
 
             try
             {
-                hiveClient = new HiveClient("ModulSimulationClient");
+                hiveClient = new HiveClient("ModuleSimulationClient");
 
                 hiveClient.ClientInstance.OnMessageReceived += (sender, args) =>
                 {
                     var message = args.PublishMessage.PayloadAsString;
-                    Console.WriteLine($"Modul {HardwareAddress} received payload:\n {message}");
+                    Console.WriteLine($"Module {HardwareAddress} received payload:\n {message}");
                 };
             }
             catch (Exception exception)
             {
-                var error = $"Error initializing HiveClient for modul {HardwareAddress}: {exception.Message}";
+                var error = $"Error initializing HiveClient for module {HardwareAddress}: {exception.Message}";
                 throw new ArgumentNullException(error);
             }
         }
 
         public void GenerateSpeedTelemetry(bool printMessage) 
         {
+            int speedValue = 100 + new Random().Next(-10, 10);
+
             var messageJson = new JsonObject
             {
                 ["header"] = new JsonObject()
                 {
                     ["hardware"] = HardwareAddress,
-                    ["manufacturer"] = ModulManufacturer,
+                    ["manufacturer"] = ModuleManufacturer,
                 },
                 ["data"] = new JsonObject()
                 {
-                    ["speed"] = 100,
+                    ["speed"] = speedValue,
                     ["distance"] = 10
                 }
             };
@@ -57,10 +59,10 @@ namespace TelemetrySimulation
 
             if (printMessage) 
             {
-                Console.WriteLine($"Modul {HardwareAddress} publishing payload:\n {message} \n\n\n");
+                Console.WriteLine($"Module {HardwareAddress} publishing payload:\n {message} \n\n\n");
             }
 
-            string topic = $"telemetry/{FleetName}/{ModulManufacturer}/{HardwareAddress}";
+            string topic = $"telemetry/{FleetName}/{ModuleManufacturer}/{HardwareAddress}";
             hiveClient.PublishToTopic(topic, message);
         }
     }

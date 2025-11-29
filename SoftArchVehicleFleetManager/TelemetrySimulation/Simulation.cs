@@ -6,18 +6,20 @@
         {
             try
             {
-                SimulatedModule vehicle1 = new SimulatedModule("FleetA", "ManufacturerA", "ABC123");
-                SimulatedModule vehicle2 = new SimulatedModule("FleetA", "ManufacturerB", "ABC234");
-                SimulatedModule vehicle3 = new SimulatedModule("FleetA", "ManufacturerA", "ABC345");
+                List<SimulatedModule> simulatedModules = new List<SimulatedModule>();
 
-                Thread.Sleep(30000);
-                vehicle1.GenerateSpeedTelemetry(true);
+                simulatedModules.Add(new SimulatedModule("FleetA", "ManufacturerA", "ABC123"));
+                simulatedModules.Add(new SimulatedModule("FleetA", "ManufacturerB", "ABC234"));
+                simulatedModules.Add(new SimulatedModule("FleetA", "ManufacturerA", "ABC345"));
 
-                Thread.Sleep(30000);
-                vehicle1.GenerateSpeedTelemetry(true);
+                //simulatedModules.Add(new SimulatedModule("FleetB", "ManufacturerA", "ABC456"));
+                //simulatedModules.Add(new SimulatedModule("FleetB", "ManufacturerB", "ABC567"));
+                //simulatedModules.Add(new SimulatedModule("FleetB", "ManufacturerA", "ABC678"));
 
-                Thread.Sleep(30000);
-                vehicle2.GenerateSpeedTelemetry(true);
+                foreach (var simulatedModule in simulatedModules) {
+                    Thread.Sleep(10000);
+                    simulatedModule.GenerateSpeedTelemetry(true);
+                }
             }
             catch (Exception exception)
             {
