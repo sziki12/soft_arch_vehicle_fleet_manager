@@ -30,11 +30,13 @@ namespace SoftArchVehicleFleetManager.Services
     {
         private readonly FleetDbContext _db;
         private readonly UsersService _usersService;
+        private readonly VehiclesService _vehiclesService;
 
-        public ModulesService(FleetDbContext db, UsersService usersService)
+        public ModulesService(FleetDbContext db, UsersService usersService, VehiclesService vehiclesService)
         {
             _db = db;
             _usersService = usersService;
+            _vehiclesService = vehiclesService;
         }
 
         public async Task<List<ModuleDto>> GetAllAsync()
@@ -92,9 +94,16 @@ namespace SoftArchVehicleFleetManager.Services
                 var resultInterfaces = modules.Where(m => m.ManufacturerId == user.ManufacturerId.Value).ToList();
                 return resultInterfaces;
             }
-            else
+            else if (user.Role == Enums.UserRole.Admin)
             {
                 return await GetAllAsync();
+            }
+            else if (user.Role == Enums.UserRole.FleetOperator)
+            {
+                var modules = await GetAllAsync();
+                var vehicles = await _vehiclesService.GetAllByUserIdAsync(userId);
+                var ownVehicleIds = vehicles.Select(v => v.Id).ToList();
+                return modules.Where(m => ownVehicleIds.Contains(m.VehicleId ?? 0)).ToList();
             }
             return [];
         }
