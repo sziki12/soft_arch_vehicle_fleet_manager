@@ -23,6 +23,14 @@
                     <span>{{ alarms.length }}</span>
                     <small>alarms</small>
                 </div>
+                <div class="stat-card">
+                    <span>{{ interfaces.length }}</span>
+                    <small>interfaces</small>
+                </div>
+                <div class="stat-card">
+                    <span>{{ modules.length }}</span>
+                    <small>modules</small>
+                </div>
             </div>
         </div>
     </section>
@@ -33,6 +41,8 @@
         <button type="button" [class.active]="activeSection === 'vehicles'" (click)="setSection('vehicles')">Vehicles</button>
         <button type="button" [class.active]="activeSection === 'alarms'" (click)="setSection('alarms')">Alarms</button>
         <button type="button" [class.active]="activeSection === 'reports'" (click)="setSection('reports')">Reports</button>
+        <button type="button" [class.active]="activeSection === 'interfaces'" (click)="setSection('interfaces')">Interfaces</button>
+        <button type="button" [class.active]="activeSection === 'modules'" (click)="setSection('modules')">Modules</button>
     </nav>
 
     <section class="panel" *ngIf="activeSection === 'fleets'">
@@ -45,7 +55,7 @@
         </header>
 
         <div class="filters">
-            <input type="search" placeholder="Search fleets or regions" [(ngModel)]="fleetSearch">
+            <input type="search" placeholder="Search fleets" [(ngModel)]="fleetSearch">
             <button type="button" class="ghost-btn" (click)="showAllFleets = !showAllFleets">
                 {{ showAllFleets ? 'Show less' : 'Show more' }}
             </button>
@@ -57,7 +67,6 @@
                     <h4>{{ fleet.name }}</h4>
                     <span class="fleet-tag">#{{ fleet.id }}</span>
                 </div>
-                <p class="muted">{{ fleet.region || 'No region set' }}</p>
                 <div class="fleet-meta">
                     <span>{{ getFleetVehicleCount(fleet.id) }} vehicles</span>
                     <span>{{ getUsersForFleet(fleet.id).length }} managers</span>
@@ -72,10 +81,6 @@
             <div>
                 <label>Fleet name</label>
                 <input type="text" formControlName="name" placeholder="e.g. West Coast Ops">
-            </div>
-            <div>
-                <label>Region / site</label>
-                <input type="text" formControlName="region" placeholder="City or hub">
             </div>
             <button type="submit">Create fleet</button>
         </form>
@@ -238,5 +243,66 @@
                 <small>{{ report.createdAt | date: 'medium' }}</small>
             </div>
         </div>
+    </section>
+
+    <section class="panel" *ngIf="activeSection === 'interfaces'">
+        <header class="panel-header">
+            <div>
+                <p class="eyebrow">Interfaces</p>
+                <h3>Interfaces</h3>
+            </div>
+            <span class="muted" *ngIf="loadingInterfaces">Loading...</span>
+        </header>
+
+        <div class="filters">
+            <input type="search" placeholder="Search interfaces" [(ngModel)]="interfaceSearch">
+            <button type="button" class="ghost-btn" (click)="showAllInterfaces = !showAllInterfaces">
+                {{ showAllInterfaces ? 'Show less' : 'Show more' }}
+            </button>
+        </div>
+
+        <ul class="list">
+            <li *ngFor="let interface of filteredInterfaces">
+                <div>
+                    <div class="text-strong">Name: {{ interface.name }}</div>
+                    <small class="muted">Interface #{{ interface.id }}</small>
+                    <br/>
+                    <small class="muted">Manufacturer #{{ interface.manufacturerId }}</small>
+                </div>
+                <pre class="interface-json">{{ interface.interfaceJson }}</pre>
+            </li>
+        </ul>
+    </section>
+
+    <section class="panel" *ngIf="activeSection === 'modules'">
+        <header class="panel-header">
+            <div>
+                <p class="eyebrow">Modules</p>
+                <h3>Modules</h3>
+            </div>
+            <span class="muted" *ngIf="loadingModules">Loading...</span>
+        </header>
+
+        <div class="filters">
+            <input type="search" placeholder="Search module Names or Id" [(ngModel)]="moduleSearch">
+            <button type="button" class="ghost-btn" (click)="showAllAlarms = !showAllAlarms">
+                {{ showAllAlarms ? 'Show less' : 'Show more' }}
+            </button>
+        </div>
+
+        <ul class="list">
+            <li *ngFor="let module of filteredModules">
+                <div>
+                    <div class="text-strong">HWD ID: {{ module.hardwareId }}</div>
+                    <small class="muted">Module #{{ module.id }}</small>
+                    <br/>
+                    <small class="muted">Interface #{{ module.interfaceId }}</small>
+                    <br/>
+                    <small class="muted">Manufacturer #{{ module.manufacturerId }}</small>
+                    <br/>
+                    <small class="muted">Vehicle #{{ module.vehicleId }}</small>
+                </div>
+            </li>
+        </ul>
     </section>
 </div>

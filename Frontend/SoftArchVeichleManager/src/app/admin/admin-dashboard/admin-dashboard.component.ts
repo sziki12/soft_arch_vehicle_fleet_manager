@@ -10,6 +10,8 @@ import { Vehicle } from '../../models/vehicle.model';
 import { AlarmService } from '../../services/alarm.service';
 import { AdminService } from '../../services/admin.service';
 import { VehicleService } from '../../services/vehicle.service';
+import { Interface } from '../../models/interface.model';
+import { Module } from '../../models/module.model';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -24,8 +26,10 @@ export class AdminDashboardComponent implements OnInit {
   vehicles: Vehicle[] = [];
   alarms: Alarm[] = [];
   reports: ReportSummary[] = [];
+  interfaces: Interface[] = [];
+  modules: Module[] = [];
 
-  activeSection: 'fleets' | 'users' | 'vehicles' | 'alarms' | 'reports' = 'fleets';
+  activeSection: 'fleets' | 'users' | 'vehicles' | 'alarms' | 'reports' | 'interfaces' | 'modules' = 'fleets';
   fleetForm: FormGroup;
   assignmentForm: FormGroup;
 
@@ -40,22 +44,27 @@ export class AdminDashboardComponent implements OnInit {
   alarmSearch = '';
   reportSearch = '';
 
+  interfaceSearch = '';
+  moduleSearch = '';
+
   showAllFleets = false;
   showAllUsers = false;
   showAllVehicles = false;
   showAllAlarms = false;
   showAllReports = false;
+  showAllInterfaces = false;
+  showAllModules = false;
 
   loadingUsers = false;
   loadingFleets = false;
   loadingVehicles = false;
   loadingAlarms = false;
   loadingReports = false;
+  loadingInterfaces = false;
+  loadingModules = false;
 
   constructor(
     private adminService: AdminService,
-    private vehicleService: VehicleService,
-    private alarmService: AlarmService,
     private fb: FormBuilder
   ) {
     this.fleetForm = this.fb.group({
@@ -75,6 +84,8 @@ export class AdminDashboardComponent implements OnInit {
     this.loadVehicles();
     this.loadAlarms();
     this.loadReports();
+    this.loadInterfaces();
+    this.loadModules();
   }
 
   loadUsers(): void {
@@ -95,7 +106,7 @@ export class AdminDashboardComponent implements OnInit {
 
   loadVehicles(): void {
     this.loadingVehicles = true;
-    this.vehicleService.getVehicles().subscribe(vehicles => {
+    this.adminService.getVehicles().subscribe(vehicles => {
       this.vehicles = vehicles;
       this.loadingVehicles = false;
     });
@@ -103,9 +114,25 @@ export class AdminDashboardComponent implements OnInit {
 
   loadAlarms(): void {
     this.loadingAlarms = true;
-    this.alarmService.getAlarms().subscribe(alarms => {
+    this.adminService.getAlarms().subscribe(alarms => {
       this.alarms = alarms;
       this.loadingAlarms = false;
+    });
+  }
+
+  loadInterfaces(): void {
+    this.loadingInterfaces= true;
+    this.adminService.getInterfaces().subscribe(interfaces => {
+      this.interfaces = interfaces;
+      this.loadingInterfaces = false;
+    });
+  }
+
+  loadModules(): void {
+    this.loadingModules = true;
+    this.adminService.getModules().subscribe(modules => {
+      this.modules = modules;
+      this.loadingModules = false;
     });
   }
 
@@ -117,7 +144,7 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  setSection(section: 'fleets' | 'users' | 'vehicles' | 'alarms' | 'reports'): void {
+  setSection(section: 'fleets' | 'users' | 'vehicles' | 'alarms' | 'reports' | 'interfaces' | 'modules'): void {
     this.activeSection = section;
   }
 
@@ -173,8 +200,7 @@ export class AdminDashboardComponent implements OnInit {
     const term = this.fleetSearch.toLowerCase();
     const filtered = this.fleets.filter(f =>
       !term ||
-      f.name.toLowerCase().includes(term) ||
-      (f.region || '').toLowerCase().includes(term)
+      f.name.toLowerCase().includes(term)
     );
     return this.limitList(filtered, this.showAllFleets ? undefined : 4);
   }
@@ -215,6 +241,21 @@ export class AdminDashboardComponent implements OnInit {
         String(r.vehicleId).includes(term) ||
         String(r.ownerFleet).includes(term));
     return this.limitList(filtered, this.showAllReports ? undefined : 6);
+  }
+
+  get filteredInterfaces(): Interface[] {
+    const term = this.interfaceSearch.toLowerCase();
+    const filtered = this.interfaces
+      .filter(a => !term || a.interfaceJson.toLowerCase().includes(term) || String(a.id).includes(term) || String(a.name).toLowerCase().includes(term) || String(a.manufacturerId).includes(term));
+    return this.limitList(filtered, this.showAllInterfaces ? undefined : 5);
+  }
+
+  get filteredModules(): Module[] {
+    const term = this.moduleSearch.toLowerCase();
+    const filtered = this.modules
+      .filter(a => !term || a.hardwareId.toLowerCase().includes(term) || String(a.id).includes(term) || String(a.vehicleId).includes(term) 
+      || String(a.interfaceId).includes(term) || String(a.manufacturerId).includes(term));
+    return this.limitList(filtered, this.showAllAlarms ? undefined : 5);
   }
 
   private limitList<T>(list: T[], max?: number): T[] {

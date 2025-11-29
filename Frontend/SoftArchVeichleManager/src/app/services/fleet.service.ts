@@ -17,8 +17,8 @@ export class FleetService {
             this.headers = this.headers.set('Authorization', `Bearer ${authService.currentUser?.token}`);
     }
     private mockData: Fleet[] = [
-        { id: 101, name: 'Central Ops', region: 'Budapest' },
-        { id: 102, name: 'Northern Logistics', region: 'Gyor' }
+        { id: 101, name: 'Central Ops' },
+        { id: 102, name: 'Northern Logistics'}
     ];
 
     private fleets: Fleet[] = [];
@@ -44,10 +44,10 @@ export class FleetService {
         if (this.apiBase) {
             if (fleet.id && fleet.id > 0) {
                 // UPDATE
-                return this.http.put<Interface>(`${this.apiBase}/${fleet.id}`, dto, { headers: this.headers });
+                return this.http.put<Fleet>(`${this.apiBase}/${fleet.id}`, dto, { headers: this.headers });
             } else {
                 // CREATE
-                return this.http.post<Interface>(`${this.apiBase}`, dto, { headers: this.headers });
+                return this.http.post<Fleet>(`${this.apiBase}`, dto, { headers: this.headers });
             }
         }
         //Mock
