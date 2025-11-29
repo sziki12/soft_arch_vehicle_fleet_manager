@@ -101,6 +101,14 @@
                 <option value="all">All roles</option>
                 <option value="admin">Admins</option>
                 <option value="manager">Managers</option>
+                <option value="manufacturer">Managers</option>
+            </select>
+            <select [(ngModel)]="userFleetFilter">
+                <option value="all">Any fleet</option>
+                <option value="unassigned">Unassigned</option>
+                <option *ngFor="let fleet of fleets" [ngValue]="fleet.id">
+                    {{ fleet.name }} ({{ fleet.id }})
+                </option>
             </select>
             <select [(ngModel)]="userFleetFilter">
                 <option value="all">Any fleet</option>
@@ -124,8 +132,7 @@
             <div class="table-row" *ngFor="let user of filteredUsers">
                 <span class="text-strong">{{ user.name }}</span>
                 <span class="badge">{{ user.role }}</span>
-                <span>{{ getFleetName(user.userId ?? null) }}</span>
-                <span class="muted">{{ user.email }}</span>
+                <span>{{ getFleetName(user.id ?? null) }}</span>
             </div>
         </div>
 
@@ -136,7 +143,7 @@
                     Team member
                     <select formControlName="userId">
                         <option [ngValue]="null">Select a user</option>
-                        <option *ngFor="let user of users" [ngValue]="user.userId">
+                        <option *ngFor="let user of users" [ngValue]="user.id">
                             {{ user.name }} ({{ user.role }})
                         </option>
                     </select>

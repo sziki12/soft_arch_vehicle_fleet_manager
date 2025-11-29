@@ -7,11 +7,10 @@ import { AdminUser } from '../../models/admin-user.model';
 import { Fleet } from '../../models/fleet.model';
 import { ReportSummary } from '../../models/report.model';
 import { Vehicle } from '../../models/vehicle.model';
-import { AlarmService } from '../../services/alarm.service';
 import { AdminService } from '../../services/admin.service';
-import { VehicleService } from '../../services/vehicle.service';
 import { Interface } from '../../models/interface.model';
 import { Module } from '../../models/module.model';
+import { Manufacturer } from '../../models/manufacturer.model';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -28,6 +27,7 @@ export class AdminDashboardComponent implements OnInit {
   reports: ReportSummary[] = [];
   interfaces: Interface[] = [];
   modules: Module[] = [];
+  manufacturers: Manufacturer[] = [];
 
   activeSection: 'fleets' | 'users' | 'vehicles' | 'alarms' | 'reports' | 'interfaces' | 'modules' = 'fleets';
   fleetForm: FormGroup;
@@ -170,7 +170,7 @@ export class AdminDashboardComponent implements OnInit {
     const normalizedFleetId = id === 0 ? null : id;
 
     this.adminService.assignUserToFleet(userId, normalizedFleetId).subscribe(updatedUser => {
-      this.users = this.users.map(u => u.userId === updatedUser.userId ? updatedUser : u);
+      this.users = this.users.map(u => u.id === updatedUser.id ? updatedUser : u);
     });
   }
 
@@ -179,7 +179,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   getUsersForFleet(id: number): AdminUser[] {
-    return this.users.filter(u => u.userId === id);
+    return this.users.filter(u => u.id === id);
   }
 
   getFleetName(id: number | null | undefined): string {
@@ -208,12 +208,12 @@ export class AdminDashboardComponent implements OnInit {
   get filteredUsers(): AdminUser[] {
     const term = this.userSearch.toLowerCase();
     const filtered = this.users
-      .filter(u => !term || u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term))
+      .filter(u => !term || u.name.toLowerCase().includes(term))
       .filter(u => this.userRoleFilter === 'all' || u.role === this.userRoleFilter)
       .filter(u => {
         if (this.userFleetFilter === 'all') return true;
-        if (this.userFleetFilter === 'unassigned') return !u.userId;
-        return u.userId === this.userFleetFilter;
+        if (this.userFleetFilter === 'unassigned') return !u.id;
+        return u.id === this.userFleetFilter;
       });
     return this.limitList(filtered, this.showAllUsers ? undefined : 6);
   }

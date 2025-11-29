@@ -1,4 +1,4 @@
-export interface Manifacturer {
+export interface Manufacturer {
     id: number;
     name: string;
 }

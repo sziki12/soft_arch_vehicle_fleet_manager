@@ -4,6 +4,8 @@ import { Interface } from "../models/interface.model";
 import { Vehicle } from "../models/vehicle.model";
 import { Fleet } from "../models/fleet.model";
 import { Alarm } from "../models/alarm.model";
+import { AdminUser } from "../models/admin-user.model";
+import { Manufacturer } from "../models/manufacturer.model";
 
 @Injectable({
   providedIn: 'root'
@@ -67,6 +69,26 @@ export class DtoMappereService {
         };
     }
 
+    public userToDto(user: AdminUser, passowrd? : string): any
+    {
+        return {
+            USER_ID: (user.id > 0) ? user.id : null,
+            USER_NAME: user.name,
+            USER_ROLE: user.role,
+            MANUFACTURER_ID: (user.manufacturerId && user.manufacturerId > 0) ? user.manufacturerId : null,
+            FLEET_ID: (user.fleetId && user.fleetId > 0) ? user.fleetId : null,
+            PASSWORD: passowrd ? passowrd : null
+        };
+    }
+
+    public manufacturerToDto(manufacturer: Manufacturer): any
+    {
+        return {
+            MANUFACTURER_ID: (manufacturer.id > 0) ? manufacturer.id : null,
+            MANUFACTURER_NAME: manufacturer.name,
+        };
+    }
+
     //From DTO Mappers
     public dtoToModule(dto: any): Module
     {
@@ -114,6 +136,25 @@ export class DtoMappereService {
             alarmJson: dto.ALARM_JSON,
             fleetId: dto.ALARM_FLEET,
             interfaceId: dto.ALARM_INTERFACE
+        };
+    }
+
+    public dtoToUser(dto: any): AdminUser
+    {
+        return {
+            id: dto.USER_ID,
+            name: dto.USER_NAME,
+            role: dto.USER_ROLE,
+            manufacturerId: dto.MANUFACTURER_ID,
+            fleetId: dto.FLEET_ID,
+        };
+    }
+
+    public dtoToManufacturer(dto: any): Manufacturer
+    {
+        return {
+            id: dto.MANUFACTURER_ID,
+            name: dto.MANUFACTURER_NAME,
         };
     }
 }

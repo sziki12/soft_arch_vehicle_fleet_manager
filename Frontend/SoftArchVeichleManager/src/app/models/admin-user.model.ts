@@ -1,7 +1,7 @@
 export interface AdminUser {
-    userId: number;
+    id: number;
     name: string;
-    email: string;
-    role: 'admin' | 'manager';
+    role: 'admin' | 'manager' | 'manufacturer';
     fleetId?: number | null;
+    manufacturerId?: number | null;
 }
