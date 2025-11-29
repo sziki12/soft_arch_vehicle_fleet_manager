@@ -9,7 +9,9 @@ import { AuthService } from './auth.service';
 export class AlarmService {
 
     private apiBase = 'https://localhost:7172/api/alarms';
+    private interfaceApiBase = 'https://localhost:7172/api/interfaces';
     private headers: HttpHeaders;
+    private interfaceCache: Array<{ id: number; name: string; properties: string[] }> = [];
 
     constructor(
         private http: HttpClient,
@@ -41,15 +43,39 @@ export class AlarmService {
     }
 
     getAlarmInterfaces(): Observable<string[]> {
-        return this.http.get<string[]>('', { params: {} }).pipe(
-            catchError(() => of(['BatteryInterface', 'EngineInterface', 'MaintenanceInterface']))
+        return this.http.get<any[]>(`${this.interfaceApiBase}/byuser?user_id=${this.authService.currentUser?.userId}`, { headers: this.headers }).pipe(
+            map(data => this.dtoMapperService.transformArray(
+                data,
+                this.dtoMapperService.dtoToInterface
+            )),
+            map(interfaces => {
+                this.interfaceCache = interfaces.map(i => ({
+                    id: i.id,
+                    name: i.name,
+                    properties: this.extractProperties(i.interfaceJson)
+                }));
+                return interfaces.map(i => i.name);
+            }),
+            catchError(() => of([]))
         );
     }
 
     getInterfaceProperties(interfaceName: string): Observable<string[]> {
-        return this.http.get<string[]>('', { params: { interfaceName } }).pipe(
-            catchError(() => of(['type', 'level', 'detail']))
-        );
+        const cached = this.interfaceCache.find(i => i.name === interfaceName);
+        if (cached) {
+            return of(cached.properties);
+        }
+        return of([]);
+    }
+
+    getInterfaceNameById(id: number): string | null {
+        const cached = this.interfaceCache.find(i => i.id === id);
+        return cached ? cached.name : null;
+    }
+
+    getInterfaceIdByName(name: string): number | null {
+        const cached = this.interfaceCache.find(i => i.name === name);
+        return cached ? cached.id : null;
     }
 
     saveAlarm(alarm: Alarm): Observable<Alarm> {
@@ -108,5 +134,20 @@ export class AlarmService {
             ...fallback,
             alarmJson: this.normalizeAlarmJson(fallback.alarmJson)
         };
+    }
+
+    private extractProperties(interfaceJson: string): string[] {
+        try {
+            const parsed = JSON.parse(interfaceJson);
+            if (Array.isArray(parsed)) {
+                return parsed.map(p => String(p));
+            }
+            if (parsed && typeof parsed === 'object') {
+                return Object.keys(parsed);
+            }
+        } catch {
+            // ignore parse errors
+        }
+        return [];
     }
 }

@@ -34,6 +34,7 @@ export class AlarmFormComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
+    this.selectedInterface = this.alarmService.getInterfaceNameById(this.alarm.interfaceId) ?? this.selectedInterface;
     const defaultFleetId = this.authService.currentUser?.fleetId ?? this.alarm.fleetId;
 
     this.form = this.fb.group({
@@ -50,6 +51,12 @@ export class AlarmFormComponent implements OnInit, OnChanges {
   private loadInterfaces(): void {
     this.alarmService.getAlarmInterfaces().subscribe(list => {
       this.interfaces = list;
+      const nameFromId = this.alarmService.getInterfaceNameById(this.alarm.interfaceId);
+      if (nameFromId) {
+        this.selectedInterface = nameFromId;
+        this.form?.patchValue({ interfaceName: nameFromId });
+        this.onInterfaceSelect(nameFromId);
+      }
     });
   }
 
@@ -63,6 +70,7 @@ export class AlarmFormComponent implements OnInit, OnChanges {
 
     this.alarmService.getInterfaceProperties(name).subscribe(props => {
       this.interfaceProperties = props;
+      console.log('Loaded interface properties for', name, ':', props);
       this.bootstrapPropertyValues(props);
       this.syncAlarmJson();
     });
@@ -157,7 +165,8 @@ export class AlarmFormComponent implements OnInit, OnChanges {
     if (this.form.valid) {
       const alarmJson = this.form.value.alarmJson;
       const fleetId = this.form.value.alarmFleet;
-      const interfaceId = 1; // placeholder until real interface IDs are provided
+      const resolvedInterfaceId = this.alarmService.getInterfaceIdByName(this.form.value.interfaceName) ?? this.alarm.interfaceId ?? 0;
+      const interfaceId = resolvedInterfaceId;
       const id = this.form.value.alarmId ?? 0;
       this.save.emit({ id, fleetId, interfaceId, alarmJson });
     }
