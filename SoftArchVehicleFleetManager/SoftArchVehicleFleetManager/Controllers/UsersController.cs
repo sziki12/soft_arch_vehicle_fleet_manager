@@ -1,121 +1,65 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
-using SoftArchVehicleFleetManager.Data;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SoftArchVehicleFleetManager.Dtos.Users;
-using SoftArchVehicleFleetManager.Models;
+using SoftArchVehicleFleetManager.Services;
+using static SoftArchVehicleFleetManager.Services.UsersService;
 
 namespace SoftArchVehicleFleetManager.Controllers
 {
     [ApiController]
     [Route("api/users")]
+    [Authorize]
     public class UsersController : ControllerBase
     {
-        private readonly FleetDbContext _db;
-        public UsersController(FleetDbContext db) => _db = db;
+        private readonly UsersService _usersService;
 
+        public UsersController(UsersService usersService)
+        {
+            _usersService = usersService;
+        }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAll()
         {
-            var users = await _db.Users
-                .AsNoTracking()
-                .Select(u => new UserDto(
-                    u.Id,
-                    u.Username,
-                    u.Role,
-                    u.ManufacturerId,
-                    u.FleetId
-                ))
-                .ToListAsync();
-
+            var users = await _usersService.GetAllAsync();
             return Ok(users);
         }
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult<UserDto>> GetOne(int id)
         {
-            var user = await _db.Users.FindAsync(id);
-            return user is null
-                ? NotFound()
-                : new UserDto(
-                    user.Id,
-                    user.Username,
-                    user.Role,
-                    user.ManufacturerId,
-                    user.FleetId
-                );
+            var user = await _usersService.GetOneAsync(id);
+            if (user is null) return NotFound();
+            return Ok(user);
         }
 
         [HttpPost]
         public async Task<ActionResult<UserDto>> Create(UserCreateDto createDto)
         {
-            var user = new User
-            {
-                Username = createDto.Username,
-                Role = createDto.Role,
-                // TODO: Hash password before storing
-                Password = createDto.Password,
-                ManufacturerId = null,
-                FleetId = null
-            };
-
-            await _db.Users.AddAsync(user);
-            await _db.SaveChangesAsync();
-
-            var result = new UserDto(user.Id, user.Username, user.Role, user.ManufacturerId, user.FleetId);
-            return CreatedAtAction(nameof(GetOne), new { id = user.Id }, result);
+            var result = await _usersService.CreateAsync(createDto);
+            return CreatedAtAction(nameof(GetOne), new { id = result.Id }, result);
         }
 
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, UserUpdateDto updateDto)
         {
-            var user = await _db.Users.FindAsync(id);
-            if (user is null) return NotFound();
+            var updateResult = await _usersService.UpdateAsync(id, updateDto);
 
-            if (updateDto.Username is not null) user.Username = updateDto.Username;
-            if (updateDto.Password is not null)
+            return updateResult switch
             {
-                // TODO: Hash password before storing
-                user.Password = updateDto.Password;
-            }
-
-            if (updateDto.Role is not null)
-            {
-                // TODO: Hash password before storing
-                user.Role = (Enums.UserRole)updateDto.Role;
-            }
-
-            if (updateDto.ManufacturerId != user.ManufacturerId)
-            {
-                if (updateDto.ManufacturerId is int mid &&
-                    !await _db.Manufacturers.AsNoTracking().AnyAsync(m => m.Id == mid))
-                    return BadRequest(new { error = "Invalid ManufacturerId." });
-
-                user.ManufacturerId = updateDto.ManufacturerId;
-            }
-
-            if (updateDto.FleetId != user.FleetId)
-            {
-                if (updateDto.FleetId is int fid &&
-                    !await _db.Fleets.AsNoTracking().AnyAsync(f => f.Id == fid))
-                    return BadRequest(new { error = "Invalid FleetId." });
-
-                user.FleetId = updateDto.FleetId;
-            }
-
-            await _db.SaveChangesAsync();
-            return NoContent();
+                UserUpdateResult.Success => NoContent(),
+                UserUpdateResult.NotFound => NotFound(),
+                UserUpdateResult.InvalidManufacturerId => BadRequest(new { error = "Invalid ManufacturerId" }),
+                UserUpdateResult.InvalidFleetId => BadRequest(new { error = "Invalid FleetId" }),
+                _ => StatusCode(StatusCodes.Status500InternalServerError)
+            };
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var user = await _db.Users.FindAsync(id);
-            if (user is null) return NotFound();
-
-            _db.Users.Remove(user);
-            await _db.SaveChangesAsync();
+            var deleted = await _usersService.DeleteAsync(id);
+            if (!deleted) return NotFound();
             return NoContent();
         }
     }

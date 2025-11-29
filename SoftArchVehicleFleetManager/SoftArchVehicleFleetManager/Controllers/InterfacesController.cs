@@ -1,116 +1,75 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
-using SoftArchVehicleFleetManager.Data;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SoftArchVehicleFleetManager.Dtos.Interfaces;
-using SoftArchVehicleFleetManager.Models;
+using SoftArchVehicleFleetManager.Services;
 
 namespace SoftArchVehicleFleetManager.Controllers
 {
     [ApiController]
     [Route("api/interfaces")]
+    [Authorize]
     public class InterfacesController : ControllerBase
     {
-        private readonly FleetDbContext _db;
-        public InterfacesController(FleetDbContext db) => _db = db;
+        private readonly InterfacesService _interfacesService;
 
+        public InterfacesController(InterfacesService interfacesService)
+        {
+            _interfacesService = interfacesService;
+        }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<InterfaceDto>>> GetAll()
         {
-            var interfaces = await _db.Interfaces
-                .AsNoTracking()
-                .Select(i => new InterfaceDto(
-                    i.Id,
-                    i.Name,
-                    i.InterfaceJSON,
-                    i.ManufacturerId
-                ))
-                .ToListAsync();
-
+            var interfaces = await _interfacesService.GetAllAsync();
             return Ok(interfaces);
         }
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult<InterfaceDto>> GetOne(int id)
         {
-            var interface_ = await _db.Interfaces.FindAsync(id);
-            return interface_ is null
-                ? NotFound()
-                : new InterfaceDto(
-                    interface_.Id,
-                    interface_.Name,
-                    interface_.InterfaceJSON,
-                    interface_.ManufacturerId
-                );
+            var iface = await _interfacesService.GetOneAsync(id);
+            if (iface is null) return NotFound();
+            return Ok(iface);
         }
 
         [HttpPost]
         public async Task<ActionResult<InterfaceDto>> Create(InterfaceCreateDto createDto)
         {
-            // Validate foreign keys
-            if (!await _db.Manufacturers.AsNoTracking().AnyAsync(m => m.Id == createDto.ManufacturerId))
-                return BadRequest(new { error = "Invalid ManufacturerId." });
+            var (status, result) = await _interfacesService.CreateAsync(createDto);
 
-            var interface_ = new Interface
+            return status switch
             {
-                Name = createDto.Name,
-                InterfaceJSON = createDto.InterfaceJSON,
-                ManufacturerId = createDto.ManufacturerId
+                InterfaceCreateResult.Success => CreatedAtAction(nameof(GetOne), new { id = result!.Id }, result),
+                InterfaceCreateResult.InvalidManufacturerId => BadRequest(new { error = "Invalid ManufacturerId." }),
+                _ => StatusCode(StatusCodes.Status500InternalServerError)
             };
-
-            await _db.Interfaces.AddAsync(interface_);
-            await _db.SaveChangesAsync();
-
-            var result = new InterfaceDto(
-                    interface_.Id,
-                    interface_.Name,
-                    interface_.InterfaceJSON,
-                    interface_.ManufacturerId
-                );
-            return CreatedAtAction(nameof(GetOne), new
-            {
-                id = interface_.Id
-            }, result);
         }
 
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, InterfaceUpdateDto updateDto)
         {
-            var interface_ = await _db.Interfaces.FindAsync(id);
-            if (interface_ is null) return NotFound();
+            var result = await _interfacesService.UpdateAsync(id, updateDto);
 
-            if (updateDto.Name is not null)
+            return result switch
             {
-                interface_.Name = updateDto.Name;
-            }
-
-            if (updateDto.InterfaceJSON is not null)
-            {
-                interface_.InterfaceJSON = updateDto.InterfaceJSON;
-            }
-
-            if (updateDto.ManufacturerId is not null)
-            {
-                if (!await _db.Manufacturers.AsNoTracking().AnyAsync(f => f.Id == updateDto.ManufacturerId))
-                    return BadRequest(new { error = "Invalid ManufacturerId." });
-
-                interface_.ManufacturerId = (int)updateDto.ManufacturerId;
-            }
-
-            await _db.SaveChangesAsync();
-            return NoContent();
+                InterfaceUpdateResult.Success => NoContent(),
+                InterfaceUpdateResult.NotFound => NotFound(),
+                InterfaceUpdateResult.InvalidManufacturerId => BadRequest(new { error = "Invalid ManufacturerId." }),
+                _ => StatusCode(StatusCodes.Status500InternalServerError)
+            };
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var interface_ = await _db.Interfaces.FindAsync(id);
-            if (interface_ is null) return NotFound();
+            var result = await _interfacesService.DeleteAsync(id);
 
-            _db.Interfaces.Remove(interface_);
-            await _db.SaveChangesAsync();
-            return NoContent();
+            if (result)
+            {
+                return NoContent();
+            }
+
+            return NotFound();
         }
     }
 }

@@ -1,82 +1,68 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
-using SoftArchVehicleFleetManager.Data;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SoftArchVehicleFleetManager.Dtos.Fleets;
-using SoftArchVehicleFleetManager.Models;
+using SoftArchVehicleFleetManager.Services;
 
 namespace SoftArchVehicleFleetManager.Controllers
 {
     [ApiController]
     [Route("api/fleets")]
+    [Authorize]
     public class FleetsController : ControllerBase
     {
-        private readonly FleetDbContext _db;
-        public FleetsController(FleetDbContext db) => _db = db;
+        private readonly FleetsService _fleetsService;
 
+        public FleetsController(FleetsService fleetsService)
+        {
+            _fleetsService = fleetsService;
+        }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FleetDto>>> GetAll()
         {
-            var fleets = await _db.Fleets
-                .AsNoTracking()
-                .Select(f => new FleetDto(
-                    f.Id,
-                    f.Name
-                ))
-                .ToListAsync();
-
+            var fleets = await _fleetsService.GetAllAsync();
             return Ok(fleets);
         }
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult<FleetDto>> GetOne(int id)
         {
-            var manufacturer = await _db.Fleets.FindAsync(id);
-            return manufacturer is null
-                ? NotFound()
-                : new FleetDto(
-                    manufacturer.Id,
-                    manufacturer.Name
-                );
+            var fleet = await _fleetsService.GetOneAsync(id);
+            if (fleet is null) return NotFound();
+            return Ok(fleet);
         }
 
         [HttpPost]
         public async Task<ActionResult<FleetDto>> Create(FleetCreateDto createDto)
         {
-            var fleet = new Fleet
-            {
-                Name = createDto.Name
-            };
-
-            await _db.Fleets.AddAsync(fleet);
-            await _db.SaveChangesAsync();
-
-            var result = new FleetDto(fleet.Id, fleet.Name);
-            return CreatedAtAction(nameof(GetOne), new { id = fleet.Id }, result);
+            var result = await _fleetsService.CreateAsync(createDto);
+            return CreatedAtAction(nameof(GetOne), new { id = result.Id }, result);
         }
 
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, FleetUpdateDto updateDto)
         {
-            var fleet = await _db.Fleets.FindAsync(id);
-            if (fleet is null) return NotFound();
+            var result = await _fleetsService.UpdateAsync(id, updateDto);
 
-            fleet.Name = updateDto.Name;
-
-            await _db.SaveChangesAsync();
-            return NoContent();
+            return result switch
+            {
+                FleetUpdateResult.Success => NoContent(),
+                FleetUpdateResult.NotFound => NotFound(),
+                _ => StatusCode(StatusCodes.Status500InternalServerError)
+            };
         }
 
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var fleet = await _db.Fleets.FindAsync(id);
-            if (fleet is null) return NotFound();
+            var result = await _fleetsService.DeleteAsync(id);
 
-            _db.Fleets.Remove(fleet);
-            await _db.SaveChangesAsync();
-            return NoContent();
+            if (result)
+            {
+                return NoContent();
+            }
+
+            return NotFound();
         }
     }
 }
