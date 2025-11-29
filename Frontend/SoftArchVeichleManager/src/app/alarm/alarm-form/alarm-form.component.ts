@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angu
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Alarm } from '../../models/alarm.model';
 import { AlarmService } from '../../services/alarm.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-alarm-form',
@@ -22,16 +23,22 @@ export class AlarmFormComponent implements OnInit, OnChanges {
   propertyValues: Record<string, string> = {};
   selectedInterface = '';
 
-  constructor(private fb: FormBuilder, private alarmService: AlarmService) { }
+  constructor(
+    private fb: FormBuilder,
+    private alarmService: AlarmService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
     this.loadInterfaces();
   }
 
   ngOnChanges(): void {
+    const defaultFleetId = this.authService.currentUser?.fleetId ?? this.alarm.fleetId;
+
     this.form = this.fb.group({
       alarmId: [this.alarm.id],
-      alarmFleet: [this.alarm.fleetId, [Validators.required, Validators.min(1)]],
+      alarmFleet: [defaultFleetId, [Validators.required, Validators.min(1)]],
       interfaceName: [this.selectedInterface],
       alarmJson: [this.alarm.alarmJson || '{}', [Validators.required, Validators.minLength(2)]]
     });
@@ -148,7 +155,10 @@ export class AlarmFormComponent implements OnInit, OnChanges {
 
   submit() {
     if (this.form.valid) {
-      const { id, fleetId, interfaceId, alarmJson } = this.form.value;
+      const alarmJson = this.form.value.alarmJson;
+      const fleetId = this.form.value.alarmFleet;
+      const interfaceId = 1; // placeholder until real interface IDs are provided
+      const id = this.form.value.alarmId ?? 0;
       this.save.emit({ id, fleetId, interfaceId, alarmJson });
     }
   }

@@ -1,91 +1,112 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, of } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 import { Alarm } from '../models/alarm.model';
 import { DtoMappereService } from './dto-mapper.service';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class AlarmService {
 
-    constructor(private http: HttpClient, private dtoMapperService: DtoMappereService) { }
+    private apiBase = 'https://localhost:7172/api/alarms';
+    private headers: HttpHeaders;
 
-    private mockData: Alarm[] = [
-        {
-            id: 1,
-            fleetId: 101,
-            interfaceId: 1,
-            alarmJson: JSON.stringify({ type: 'Battery', level: 'Critical', lastUpdate: '2024-05-01T10:00:00Z' })
-        },
-        {
-            id: 2,
-            fleetId: 102,
-            interfaceId: 2,
-            alarmJson: JSON.stringify({ type: 'Engine', level: 'Warning', temperature: 95 })
-        },
-        {
-            id: 3,
-            fleetId: 101,
-            interfaceId: 3,
-            alarmJson: JSON.stringify({ type: 'Maintenance', dueInKm: 1500 })
-        }
-    ];
+    constructor(
+        private http: HttpClient,
+        private authService: AuthService,
+        private dtoMapperService: DtoMappereService
+    ) {
+        this.headers = new HttpHeaders();
+        this.headers = this.headers.set('Authorization', `Bearer ${authService.currentUser?.token}`);
+    }
+
+    private alarms: Alarm[] = [];
 
     getAlarms(): Observable<Alarm[]> {
-        return new Observable(observer => {
-            setTimeout(() => {
-                observer.next([...this.mockData]);
-                observer.complete();
-            }, 400);
-        });
+
+        return this.http.get<any[]>(`${this.apiBase}/byuser?user_id=${this.authService.currentUser?.userId}`, { headers: this.headers }).pipe(
+            map(data => this.dtoMapperService.transformArray(
+                data,
+                dto => {
+                    const alarm = this.dtoMapperService.dtoToAlarm(dto);
+                    return {
+                        ...alarm,
+                        alarmJson: this.normalizeAlarmJson(alarm.alarmJson)
+                    };
+                }
+            )),
+            tap(transformed => this.alarms = transformed)
+        );
+
     }
 
     getAlarmInterfaces(): Observable<string[]> {
-        // TODO: replace empty URL with real endpoint when available
         return this.http.get<string[]>('', { params: {} }).pipe(
             catchError(() => of(['BatteryInterface', 'EngineInterface', 'MaintenanceInterface']))
         );
     }
 
     getInterfaceProperties(interfaceName: string): Observable<string[]> {
-        // TODO: replace empty URL with real endpoint when available
         return this.http.get<string[]>('', { params: { interfaceName } }).pipe(
             catchError(() => of(['type', 'level', 'detail']))
         );
     }
 
     saveAlarm(alarm: Alarm): Observable<Alarm> {
-        return new Observable(observer => {
-            setTimeout(() => {
-                if (alarm.id && alarm.id > 0) {
-                    const index = this.mockData.findIndex(a => a.id === alarm.id);
-                    if (index > -1) {
-                        this.mockData[index] = alarm;
-                    }
-                } else {
-                    const maxId = this.mockData.length > 0 ? Math.max(...this.mockData.map(a => a.id)) : 0;
-                    alarm.id = maxId + 1;
-                    this.mockData.push(alarm);
-                }
+        const fleetId = this.authService.currentUser?.fleetId ?? alarm.fleetId;
+        const interfaceId = alarm.interfaceId && alarm.interfaceId > 0 ? alarm.interfaceId : 1;
+        const alarmForDto: Alarm = { ...alarm, fleetId, interfaceId };
+        const dto = this.dtoMapperService.alarmToDto(alarmForDto);
 
-                observer.next(alarm);
-                observer.complete();
-            }, 400);
-        });
+
+        if (alarmForDto.id && alarmForDto.id > 0) {
+            // UPDATE existing alarm
+            return this.http.put<any>(`${this.apiBase}/${alarmForDto.id}`, dto, { headers: this.headers }).pipe(
+                map(response => this.mapDtoToAlarmSafe(response, alarmForDto))
+            );
+        }
+
+        // CREATE new alarm
+        return this.http.post<any>(`${this.apiBase}`, dto, { headers: this.headers }).pipe(
+            map(response => this.mapDtoToAlarmSafe(response, alarmForDto))
+        );
+
+
     }
 
     deleteAlarm(id: number): Observable<boolean> {
-        return new Observable(observer => {
-            setTimeout(() => {
-                const index = this.mockData.findIndex(a => a.id === id);
-                if (index > -1) {
-                    this.mockData.splice(index, 1);
-                    observer.next(true);
-                } else {
-                    observer.next(false);
-                }
 
-                observer.complete();
-            }, 400);
-        });
+        return this.http.delete<boolean>(`${this.apiBase}/${id}`, { headers: this.headers });
+
+
+
+    }
+
+    private normalizeAlarmJson(json: string): string {
+        try {
+            const parsed = JSON.parse(json);
+            if (typeof parsed === 'object') {
+                return JSON.stringify(parsed, null, 2);
+            }
+            return String(parsed);
+        } catch {
+            return json;
+        }
+    }
+
+    private mapDtoToAlarmSafe(dto: any, fallback: Alarm): Alarm {
+        if (dto && typeof dto === 'object' && 'ALARM_JSON' in dto) {
+            const mapped = this.dtoMapperService.dtoToAlarm(dto);
+            return {
+                ...mapped,
+                alarmJson: this.normalizeAlarmJson(mapped.alarmJson)
+            };
+        }
+
+        // Fallback to the submitted alarm when API does not echo a payload
+        return {
+            ...fallback,
+            alarmJson: this.normalizeAlarmJson(fallback.alarmJson)
+        };
     }
 }
