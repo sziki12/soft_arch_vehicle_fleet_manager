@@ -37,7 +37,7 @@ export class RegisterComponent {
     this.error = '';
     this.success = '';
     const { username, password, role } = this.form.value;
-    this.userService.registerUser({ name: username, password, role }).subscribe({
+    this.userService.registerUser({ username, password, role }).subscribe({
       next: () => {
         this.success = 'Registration successful. Redirecting to login...';
         this.error = '';

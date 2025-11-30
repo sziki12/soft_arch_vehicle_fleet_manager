@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Alarm } from '../../models/alarm.model';
 import { AlarmService } from '../../services/alarm.service';
 import { AuthService } from '../../services/auth.service';
@@ -44,9 +44,9 @@ export class AlarmFormComponent implements OnInit, OnChanges {
 
     this.form = this.fb.group({
       alarmId: [this.alarm.id],
-      alarmFleet: [defaultFleetId, [Validators.required, Validators.min(1)]],
+      alarmFleet: [defaultFleetId],
       interfaceName: [this.selectedInterface],
-      alarmJson: [this.alarm.alarmJson || '{}', [Validators.required, Validators.minLength(2)]]
+      alarmJson: [this.alarm.alarmJson || '{}']
     });
 
     this.initializePropertiesFromJson(this.alarm.alarmJson);

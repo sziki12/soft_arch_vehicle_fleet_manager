@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { Alarm } from '../../models/alarm.model';
-import { AdminUser } from '../../models/admin-user.model';
+import { User } from '../../models/admin-user.model';
 import { Fleet } from '../../models/fleet.model';
 import { ReportSummary } from '../../models/report.model';
 import { Vehicle } from '../../models/vehicle.model';
@@ -26,7 +26,7 @@ import { UserService } from '../../services/user.service';
   styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit {
-  users: AdminUser[] = [];
+  users: User[] = [];
   fleets: Fleet[] = [];
   vehicles: Vehicle[] = [];
   alarms: Alarm[] = [];
@@ -129,7 +129,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   loadInterfaces(): void {
-    this.loadingInterfaces= true;
+    this.loadingInterfaces = true;
     this.adminService.getInterfaces().subscribe(interfaces => {
       this.interfaces = interfaces;
       this.loadingInterfaces = false;
@@ -318,7 +318,7 @@ export class AdminDashboardComponent implements OnInit {
     return this.vehicles.filter(v => v.fleetId === id).length;
   }
 
-  getUsersForFleet(id: number): AdminUser[] {
+  getUsersForFleet(id: number): User[] {
     return this.users.filter(u => u.fleetId === id);
   }
 
@@ -345,7 +345,7 @@ export class AdminDashboardComponent implements OnInit {
     return this.limitList(filtered, this.showAllFleets ? undefined : 4);
   }
 
-  get filteredUsers(): AdminUser[] {
+  get filteredUsers(): User[] {
     const term = this.userSearch.toLowerCase();
     const filtered = this.users
       .filter(u => !term || u.name.toLowerCase().includes(term))
@@ -354,7 +354,7 @@ export class AdminDashboardComponent implements OnInit {
     return this.limitList(filtered, this.showAllUsers ? undefined : 6);
   }
 
-  deleteUser(user: AdminUser, event?: Event): void {
+  deleteUser(user: User, event?: Event): void {
     if (event) {
       event.stopPropagation();
     }
@@ -392,8 +392,8 @@ export class AdminDashboardComponent implements OnInit {
   get filteredModules(): Module[] {
     const term = this.moduleSearch.toLowerCase();
     const filtered = this.modules
-      .filter(a => !term || a.hardwareId.toLowerCase().includes(term) || String(a.id).includes(term) || String(a.vehicleId).includes(term) 
-      || String(a.interfaceId).includes(term) || String(a.manufacturerId).includes(term));
+      .filter(a => !term || a.hardwareId.toLowerCase().includes(term) || String(a.id).includes(term) || String(a.vehicleId).includes(term)
+        || String(a.interfaceId).includes(term) || String(a.manufacturerId).includes(term));
     return this.limitList(filtered, this.showAllAlarms ? undefined : 5);
   }
 
@@ -430,7 +430,7 @@ export class AdminDashboardComponent implements OnInit {
     return '';
   }
 
-  get alarmOperators(): AdminUser[] {
+  get alarmOperators(): User[] {
     return this.users.filter(u => {
       const role = (u.role || '').toLowerCase();
       return role === 'manager' || role === 'fleet_operator' || role === 'fleet-operator';

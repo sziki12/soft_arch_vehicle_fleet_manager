@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { AdminUser } from '../models/admin-user.model';
+import { User } from '../models/admin-user.model';
 import { Fleet } from '../models/fleet.model';
 import { ReportSummary } from '../models/report.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -23,16 +23,16 @@ export class AdminService {
 
     private apiBase = 'https://localhost:7172/api/fleets';
     private headers: HttpHeaders;
-    constructor(private http: HttpClient, private authService: AuthService, 
+    constructor(private http: HttpClient, private authService: AuthService,
         private dtoMapperService: DtoMappereService, private fleetService: FleetService,
         private vehicleService: VehicleService, private alarmService: AlarmService,
-        private interfaceService: InterfaceService, private moduleService: ModuleService, 
-        private userService: UserService) { 
+        private interfaceService: InterfaceService, private moduleService: ModuleService,
+        private userService: UserService) {
         this.headers = new HttpHeaders();
-            this.headers = this.headers.set('Authorization', `Bearer ${authService.currentUser?.token}`);
+        this.headers = this.headers.set('Authorization', `Bearer ${authService.currentUser?.token}`);
     }
 
-    getUsers(): Observable<AdminUser[]> {
+    getUsers(): Observable<User[]> {
         return this.userService.getUsers();
     }
 
@@ -56,17 +56,17 @@ export class AdminService {
         return this.moduleService.getModules();
     }
 
-    createFleet(payload: { name: string; region?: string }): Observable<Fleet> { 
-        var newFleet: Fleet = {id: 0, name: payload.name};
+    createFleet(payload: { name: string; region?: string }): Observable<Fleet> {
+        var newFleet: Fleet = { id: 0, name: payload.name };
         return this.fleetService.saveFleet(newFleet);
     }
 
-    createUser(payload: { name: string; password: string, role: AdminUser['role'] }): Observable<AdminUser> { 
-        var newUser: AdminUser = {id: 0, ...payload};
+    createUser(payload: { name: string; password: string, role: User['role'] }): Observable<User> {
+        var newUser: User = { id: 0, ...payload };
         return this.userService.saveUser(newUser);
     }
 
-    assignUserToFleet(user: AdminUser, fleetId: number | null): Observable<AdminUser> {
+    assignUserToFleet(user: User, fleetId: number | null): Observable<User> {
         return this.userService.saveUser({ ...user, fleetId });
     }
 }

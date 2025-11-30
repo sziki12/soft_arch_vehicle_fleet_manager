@@ -4,22 +4,21 @@ import { Interface } from "../models/interface.model";
 import { Vehicle } from "../models/vehicle.model";
 import { Fleet } from "../models/fleet.model";
 import { Alarm } from "../models/alarm.model";
-import { AdminUser } from "../models/admin-user.model";
+import { User } from "../models/admin-user.model";
 import { Manufacturer } from "../models/manufacturer.model";
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class DtoMappereService {
-    constructor() {}
+    constructor() { }
 
     public transformArray<T>(array: any[], transformFn: (dto: any) => T): T[] {
         return array.map(item => transformFn(item));
     }
 
     //To DTO Mappers
-    public moduleToDto(module: Module): any
-    {
+    public moduleToDto(module: Module): any {
         return {
             HWID: module.hardwareId,
             INTERFACE_ID: module.interfaceId,
@@ -28,8 +27,7 @@ export class DtoMappereService {
         };
     }
 
-    public interfaceToDto(interfaceModel: Interface): any
-    {
+    public interfaceToDto(interfaceModel: Interface): any {
         return {
             INTERFACE_ID: (interfaceModel.id > 0) ? interfaceModel.id : null,
             INTERFACE_NAME: interfaceModel.name,
@@ -38,8 +36,7 @@ export class DtoMappereService {
         };
     }
 
-    public vehicleToDto(vehilce: Vehicle): any
-    {
+    public vehicleToDto(vehilce: Vehicle): any {
         return {
             VEHICLE_ID: (vehilce.id > 0) ? vehilce.id : null,
             VEHICLE_NAME: vehilce.name,
@@ -50,16 +47,14 @@ export class DtoMappereService {
         };
     }
 
-    public fleetToDto(fleet: Fleet): any
-    {
+    public fleetToDto(fleet: Fleet): any {
         return {
             FLEET_ID: (fleet.id > 0) ? fleet.id : null,
             FLEET_NAME: fleet.name
         };
     }
 
-    public alarmToDto(alarm: Alarm): any
-    {
+    public alarmToDto(alarm: Alarm): any {
         return {
             ALARM_ID: (alarm.id > 0) ? alarm.id : null,
             ALARM_JSON: alarm.alarmJson,
@@ -68,8 +63,7 @@ export class DtoMappereService {
         };
     }
 
-    public userToDto(user: AdminUser, passowrd? : string): any
-    {
+    public userToDto(user: User, passowrd?: string): any {
         return {
             USER_ID: (user.id > 0) ? user.id : null,
             USER_NAME: user.name,
@@ -80,8 +74,7 @@ export class DtoMappereService {
         };
     }
 
-    public manufacturerToDto(manufacturer: Manufacturer): any
-    {
+    public manufacturerToDto(manufacturer: Manufacturer): any {
         return {
             MANUFACTURER_ID: (manufacturer.id > 0) ? manufacturer.id : null,
             MANUFACTURER_NAME: manufacturer.name,
@@ -89,8 +82,7 @@ export class DtoMappereService {
     }
 
     //From DTO Mappers
-    public dtoToModule(dto: any): Module
-    {
+    public dtoToModule(dto: any): Module {
         return {
             id: dto.MODULE_ID,
             hardwareId: dto.HWID,
@@ -100,8 +92,7 @@ export class DtoMappereService {
         };
     }
 
-    public dtoToInterface(dto: any): Interface
-    {
+    public dtoToInterface(dto: any): Interface {
         return {
             id: dto.INTERFACE_ID,
             name: dto.INTERFACE_NAME,
@@ -110,8 +101,7 @@ export class DtoMappereService {
         };
     }
 
-    public dtoToVehicle(dto: any): Vehicle
-    {
+    public dtoToVehicle(dto: any): Vehicle {
         return {
             id: dto.VEHICLE_ID,
             name: dto.VEHICLE_NAME,
@@ -121,15 +111,13 @@ export class DtoMappereService {
             fleetId: dto.FLEET_ID
         };
     }
-    public dtoToFleet(dto: any): Fleet
-    {
+    public dtoToFleet(dto: any): Fleet {
         return {
             id: dto.FLEET_ID,
             name: dto.FLEET_NAME
         };
     }
-    public dtoToAlarm(dto: any): Alarm
-    {
+    public dtoToAlarm(dto: any): Alarm {
         return {
             id: dto.ALARM_ID,
             alarmJson: dto.ALARM_JSON,
@@ -138,8 +126,7 @@ export class DtoMappereService {
         };
     }
 
-    public dtoToUser(dto: any): AdminUser
-    {
+    public dtoToUser(dto: any): User {
         return {
             id: dto.USER_ID,
             name: dto.USER_NAME,
@@ -149,8 +136,7 @@ export class DtoMappereService {
         };
     }
 
-    public dtoToManufacturer(dto: any): Manufacturer
-    {
+    public dtoToManufacturer(dto: any): Manufacturer {
         return {
             id: dto.MANUFACTURER_ID,
             name: dto.MANUFACTURER_NAME,

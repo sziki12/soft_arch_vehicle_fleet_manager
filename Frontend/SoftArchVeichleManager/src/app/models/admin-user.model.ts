@@ -1,4 +1,4 @@
-export interface AdminUser {
+export interface User {
     id: number;
     name: string;
     role: 'admin' | 'manager' | 'manufacturer' | 'fleet_operator';

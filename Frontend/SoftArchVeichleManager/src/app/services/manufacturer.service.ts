@@ -5,22 +5,22 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Fleet } from '../models/fleet.model';
 import { DtoMappereService } from './dto-mapper.service';
-import { AdminUser } from '../models/admin-user.model';
+import { User } from '../models/admin-user.model';
 import { Manufacturer } from '../models/manufacturer.model';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class ManufacturerService {
     private apiBase = 'https://localhost:7172/api/users';
     private headers: HttpHeaders;
-    constructor(private http: HttpClient, private authService: AuthService, private dtoMapperService: DtoMappereService) { 
+    constructor(private http: HttpClient, private authService: AuthService, private dtoMapperService: DtoMappereService) {
         this.headers = new HttpHeaders();
-            this.headers = this.headers.set('Authorization', `Bearer ${authService.currentUser?.token}`);
+        this.headers = this.headers.set('Authorization', `Bearer ${authService.currentUser?.token}`);
     }
     private mockData: Manufacturer[] = [
-        { id: 1, name: 'Foundry'},
-        { id: 2, name: 'The Manufacture'},
+        { id: 1, name: 'Foundry' },
+        { id: 2, name: 'The Manufacture' },
     ];
 
     private manufacturers: Manufacturer[] = [];
@@ -28,13 +28,13 @@ export class ManufacturerService {
     getManufacturers(): Observable<Manufacturer[]> {
         //API
         if (this.apiBase) {
-           return this.http.get<any[]>(`${this.apiBase}`, { headers: this.headers }).pipe(
+            return this.http.get<any[]>(`${this.apiBase}`, { headers: this.headers }).pipe(
                 map(data => this.dtoMapperService.transformArray(
                     data,
                     this.dtoMapperService.dtoToManufacturer
                 )),
                 tap(transformed => this.manufacturers = transformed)
-                );
+            );
         }
         //Mock
         return of([...this.mockData]).pipe(delay(400));
@@ -46,10 +46,10 @@ export class ManufacturerService {
         if (this.apiBase) {
             if (manufacturer.id && manufacturer.id > 0) {
                 // UPDATE
-                return this.http.put<AdminUser>(`${this.apiBase}/${manufacturer.id}`, dto, { headers: this.headers });
+                return this.http.put<User>(`${this.apiBase}/${manufacturer.id}`, dto, { headers: this.headers });
             } else {
                 // CREATE
-                return this.http.post<AdminUser>(`${this.apiBase}`, dto, { headers: this.headers });
+                return this.http.post<User>(`${this.apiBase}`, dto, { headers: this.headers });
             }
         }
         //Mock
