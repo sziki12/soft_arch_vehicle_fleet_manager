@@ -20,6 +20,37 @@ public static class SeedData
         AddSeedFleets(db);
         AddSeedManufacturers(db);
         AddSeedInterfaces(db);
+        AddSeedVehicles(db);
+        AddSeedModules(db);
+    }
+
+    private static void AddSeedVehicles(FleetDbContext db)
+    {
+        var vehicle = new Vehicle
+        {
+            Name = "Vehicle numero uno",
+            LicensePlate = "ASD-1337",
+            Model = "string",
+            Year = 2003,
+            FleetId = db.Fleets.Single().Id,
+        };
+
+        db.Vehicles.Add(vehicle);
+        db.SaveChanges();
+    }
+
+    private static void AddSeedModules(FleetDbContext db)
+    {
+        var module = new Module
+        {
+            HardwareId = "XYZ",
+            ManufacturerId = db.Manufacturers.Single().Id,
+            InterfaceId = db.Interfaces.Single().Id,
+            VehicleId = db.Vehicles.Single().Id
+        };
+
+        db.Modules.Add(module);
+        db.SaveChanges();
     }
 
     private static void AddSeedFleets(FleetDbContext db)
@@ -38,7 +69,7 @@ public static class SeedData
         var _interface = new Interface
         {
             Name = "Interface numero uno",
-            InterfaceJSON = "{ }",
+            InterfaceFields = new List<string>() { "speed", "distance" },
             ManufacturerId = db.Manufacturers.Single().Id,
         };
 
