@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SoftArchVehicleFleetManager.Data;
+using SoftArchVehicleFleetManager.Enums;
 using SoftArchVehicleFleetManager.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,7 +17,14 @@ namespace SoftArchVehicleFleetManager.Services
         InvalidPassword
     }
 
+    public enum RegisterResultStatus
+    {
+        Success,
+        UsernameAlreadyExists
+    }
+
     public record LoginResult(LoginResultStatus Status, string? Token = null);
+    public record RegisterResult(RegisterResultStatus Status, string? Token = null);
 
     public class AuthService
     {
@@ -57,6 +65,29 @@ namespace SoftArchVehicleFleetManager.Services
 
             var token = GenerateToken(user);
             return new LoginResult(LoginResultStatus.Success, token);
+        }
+
+        public async Task<RegisterResult> RegisterAsync(string username, UserRole role, string password)
+        {
+            var exists = await _db.Users.AnyAsync(u => u.Username == username);
+            if (exists)
+                return new RegisterResult(RegisterResultStatus.UsernameAlreadyExists);
+
+            var user = new User
+            {
+                Username = username,
+                Role = role,
+                ManufacturerId = null,
+                FleetId = null
+            };
+
+            user.PasswordHash = _passwordHasher.HashPassword(user, password);
+
+            _db.Users.Add(user);
+            await _db.SaveChangesAsync();
+
+            var token = GenerateToken(user);
+            return new RegisterResult(RegisterResultStatus.Success, token);
         }
 
         private string GenerateToken(User user)
