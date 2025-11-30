@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { ListEditorComponent } from '../../../../shared/list-editor/list-editor.component';
+import { Manufacturer } from '../../../models/manufacturer.model';
 
 @Component({
   selector: 'app-interface-form',
@@ -14,6 +15,8 @@ import { ListEditorComponent } from '../../../../shared/list-editor/list-editor.
 })
 export class InterfaceFormComponent implements OnChanges {
   @Input() interface!: Interface;
+  @Input() manufacturers!: Manufacturer[];
+  @Input() showInterfaceSelect = false;
   @Output() save = new EventEmitter<Interface>();
   @Output() cancel = new EventEmitter<void>();
 
@@ -22,11 +25,14 @@ export class InterfaceFormComponent implements OnChanges {
   constructor(private fb: FormBuilder, private authService: AuthService) { }
 
   ngOnChanges(): void {
+    const defaultManufacturerId = this.showInterfaceSelect
+      ? (this.interface.manufacturerId || this.manufacturers[0]?.id || null)
+      : (this.authService.currentUser?.manufacturerId || this.interface.manufacturerId || null);
     this.form = this.fb.group({
       id: [this.interface.id],
       name: [this.interface.name, Validators.required],
       interfaceFields: [this.interface.interfaceFields, [Validators.required, Validators.min(1)]],
-      manufacturerId: [this.authService.currentUser?.manufacturerId]
+      manufacturerId: [defaultManufacturerId]
     });
   }
 

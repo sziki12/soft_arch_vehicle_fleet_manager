@@ -18,11 +18,15 @@ import { AlarmFormComponent } from '../../alarm/alarm-form/alarm-form.component'
 import { AlarmService } from '../../services/alarm.service';
 import { UserService } from '../../services/user.service';
 import { ManufacturerService } from '../../services/manufacturer.service';
+import { InterfaceService } from '../../services/interface.serice';
+import { ModuleService } from '../../services/module.service';
+import { InterfaceFormComponent } from '../../manufacturer/interface/interface-form/interface-form.component';
+import { ModuleFormComponent } from '../../manufacturer/module/module-form/module-form.component';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, VehicleFormComponent, AlarmFormComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, VehicleFormComponent, AlarmFormComponent, InterfaceFormComponent, ModuleFormComponent],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
@@ -37,6 +41,8 @@ export class AdminDashboardComponent implements OnInit {
   selectedVehicle: Vehicle | null = null;
   selectedAlarm: Alarm | null = null;
   selectedManufacturer: Manufacturer | null = null;
+  selectedInterface: Interface | null = null;
+  selectedModule: Module | null = null;
   selectedAlarmUserId: number | null = null;
 
   activeSection: 'fleets' | 'users' | 'vehicles' | 'alarms' | 'interfaces' | 'modules' | 'manufacturers' = 'fleets';
@@ -80,7 +86,8 @@ export class AdminDashboardComponent implements OnInit {
     private vehicleService: VehicleService,
     private alarmService: AlarmService,
     private userService: UserService,
-    
+    private interfaceService: InterfaceService,
+    private moduleService: ModuleService,
   ) {
     this.fleetForm = this.fb.group({
       name: ['', Validators.required],
@@ -385,6 +392,85 @@ export class AdminDashboardComponent implements OnInit {
         this.loadingManufacturers = false;
       }
     });
+  }
+
+  selectInterface(inetrface: Interface): void {
+    this.selectedInterface = { ...inetrface };
+  }
+
+  createInterface(): void {
+    this.selectedInterface = {
+      id: 0,
+      name: '',
+      interfaceFields: [],
+      manufacturerId: this.manufacturers[0]?.id ?? 0,
+    };
+  }
+
+  onSaveInterface(interfaceModel: Interface): void {
+    this.loadingInterfaces = true;
+    this.interfaceService.saveInterface(interfaceModel).subscribe({
+      next: () => {
+        this.selectedInterface = null;
+        this.loadInterfaces();
+      },
+      error: () => {
+        alert('Interface save failed. Please check the data and try again.');
+        this.loadingInterfaces = false;
+      }
+    });
+  }
+
+  onDeleteInterface(id: number, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    if (confirm('Biztos törlöd az interface-t?')) {
+      this.interfaceService.deleteInterface(id).subscribe(() => {
+        this.selectedInterface = null;
+        this.loadInterfaces();
+      });
+    }
+  }
+  //MODULE
+    selectModule(module: Module): void {
+    this.selectedModule = { ...module };
+  }
+
+  createModule(): void {
+    this.selectedModule = {
+      id: 0,
+      hardwareId: '',
+      interfaceId: 0,
+      manufacturerId: this.manufacturers[0]?.id ?? 0,
+      vehicleId: 0,
+    };
+  }
+
+  onSaveModule(module: Module): void {
+    this.loadingModules = true;
+    this.moduleService.saveModule(module).subscribe({
+      next: () => {
+        this.selectedModule = null;
+        this.loadModules();
+      },
+      error: () => {
+        alert('Module save failed. Please check the data and try again.');
+        this.loadingModules = false;
+      }
+    });
+  }
+
+  onDeleteModule(id: number, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    if (confirm('Biztos törlöd a járművet?')) {
+      this.moduleService.deleteModule(id).subscribe(() => {
+        this.selectedModule = null;
+        this.loadModules();
+      });
+    }
   }
 
   get filteredFleets(): Fleet[] {
