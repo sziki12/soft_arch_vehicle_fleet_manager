@@ -16,6 +16,10 @@
                     <small>fleets</small>
                 </div>
                 <div class="stat-card">
+                    <span>{{ manufacturers.length }}</span>f
+                    <small>manufacturers</small>
+                </div>
+                <div class="stat-card">
                     <span>{{ vehicles.length }}</span>
                     <small>vehicles</small>
                 </div>
@@ -37,6 +41,7 @@
 
     <nav class="section-nav">
         <button type="button" [class.active]="activeSection === 'fleets'" (click)="setSection('fleets')">Fleets</button>
+        <button type="button" [class.active]="activeSection === 'manufacturers'" (click)="setSection('manufacturers')">Manufacturers</button>
         <button type="button" [class.active]="activeSection === 'users'" (click)="setSection('users')">Users</button>
         <button type="button" [class.active]="activeSection === 'vehicles'" (click)="setSection('vehicles')">Vehicles</button>
         <button type="button" [class.active]="activeSection === 'alarms'" (click)="setSection('alarms')">Alarms</button>
@@ -304,5 +309,40 @@
                 </div>
             </li>
         </ul>
+    </section>
+
+    <section class="panel" *ngIf="activeSection === 'manufacturers'">
+        <header class="panel-header">
+            <div>
+                <p class="eyebrow">Manufacturers</p>
+                <h3>Manufacturers</h3>
+            </div>
+            <span class="muted" *ngIf="loadingManufacturers">Loading...</span>
+        </header>
+
+        <div class="filters">
+            <input type="search" placeholder="Search manufacturers" [(ngModel)]="manufacturerSearch">
+            <button type="button" class="ghost-btn" (click)="showAllManufacturers = !showAllManufacturers">
+                {{ showAllManufacturers ? 'Show less' : 'Show more' }}
+            </button>
+        </div>
+
+        <ul class="list">
+            <li *ngFor="let manufacturer of filteredManufacturers">
+                <div>
+                    <div class="text-strong">Name: {{ manufacturer.name }}</div>
+                    <small class="muted">Manufacturer #{{ manufacturer.id }}</small>
+                    <br/>
+                    <small class="muted">User Count #{{ manufacturer.id }}</small>
+                </div>
+            </li>
+        </ul>
+        <form class="inline-form" [formGroup]="manufacturerForm" (ngSubmit)="createManufacturer()">
+            <div>
+                <label>Manufacturer name</label>
+                <input type="text" formControlName="name" placeholder="e.g. Manufacturer Co.">
+            </div>
+            <button type="submit">Create manufacturer</button>
+        </form>
     </section>
 </div>

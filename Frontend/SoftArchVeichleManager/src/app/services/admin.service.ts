@@ -17,6 +17,8 @@ import { Module } from '../models/module.model';
 import { Vehicle } from '../models/vehicle.model';
 import { Alarm } from '../models/alarm.model';
 import { UserService } from './user.service';
+import { ManufacturerService } from './manufacturer.service';
+import { Manufacturer } from '../models/manufacturer.model';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -26,8 +28,9 @@ export class AdminService {
     constructor(private http: HttpClient, private authService: AuthService,
         private dtoMapperService: DtoMappereService, private fleetService: FleetService,
         private vehicleService: VehicleService, private alarmService: AlarmService,
-        private interfaceService: InterfaceService, private moduleService: ModuleService,
-        private userService: UserService) {
+        private interfaceService: InterfaceService, private moduleService: ModuleService, 
+        private userService: UserService, private manufacturerService: ManufacturerService,
+    ) { 
         this.headers = new HttpHeaders();
         this.headers = this.headers.set('Authorization', `Bearer ${authService.currentUser?.token}`);
     }
@@ -56,8 +59,17 @@ export class AdminService {
         return this.moduleService.getModules();
     }
 
-    createFleet(payload: { name: string; region?: string }): Observable<Fleet> {
-        var newFleet: Fleet = { id: 0, name: payload.name };
+    getManufacturers(): Observable<Manufacturer[]> {
+        return this.manufacturerService.getManufacturers();
+    }
+
+    createManufacturer(payload: { name: string }): Observable<Manufacturer> {
+        var newManufacturer: Manufacturer = {id: 0, name: payload.name};
+        return this.manufacturerService.saveManufacturer(newManufacturer);
+    }
+
+    createFleet(payload: { name: string }): Observable<Fleet> { 
+        var newFleet: Fleet = {id: 0, name: payload.name};
         return this.fleetService.saveFleet(newFleet);
     }
 

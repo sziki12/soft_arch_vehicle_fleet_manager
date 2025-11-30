@@ -17,6 +17,7 @@ import { VehicleFormComponent } from '../../fleet/vehicle-form/vehicle-form.comp
 import { AlarmFormComponent } from '../../alarm/alarm-form/alarm-form.component';
 import { AlarmService } from '../../services/alarm.service';
 import { UserService } from '../../services/user.service';
+import { ManufacturerService } from '../../services/manufacturer.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -35,16 +36,19 @@ export class AdminDashboardComponent implements OnInit {
   manufacturers: Manufacturer[] = [];
   selectedVehicle: Vehicle | null = null;
   selectedAlarm: Alarm | null = null;
+  selectedManufacturer: Manufacturer | null = null;
   selectedAlarmUserId: number | null = null;
 
-  activeSection: 'fleets' | 'users' | 'vehicles' | 'alarms' | 'interfaces' | 'modules' = 'fleets';
+  activeSection: 'fleets' | 'users' | 'vehicles' | 'alarms' | 'interfaces' | 'modules' | 'manufacturers' = 'fleets';
   fleetForm: FormGroup;
+  manufacturerForm: FormGroup;
   assignmentForm: FormGroup;
 
   userSearch = '';
   userRoleFilter: 'all' | 'admin' | 'manager' | 'fleet_operator' | 'manufacturer' = 'all';
 
   fleetSearch = '';
+  manufacturerSearch = '';
   vehicleSearch = '';
   vehicleFleetFilter: 'all' | number = 'all';
 
@@ -60,6 +64,7 @@ export class AdminDashboardComponent implements OnInit {
   showAllAlarms = false;
   showAllInterfaces = false;
   showAllModules = false;
+  showAllManufacturers = false;
 
   loadingUsers = false;
   loadingFleets = false;
@@ -67,18 +72,22 @@ export class AdminDashboardComponent implements OnInit {
   loadingAlarms = false;
   loadingInterfaces = false;
   loadingModules = false;
+  loadingManufacturers = false;
 
   constructor(
     private adminService: AdminService,
     private fb: FormBuilder,
     private vehicleService: VehicleService,
-    private fleetService: FleetService,
     private alarmService: AlarmService,
-    private userService: UserService
+    private userService: UserService,
+    
   ) {
     this.fleetForm = this.fb.group({
       name: ['', Validators.required],
-      region: ['']
+    });
+
+    this.manufacturerForm = this.fb.group({
+      name: ['', Validators.required],
     });
 
     this.assignmentForm = this.fb.group({
@@ -94,6 +103,7 @@ export class AdminDashboardComponent implements OnInit {
     this.loadAlarms();
     this.loadInterfaces();
     this.loadModules();
+    this.loadManufacturers();
   }
 
   loadUsers(): void {
@@ -106,7 +116,7 @@ export class AdminDashboardComponent implements OnInit {
 
   loadFleets(): void {
     this.loadingFleets = true;
-    this.fleetService.getFleets().subscribe(fleets => {
+    this.adminService.getFleets().subscribe(fleets => {
       this.fleets = fleets;
       this.loadingFleets = false;
     });
@@ -144,7 +154,15 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  setSection(section: 'fleets' | 'users' | 'vehicles' | 'alarms' | 'interfaces' | 'modules'): void {
+  loadManufacturers(): void {
+    this.loadingManufacturers = true;
+    this.adminService.getManufacturers().subscribe(manufacturers => {
+      this.manufacturers = manufacturers;
+      this.loadingManufacturers = false;
+    });
+  }
+
+  setSection(section: 'fleets' | 'users' | 'vehicles' | 'alarms' | 'interfaces' | 'modules' | 'manufacturers'): void {
     this.activeSection = section;
   }
 
@@ -277,7 +295,8 @@ export class AdminDashboardComponent implements OnInit {
     }
 
     this.adminService.createFleet(this.fleetForm.value).subscribe(newFleet => {
-      this.fleets = [...this.fleets, newFleet];
+      console.log("new newFleet", newFleet);
+      this.fleets.push(newFleet)
       this.fleetForm.reset({ name: '', region: '' });
     });
   }
@@ -334,6 +353,31 @@ export class AdminDashboardComponent implements OnInit {
     if (status === 'green') return 'status-green';
     if (status === 'amber') return 'status-amber';
     return 'status-red';
+  }
+
+  createManufacturer(): void {
+    if (this.manufacturerForm.invalid) {
+      this.manufacturerForm.markAllAsTouched();
+      return;
+    }
+    this.adminService.createManufacturer(this.manufacturerForm.value).subscribe(newManufacturer => {
+      this.manufacturers.push(newManufacturer)
+      this.manufacturerForm.reset({ name: ''});
+    });
+  }
+
+  onSaveManufacturer(manufacturer: Manufacturer): void {
+    this.loadingManufacturers = true;
+    this.adminService.createManufacturer(manufacturer).subscribe({
+      next: () => {
+        this.selectedManufacturer = null;
+        this.loadManufacturers();
+      },
+      error: () => {
+        alert('Manufacturer save failed. Please check the data and try again.');
+        this.loadingManufacturers = false;
+      }
+    });
   }
 
   get filteredFleets(): Fleet[] {
@@ -395,6 +439,13 @@ export class AdminDashboardComponent implements OnInit {
       .filter(a => !term || a.hardwareId.toLowerCase().includes(term) || String(a.id).includes(term) || String(a.vehicleId).includes(term)
         || String(a.interfaceId).includes(term) || String(a.manufacturerId).includes(term));
     return this.limitList(filtered, this.showAllAlarms ? undefined : 5);
+  }
+
+  get filteredManufacturers(): Manufacturer[] {
+    const term = this.manufacturerSearch.toLowerCase();
+    const filtered = this.manufacturers
+      .filter(a => !term || a.name.toLowerCase().includes(term) || String(a.id).includes(term));
+    return this.limitList(filtered, this.showAllManufacturers ? undefined : 5);
   }
 
   getAlarmEntries(alarm: Alarm): Array<{ key: string; value: string }> {

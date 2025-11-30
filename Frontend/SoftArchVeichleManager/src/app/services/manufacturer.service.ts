@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Interface } from '../models/interface.model';
 import { BehaviorSubject, delay, map, Observable, of, tap } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
-import { Fleet } from '../models/fleet.model';
 import { DtoMappereService } from './dto-mapper.service';
 import { User } from '../models/admin-user.model';
 import { Manufacturer } from '../models/manufacturer.model';
@@ -12,7 +10,7 @@ import { Manufacturer } from '../models/manufacturer.model';
     providedIn: 'root'
 })
 export class ManufacturerService {
-    private apiBase = 'https://localhost:7172/api/users';
+    private apiBase = 'https://localhost:7172/api/manufacturers';
     private headers: HttpHeaders;
     constructor(private http: HttpClient, private authService: AuthService, private dtoMapperService: DtoMappereService) {
         this.headers = new HttpHeaders();
