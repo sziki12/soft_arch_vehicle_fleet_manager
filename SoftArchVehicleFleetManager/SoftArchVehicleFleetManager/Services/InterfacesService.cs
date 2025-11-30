@@ -39,7 +39,7 @@ namespace SoftArchVehicleFleetManager.Services
                 .Select(i => new InterfaceDto(
                     i.Id,
                     i.Name,
-                    i.InterfaceJSON,
+                    i.InterfaceFields,
                     i.ManufacturerId
                 ))
                 .ToListAsync();
@@ -56,7 +56,7 @@ namespace SoftArchVehicleFleetManager.Services
             return new InterfaceDto(
                 iface.Id,
                 iface.Name,
-                iface.InterfaceJSON,
+                iface.InterfaceFields,
                 iface.ManufacturerId
             );
         }
@@ -99,7 +99,7 @@ namespace SoftArchVehicleFleetManager.Services
             var iface = new Interface
             {
                 Name = createDto.Name,
-                InterfaceJSON = createDto.InterfaceJSON,
+                InterfaceFields = createDto.InterfaceFields,
                 ManufacturerId = createDto.ManufacturerId
             };
 
@@ -109,7 +109,7 @@ namespace SoftArchVehicleFleetManager.Services
             var dto = new InterfaceDto(
                 iface.Id,
                 iface.Name,
-                iface.InterfaceJSON,
+                iface.InterfaceFields,
                 iface.ManufacturerId
             );
 
@@ -126,9 +126,9 @@ namespace SoftArchVehicleFleetManager.Services
                 iface.Name = updateDto.Name;
             }
 
-            if (updateDto.InterfaceJSON is not null)
+            if (updateDto.InterfaceFields is not null)
             {
-                iface.InterfaceJSON = updateDto.InterfaceJSON;
+                iface.InterfaceFields = updateDto.InterfaceFields;
             }
 
             if (updateDto.ManufacturerId is not null)

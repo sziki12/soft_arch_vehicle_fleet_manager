@@ -152,7 +152,7 @@ namespace SoftArchVehicleFleetManager.Services
 
             if (updateDto.HardwareId is not null)
             {
-                if (await _db.Modules.AsNoTracking().AnyAsync(m => m.HardwareId == updateDto.HardwareId))
+                if (await _db.Modules.AsNoTracking().AnyAsync(m => m.HardwareId == updateDto.HardwareId && module.Id != m.Id))
                     return ModuleUpdateResult.HWIDAlreadyExists;
 
                 module.HardwareId = updateDto.HardwareId;
