@@ -9,7 +9,7 @@ namespace SoftArchVehicleFleetManager.Models
 
         // Properties
         public string Name { get; set; }
-        public string InterfaceJSON { get; set; }
+        public List<string> InterfaceFields { get; set; }
 
         // Foreign Keys
         public int ManufacturerId { get; set; }
