@@ -385,7 +385,7 @@ export class AdminDashboardComponent implements OnInit {
   get filteredInterfaces(): Interface[] {
     const term = this.interfaceSearch.toLowerCase();
     const filtered = this.interfaces
-      .filter(a => !term || a.interfaceJson.toLowerCase().includes(term) || String(a.id).includes(term) || String(a.name).toLowerCase().includes(term) || String(a.manufacturerId).includes(term));
+      .filter(a => !term || a.interfaceFields.map(f => f.toLowerCase()).includes(term) || String(a.id).includes(term) || String(a.name).toLowerCase().includes(term) || String(a.manufacturerId).includes(term));
     return this.limitList(filtered, this.showAllInterfaces ? undefined : 5);
   }
 

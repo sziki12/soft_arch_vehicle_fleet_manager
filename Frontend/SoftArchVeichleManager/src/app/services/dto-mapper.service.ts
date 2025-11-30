@@ -33,7 +33,7 @@ export class DtoMappereService {
         return {
             INTERFACE_ID: (interfaceModel.id > 0) ? interfaceModel.id : null,
             INTERFACE_NAME: interfaceModel.name,
-            INTERFACE_JSON: interfaceModel.interfaceJson,
+            INTERFACE_FIELDS: interfaceModel.interfaceFields,
             MANUFACTURER_ID: interfaceModel.manufacturerId
         };
     }
@@ -105,7 +105,7 @@ export class DtoMappereService {
         return {
             id: dto.INTERFACE_ID,
             name: dto.INTERFACE_NAME,
-            interfaceJson: dto.INTERFACE_JSON,
+            interfaceFields: dto.INTERFACE_FIELDS,
             manufacturerId: dto.MANUFACTURER_ID
         };
     }

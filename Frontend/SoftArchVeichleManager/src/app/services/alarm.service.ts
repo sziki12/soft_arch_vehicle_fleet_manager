@@ -58,7 +58,7 @@ export class AlarmService {
                 this.interfaceCache[cacheKey] = interfaces.map(i => ({
                     id: i.id,
                     name: i.name,
-                    properties: this.extractProperties(i.interfaceJson)
+                    properties: i.interfaceFields
                 }));
                 return interfaces.map(i => i.name);
             }),
@@ -143,20 +143,5 @@ export class AlarmService {
             ...fallback,
             alarmJson: this.normalizeAlarmJson(fallback.alarmJson)
         };
-    }
-
-    private extractProperties(interfaceJson: string): string[] {
-        try {
-            const parsed = JSON.parse(interfaceJson);
-            if (Array.isArray(parsed)) {
-                return parsed.map(p => String(p));
-            }
-            if (parsed && typeof parsed === 'object') {
-                return Object.keys(parsed);
-            }
-        } catch {
-            // ignore parse errors
-        }
-        return [];
     }
 }

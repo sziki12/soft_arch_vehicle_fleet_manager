@@ -16,9 +16,9 @@ export class InterfaceService {
             this.headers = this.headers.set('Authorization', `Bearer ${authService.currentUser?.token}`);
     }
     private mockData: Interface[] = [
-        { id: 1, name: 'Speed Meter Interface', interfaceJson: "{}", manufacturerId: 1},
-        { id: 2, name: 'Distance Sensor Interface', interfaceJson: "{}", manufacturerId: 1},
-        { id: 3, name: 'Temperature Meter Interface', interfaceJson: "{}", manufacturerId: 2},
+        { id: 1, name: 'Speed Meter Interface', interfaceFields: [], manufacturerId: 1},
+        { id: 2, name: 'Distance Sensor Interface', interfaceFields: [], manufacturerId: 1},
+        { id: 3, name: 'Temperature Meter Interface', interfaceFields: [], manufacturerId: 2},
     ];
 
     private interfaces: Interface[] = [];
