@@ -40,7 +40,6 @@
         <button type="button" [class.active]="activeSection === 'users'" (click)="setSection('users')">Users</button>
         <button type="button" [class.active]="activeSection === 'vehicles'" (click)="setSection('vehicles')">Vehicles</button>
         <button type="button" [class.active]="activeSection === 'alarms'" (click)="setSection('alarms')">Alarms</button>
-        <button type="button" [class.active]="activeSection === 'reports'" (click)="setSection('reports')">Reports</button>
         <button type="button" [class.active]="activeSection === 'interfaces'" (click)="setSection('interfaces')">Interfaces</button>
         <button type="button" [class.active]="activeSection === 'modules'" (click)="setSection('modules')">Modules</button>
     </nav>
@@ -99,23 +98,10 @@
             <input type="search" placeholder="Search by name or email" [(ngModel)]="userSearch">
             <select [(ngModel)]="userRoleFilter">
                 <option value="all">All roles</option>
-                <option value="admin">Admins</option>
-                <option value="manager">Managers</option>
-                <option value="manufacturer">Managers</option>
-            </select>
-            <select [(ngModel)]="userFleetFilter">
-                <option value="all">Any fleet</option>
-                <option value="unassigned">Unassigned</option>
-                <option *ngFor="let fleet of fleets" [ngValue]="fleet.id">
-                    {{ fleet.name }} ({{ fleet.id }})
-                </option>
-            </select>
-            <select [(ngModel)]="userFleetFilter">
-                <option value="all">Any fleet</option>
-                <option value="unassigned">Unassigned</option>
-                <option *ngFor="let fleet of fleets" [ngValue]="fleet.id">
-                    {{ fleet.name }} ({{ fleet.id }})
-                </option>
+                <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
+                <option value="fleet_operator">Fleet operator</option>
+                <option value="manufacturer">Manufacturer</option>
             </select>
             <button type="button" class="ghost-btn" (click)="showAllUsers = !showAllUsers">
                 {{ showAllUsers ? 'Show less' : 'Show more' }}
@@ -127,12 +113,13 @@
                 <span>Name</span>
                 <span>Role</span>
                 <span>Fleet</span>
-                <span>Email</span>
+                <span></span>
             </div>
             <div class="table-row" *ngFor="let user of filteredUsers">
                 <span class="text-strong">{{ user.name }}</span>
                 <span class="badge">{{ user.role }}</span>
-                <span>{{ getFleetName(user.id ?? null) }}</span>
+                <span>{{ getFleetName(user.fleetId ?? null) }}</span>
+                <button type="button" class="ghost-btn danger" (click)="deleteUser(user, $event)">Delete</button>
             </div>
         </div>
 
@@ -184,6 +171,7 @@
             <button type="button" class="ghost-btn" (click)="showAllVehicles = !showAllVehicles">
                 {{ showAllVehicles ? 'Show less' : 'Show more' }}
             </button>
+            <button type="button" class="ghost-btn" (click)="createVehicle()">+ New vehicle</button>
         </div>
 
         <ul class="list">
@@ -192,9 +180,18 @@
                     <div class="text-strong">{{ vehicle.name }}</div>
                     <small class="muted">{{ vehicle.model }} &bull; {{ vehicle.year }}</small>
                 </div>
-                <span class="fleet-chip">Fleet #{{ vehicle.id }}</span>
+                <div class="flex gap">
+                    <span class="fleet-chip">Fleet #{{ vehicle.fleetId }}</span>
+                    <button type="button" class="ghost-btn" (click)="selectVehicle(vehicle)">Edit</button>
+                    <button type="button" class="ghost-btn danger" (click)="onDeleteVehicle(vehicle.id, $event)">Delete</button>
+                </div>
             </li>
         </ul>
+
+        <div *ngIf="selectedVehicle" class="form-wrapper">
+            <app-vehicle-form [vehicle]="selectedVehicle" [fleets]="fleets" [showFleetSelect]="true" (save)="onSaveVehicle($event)"
+                (cancel)="selectedVehicle = null"></app-vehicle-form>
+        </div>
     </section>
 
     <section class="panel" *ngIf="activeSection === 'alarms'">
@@ -211,6 +208,13 @@
             <button type="button" class="ghost-btn" (click)="showAllAlarms = !showAllAlarms">
                 {{ showAllAlarms ? 'Show less' : 'Show more' }}
             </button>
+            <select [(ngModel)]="selectedAlarmUserId" (ngModelChange)="onAlarmUserChange($event)">
+                <option [ngValue]="null">Válassz fleet operátort</option>
+                <option *ngFor="let user of alarmOperators" [ngValue]="user.id">
+                    {{ user.name }} (Fleet #{{ user.fleetId || 'n/a' }})
+                </option>
+            </select>
+            <button type="button" class="ghost-btn" (click)="createAlarm()">+ New alarm</button>
         </div>
 
         <ul class="list">
@@ -219,36 +223,20 @@
                     <div class="text-strong">Alarm #{{ alarm.id }}</div>
                     <small class="muted">Fleet #{{ alarm.fleetId }}</small>
                 </div>
-                <pre class="alarm-json">{{ alarm.alarmJson }}</pre>
+                <div class="flex">
+                    <pre class="alarm-json">{{ alarm.alarmJson }}</pre>
+                    <div class="flex">
+                        <button type="button" class="ghost-btn" (click)="selectAlarm(alarm)">Edit</button>
+                        <button type="button" class="ghost-btn danger" (click)="onDeleteAlarm(alarm.id, $event)">Delete</button>
+                    </div>
+                </div>
             </li>
         </ul>
-    </section>
 
-    <section class="panel" *ngIf="activeSection === 'reports'">
-        <header class="panel-header">
-            <div>
-                <p class="eyebrow">Reports</p>
-                <h3>Recent vehicle reports</h3>
-            </div>
-            <span class="muted" *ngIf="loadingReports">Loading...</span>
-        </header>
-
-        <div class="filters">
-            <input type="search" placeholder="Search title, vehicle or fleet" [(ngModel)]="reportSearch">
-            <button type="button" class="ghost-btn" (click)="showAllReports = !showAllReports">
-                {{ showAllReports ? 'Show less' : 'Show more' }}
-            </button>
-        </div>
-
-        <div class="report-list">
-            <div class="report-card" *ngFor="let report of filteredReports">
-                <div class="report-card__top">
-                    <span class="report-title">{{ report.title }}</span>
-                    <span class="badge" [class]="statusBadgeClass(report.status)">{{ report.status }}</span>
-                </div>
-                <p class="muted">Vehicle #{{ report.vehicleId }} &bull; Fleet #{{ report.ownerFleet }}</p>
-                <small>{{ report.createdAt | date: 'medium' }}</small>
-            </div>
+        <div *ngIf="selectedAlarm" class="form-wrapper">
+            <app-alarm-form [alarm]="selectedAlarm" [overrideFleetId]="getFleetIdForUser(selectedAlarmUserId)"
+                [interfaceUserId]="selectedAlarmUserId" (save)="onSaveAlarm($event)"
+                (cancel)="selectedAlarm = null"></app-alarm-form>
         </div>
     </section>
 

@@ -109,6 +109,23 @@ button[type="submit"]:disabled {
     cursor: not-allowed;
 }
 
+.ghost-btn {
+    width: 100%;
+    background: linear-gradient(120deg, #f8fafc, #ffffff);
+    border: 1px solid #d7dde7;
+    color: #0f172a;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.ghost-btn:hover {
+    background: linear-gradient(120deg, #e8f0ff, #ffffff);
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
 .switch {
     display: flex;
     align-items: center;

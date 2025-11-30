@@ -16,6 +16,15 @@
                 </option>
             </select>
             </label>
+            <label>
+                Vehicle:
+                <select formControlName="vehicleId">
+                    <option [ngValue]="null">-- Select vehicle --</option>
+                    <option *ngFor="let v of vehicles" [ngValue]="v.id">
+                        {{ v.name || 'Vehicle' }} (ID: {{ v.id }})
+                    </option>
+                </select>
+            </label>
         </div>
     </div>
 

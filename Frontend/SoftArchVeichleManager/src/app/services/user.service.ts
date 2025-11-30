@@ -43,6 +43,11 @@ export class UserService {
         return of([...this.mockData]).pipe(delay(400));
     }
 
+    registerUser(payload: { name: string; password: string; role: AdminUser['role'] }): Observable<AdminUser> {
+        const dto = this.dtoMapperService.userToDto({ id: 0, name: payload.name, role: payload.role }, payload.password);
+        return this.http.post<AdminUser>(`${this.apiBase}`, dto, { headers: this.headers });
+    }
+
     saveUser(user: AdminUser): Observable<AdminUser> {
         var dto = this.dtoMapperService.userToDto(user);
         //API

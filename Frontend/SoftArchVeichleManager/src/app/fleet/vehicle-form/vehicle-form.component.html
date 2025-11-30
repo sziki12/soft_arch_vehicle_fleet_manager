@@ -23,6 +23,14 @@
             <input formControlName="year" type="number">
         </div>
 
+        <div class="form-group" *ngIf="showFleetSelect">
+            <label>Fleet</label>
+            <select formControlName="fleetId">
+                <option [ngValue]="null">-- Válassz flotta --</option>
+                <option *ngFor="let fleet of fleets" [ngValue]="fleet.id">{{ fleet.name }} (#{{ fleet.id }})</option>
+            </select>
+        </div>
+
     </div>
 
     <div class="actions">

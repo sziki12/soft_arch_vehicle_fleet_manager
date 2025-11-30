@@ -14,6 +14,8 @@ import { AuthService } from '../../services/auth.service';
 })
 export class AlarmFormComponent implements OnInit, OnChanges {
   @Input() alarm!: Alarm;
+  @Input() overrideFleetId: number | null = null;
+  @Input() interfaceUserId: number | null = null;
   @Output() save = new EventEmitter<Alarm>();
   @Output() cancel = new EventEmitter<void>();
 
@@ -34,8 +36,8 @@ export class AlarmFormComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
-    this.selectedInterface = this.alarmService.getInterfaceNameById(this.alarm.interfaceId) ?? this.selectedInterface;
-    const defaultFleetId = this.authService.currentUser?.fleetId ?? this.alarm.fleetId;
+    this.selectedInterface = this.alarmService.getInterfaceNameById(this.alarm.interfaceId, this.interfaceUserId ?? undefined) ?? this.selectedInterface;
+    const defaultFleetId = this.overrideFleetId ?? this.authService.currentUser?.fleetId ?? this.alarm.fleetId;
 
     this.form = this.fb.group({
       alarmId: [this.alarm.id],
@@ -49,9 +51,9 @@ export class AlarmFormComponent implements OnInit, OnChanges {
   }
 
   private loadInterfaces(): void {
-    this.alarmService.getAlarmInterfaces().subscribe(list => {
+    this.alarmService.getAlarmInterfaces(this.interfaceUserId ?? undefined).subscribe(list => {
       this.interfaces = list;
-      const nameFromId = this.alarmService.getInterfaceNameById(this.alarm.interfaceId);
+      const nameFromId = this.alarmService.getInterfaceNameById(this.alarm.interfaceId, this.interfaceUserId ?? undefined);
       if (nameFromId) {
         this.selectedInterface = nameFromId;
         this.form?.patchValue({ interfaceName: nameFromId });
@@ -68,7 +70,7 @@ export class AlarmFormComponent implements OnInit, OnChanges {
       return;
     }
 
-    this.alarmService.getInterfaceProperties(name).subscribe(props => {
+    this.alarmService.getInterfaceProperties(name, this.interfaceUserId ?? undefined).subscribe(props => {
       this.interfaceProperties = props;
       console.log('Loaded interface properties for', name, ':', props);
       this.bootstrapPropertyValues(props);
@@ -165,7 +167,7 @@ export class AlarmFormComponent implements OnInit, OnChanges {
     if (this.form.valid) {
       const alarmJson = this.form.value.alarmJson;
       const fleetId = this.form.value.alarmFleet;
-      const resolvedInterfaceId = this.alarmService.getInterfaceIdByName(this.form.value.interfaceName) ?? this.alarm.interfaceId ?? 0;
+      const resolvedInterfaceId = this.alarmService.getInterfaceIdByName(this.form.value.interfaceName, this.interfaceUserId ?? undefined) ?? this.alarm.interfaceId ?? 0;
       const interfaceId = resolvedInterfaceId;
       const id = this.form.value.alarmId ?? 0;
       this.save.emit({ id, fleetId, interfaceId, alarmJson });

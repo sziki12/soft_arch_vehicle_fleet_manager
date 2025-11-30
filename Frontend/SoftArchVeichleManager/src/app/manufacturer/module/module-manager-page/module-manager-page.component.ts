@@ -77,9 +77,15 @@ export class ModuleManagerPageComponent implements OnInit {
 
   onSave(module: Module) {
     this.loading = true;
-    this.moduleService.saveModule(module).subscribe(() => {
-      this.selectedModule = null;
-      this.loadData();
+    this.moduleService.saveModule(module).subscribe({
+      next: () => {
+        this.selectedModule = null;
+        this.loadData();
+      },
+      error: () => {
+        alert('Save failed. Please ensure the vehicle ID exists.');
+        this.loading = false;
+      }
     });
   }
 

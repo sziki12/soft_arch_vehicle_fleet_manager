@@ -40,14 +40,15 @@ export class ModuleService {
 
     saveModule(module: Module): Observable<Module> {
         var dto = this.dtoMapperService.moduleToDto(module);
-        console.log('Saving module DTO:', dto);
         //API
         if (this.apiBase) {
             if (module.id && module.id > 0) {
                 // UPDATE
+                console.log(`Updating module ${module.id} with DTO:`, dto);
                 return this.http.put<Module>(`${this.apiBase}/${module.id}`, dto, { headers: this.headers });
             } else {
                 // CREATE
+                console.log('Creating module with DTO:', dto);
                 return this.http.post<Module>(`${this.apiBase}`, dto, { headers: this.headers });
             }
         }

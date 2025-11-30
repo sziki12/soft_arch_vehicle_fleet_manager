@@ -21,11 +21,10 @@ export class DtoMappereService {
     public moduleToDto(module: Module): any
     {
         return {
-            MODULE_ID: (module.id > 0) ? module.id : null,
             HWID: module.hardwareId,
             INTERFACE_ID: module.interfaceId,
             MANUFACTURER_ID: module.manufacturerId,
-            VEHICLE_ID: (module.vehicleId > 0) ? module.vehicleId : null
+            VEHICLE_ID: module.vehicleId
         };
     }
 

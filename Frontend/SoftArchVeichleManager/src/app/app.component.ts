@@ -4,6 +4,7 @@ import { AlarmManagerPageComponent } from './alarm/alarm-manager-page/alarm-mana
 import { FleetManagerPageComponent } from './fleet/fleet-manager-page/fleet-manager-page.component';
 import { AdminDashboardComponent } from './admin/admin-dashboard/admin-dashboard.component';
 import { LoginComponent } from './auth/login.component';
+import { RegisterComponent } from './auth/register.component';
 import { AuthService } from './services/auth.service';
 import { UserSession } from './models/auth-user.model';
 import { HttpClientModule } from '@angular/common/http';
@@ -12,7 +13,8 @@ import { InterfaceManagerPageComponent } from './manufacturer/interface/interfac
 import { ModuleManagerPageComponent } from './manufacturer/module/module-manager-page/module-manager-page.component';
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, HttpClientModule, FleetManagerPageComponent, AlarmManagerPageComponent, InterfaceManagerPageComponent, ModuleManagerPageComponent, AdminDashboardComponent, LoginComponent],
+  standalone: true,
+  imports: [CommonModule, HttpClientModule, FleetManagerPageComponent, AlarmManagerPageComponent, InterfaceManagerPageComponent, ModuleManagerPageComponent, AdminDashboardComponent, LoginComponent, RegisterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -21,6 +23,7 @@ export class AppComponent implements OnInit, OnDestroy {
   currentRole: 'manager' | 'admin' | 'manufacturer' = 'manager';
   activeScreen: 'fleet' | 'alarm' | 'interface' | 'module' = 'fleet';
   session: UserSession | null = null;
+  authView: 'login' | 'register' = 'login';
   private sub?: Subscription;
 
   constructor(private authService: AuthService) { }
@@ -31,6 +34,7 @@ export class AppComponent implements OnInit, OnDestroy {
       if (session) {
         this.currentRole = session.role;
         this.activeScreen = session.role === 'manufacturer' ? 'interface' : 'fleet';
+        this.authView = 'login';
       }
     });
   }
@@ -45,5 +49,13 @@ export class AppComponent implements OnInit, OnDestroy {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  switchToRegister(): void {
+    this.authView = 'register';
+  }
+
+  switchToLogin(): void {
+    this.authView = 'login';
   }
 }

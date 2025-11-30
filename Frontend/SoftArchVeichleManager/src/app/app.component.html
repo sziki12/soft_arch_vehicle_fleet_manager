@@ -53,5 +53,8 @@
 </ng-container>
 
 <ng-template #loginView>
-    <app-login></app-login>
+    <ng-container [ngSwitch]="authView">
+        <app-login *ngSwitchCase="'login'" (switchToRegister)="switchToRegister()"></app-login>
+        <app-register *ngSwitchCase="'register'" (switchToLogin)="switchToLogin()"></app-register>
+    </ng-container>
 </ng-template>

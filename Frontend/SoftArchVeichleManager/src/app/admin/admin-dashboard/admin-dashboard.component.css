@@ -128,17 +128,49 @@
 }
 
 .ghost-btn {
-    border: 1px solid var(--border-color);
-    background: #fff;
-    padding: 8px 12px;
-    border-radius: 8px;
+    border: 1px solid #d7dde7;
+    background: linear-gradient(120deg, #f8fafc, #ffffff);
+    padding: 9px 14px;
+    border-radius: 12px;
     cursor: pointer;
-    font-weight: 600;
-    color: var(--text-main);
+    font-weight: 700;
+    color: #0f172a;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+    transition: all 0.18s ease;
+    letter-spacing: 0.02em;
 }
 
 .ghost-btn:hover {
-    background: #f8fafc;
+    background: linear-gradient(120deg, #e8f0ff, #ffffff);
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+    transform: translateY(-1px);
+}
+
+.ghost-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+.ghost-btn.danger {
+    border-color: #fecdd3;
+    color: #b91c1c;
+    background: linear-gradient(120deg, #fff1f2, #ffffff);
+}
+
+.ghost-btn.danger:hover {
+    border-color: #fca5a5;
+    color: #991b1b;
+    background: linear-gradient(120deg, #fee2e2, #fff8f8);
+    box-shadow: 0 8px 18px rgba(185, 28, 28, 0.15);
+    transform: translateY(-1px);
+}
+
+.list li .flex {
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 .fleet-grid {
@@ -259,7 +291,8 @@
 .table-head,
 .table-row {
     display: grid;
-    grid-template-columns: 1.2fr 0.7fr 1fr 1.5fr;
+    grid-template-columns: 1.3fr 0.8fr 1fr 0.6fr;
+    column-gap: 16px;
     padding: 10px 12px;
 }
 
@@ -320,32 +353,6 @@
     max-width: 320px;
     overflow-x: auto;
     margin: 0;
-}
-
-.report-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 10px;
-}
-
-.report-card {
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 10px 12px;
-    background: #f8fafc;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.report-card__top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.report-title {
-    font-weight: 600;
 }
 
 .status-green {

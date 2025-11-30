@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
+import { EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-login',
@@ -15,11 +16,12 @@ export class LoginComponent {
   loading = false;
   error = '';
   submitted = false;
+  @Output() switchToRegister = new EventEmitter<void>();
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     this.form = this.fb.group({
       username: ['', [Validators.required]],
-      password: ['', [Validators.required]]
+      password: ['', [Validators.required,]]
     });
   }
 

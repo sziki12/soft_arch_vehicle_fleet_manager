@@ -35,17 +35,38 @@ export class ModuleFormComponent implements OnChanges, OnInit {
   }
 
   ngOnChanges(): void {
+    const manufacturerId = this.module.manufacturerId || this.authService.currentUser?.manufacturerId || 0;
+    this.selectedInterfaceId = this.module.interfaceId;
+
     this.form = this.fb.group({
       id: [this.module.id],
       hardwareId: [this.module.hardwareId, [Validators.required]],
-      manufacturerId: [this.authService.currentUser?.manufacturerId],
-      interfaceId: [this.selectedInterfaceId],
-      vehicleId: [0],
+      manufacturerId: [manufacturerId, [Validators.required, Validators.min(1)]],
+      interfaceId: [this.selectedInterfaceId, [Validators.required, Validators.min(1)]],
+      vehicleId: [this.module.vehicleId ?? 0, [Validators.required, Validators.min(1)]],
     });
   }
 
   submit() {
     if (this.form.valid) {
+      const vehicleId = this.form.value.vehicleId;
+      const interfaceId = this.form.value.interfaceId;
+      const manufacturerId = this.form.value.manufacturerId;
+
+      const exists = this.vehicles?.some(v => v.id === vehicleId);
+      if (!exists) {
+        alert('The provided vehicle ID does not exist.');
+        return;
+      }
+      if (!interfaceId || interfaceId < 1) {
+        alert('Please select an interface.');
+        return;
+      }
+      if (!manufacturerId || manufacturerId < 1) {
+        alert('Manufacturer is missing or invalid.');
+        return;
+      }
+
       this.save.emit(this.form.value);
     }
   }

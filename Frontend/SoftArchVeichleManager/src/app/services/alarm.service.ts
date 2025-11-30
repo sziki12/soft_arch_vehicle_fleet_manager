@@ -11,7 +11,7 @@ export class AlarmService {
     private apiBase = 'https://localhost:7172/api/alarms';
     private interfaceApiBase = 'https://localhost:7172/api/interfaces';
     private headers: HttpHeaders;
-    private interfaceCache: Array<{ id: number; name: string; properties: string[] }> = [];
+    private interfaceCache: Record<number, Array<{ id: number; name: string; properties: string[] }>> = {};
 
     constructor(
         private http: HttpClient,
@@ -42,14 +42,20 @@ export class AlarmService {
 
     }
 
-    getAlarmInterfaces(): Observable<string[]> {
-        return this.http.get<any[]>(`${this.interfaceApiBase}/byuser?user_id=${this.authService.currentUser?.userId}`, { headers: this.headers }).pipe(
+    getAlarmInterfaces(userId?: number): Observable<string[]> {
+        const cacheKey = userId ?? this.authService.currentUser?.userId ?? 0;
+        const cached = this.interfaceCache[cacheKey];
+        if (cached && cached.length) {
+            return of(cached.map(i => i.name));
+        }
+
+        return this.http.get<any[]>(`${this.interfaceApiBase}/byuser?user_id=${cacheKey}`, { headers: this.headers }).pipe(
             map(data => this.dtoMapperService.transformArray(
                 data,
                 this.dtoMapperService.dtoToInterface
             )),
             map(interfaces => {
-                this.interfaceCache = interfaces.map(i => ({
+                this.interfaceCache[cacheKey] = interfaces.map(i => ({
                     id: i.id,
                     name: i.name,
                     properties: this.extractProperties(i.interfaceJson)
@@ -60,21 +66,24 @@ export class AlarmService {
         );
     }
 
-    getInterfaceProperties(interfaceName: string): Observable<string[]> {
-        const cached = this.interfaceCache.find(i => i.name === interfaceName);
+    getInterfaceProperties(interfaceName: string, userId?: number): Observable<string[]> {
+        const cacheKey = userId ?? this.authService.currentUser?.userId ?? 0;
+        const cached = this.interfaceCache[cacheKey]?.find(i => i.name === interfaceName);
         if (cached) {
             return of(cached.properties);
         }
         return of([]);
     }
 
-    getInterfaceNameById(id: number): string | null {
-        const cached = this.interfaceCache.find(i => i.id === id);
+    getInterfaceNameById(id: number, userId?: number): string | null {
+        const cacheKey = userId ?? this.authService.currentUser?.userId ?? 0;
+        const cached = this.interfaceCache[cacheKey]?.find(i => i.id === id);
         return cached ? cached.name : null;
     }
 
-    getInterfaceIdByName(name: string): number | null {
-        const cached = this.interfaceCache.find(i => i.name === name);
+    getInterfaceIdByName(name: string, userId?: number): number | null {
+        const cacheKey = userId ?? this.authService.currentUser?.userId ?? 0;
+        const cached = this.interfaceCache[cacheKey]?.find(i => i.name === name);
         return cached ? cached.id : null;
     }
 
