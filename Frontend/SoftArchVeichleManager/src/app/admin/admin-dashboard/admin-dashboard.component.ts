@@ -114,9 +114,16 @@ export class AdminDashboardComponent implements OnInit {
 
   loadVehicles(): void {
     this.loadingVehicles = true;
-    this.vehicleService.getVehicles().subscribe(vehicles => {
-      this.vehicles = vehicles;
-      this.loadingVehicles = false;
+    this.vehicleService.getVehicles().subscribe({
+      next: vehicles => {
+        console.log('[AdminDashboard] vehicles received', vehicles?.length ?? 0, vehicles);
+        this.vehicles = vehicles;
+        this.loadingVehicles = false;
+      },
+      error: (err) => {
+        console.error('[AdminDashboard] vehicle load failed', err);
+        this.loadingVehicles = false;
+      }
     });
   }
 
