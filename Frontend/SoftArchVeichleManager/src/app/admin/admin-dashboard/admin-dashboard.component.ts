@@ -208,17 +208,27 @@ export class AdminDashboardComponent implements OnInit {
 
   onSaveAlarm(alarm: Alarm): void {
     this.loadingAlarms = true;
-    if (!this.selectedAlarmUserId) {
+    let targetFleetId: number | null = alarm.fleetId ?? null;
+
+    if (this.selectedAlarmUserId) {
+      targetFleetId = this.getFleetIdForUser(this.selectedAlarmUserId);
+      if (!targetFleetId) {
+        alert('A kiválasztott operátorhoz nincs flotta rendelve.');
+        this.loadingAlarms = false;
+        return;
+      }
+    } else if (!alarm.id || alarm.id === 0) {
       alert('Válassz egy fleet operátort a riasztáshoz.');
       this.loadingAlarms = false;
       return;
     }
-    const targetFleetId = this.getFleetIdForUser(this.selectedAlarmUserId);
+
     if (!targetFleetId) {
-      alert('A kiválasztott operátorhoz nincs flotta rendelve.');
+      alert('A riasztás flottája hiányzik.');
       this.loadingAlarms = false;
       return;
     }
+
     alarm.fleetId = targetFleetId;
     this.alarmService.saveAlarm(alarm).subscribe({
       next: () => {
@@ -385,6 +395,39 @@ export class AdminDashboardComponent implements OnInit {
       .filter(a => !term || a.hardwareId.toLowerCase().includes(term) || String(a.id).includes(term) || String(a.vehicleId).includes(term) 
       || String(a.interfaceId).includes(term) || String(a.manufacturerId).includes(term));
     return this.limitList(filtered, this.showAllAlarms ? undefined : 5);
+  }
+
+  getAlarmEntries(alarm: Alarm): Array<{ key: string; value: string }> {
+    try {
+      const parsed = JSON.parse(alarm.alarmJson);
+      if (parsed && typeof parsed === 'object') {
+        return Object.entries(parsed).map(([key, value]) => ({
+          key,
+          value: this.stringifyEntryValue(value)
+        }));
+      }
+    } catch {
+      // keep fallback below
+    }
+    return [{ key: 'payload', value: alarm.alarmJson }];
+  }
+
+  private stringifyEntryValue(value: any): string {
+    if (value && typeof value === 'object' && 'operator' in value) {
+      const symbol = this.operatorSymbol((value as any).operator);
+      const val = (value as any).value;
+      const displayValue = typeof val === 'object' ? JSON.stringify(val) : String(val);
+      return [symbol, displayValue].filter(Boolean).join(' ');
+    }
+    return typeof value === 'object' ? JSON.stringify(value) : String(value);
+  }
+
+  private operatorSymbol(raw: any): string {
+    const upper = String(raw || '').toUpperCase();
+    if (upper === 'GT') return '>';
+    if (upper === 'LT') return '<';
+    if (upper === 'EQ') return '=';
+    return '';
   }
 
   get alarmOperators(): AdminUser[] {

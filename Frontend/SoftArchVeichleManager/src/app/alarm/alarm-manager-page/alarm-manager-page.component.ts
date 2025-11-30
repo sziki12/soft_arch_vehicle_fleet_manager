@@ -71,12 +71,36 @@ export class AlarmManagerPageComponent implements OnInit {
       if (parsed && typeof parsed === 'object') {
         return Object.entries(parsed).map(([key, value]) => ({
           key,
-          value: typeof value === 'object' ? JSON.stringify(value) : String(value)
+          value: this.stringifyEntryValue(value)
         }));
       }
     } catch {
 
     }
     return [{ key: 'payload', value: alarm.alarmJson }];
+  }
+
+  private stringifyEntryValue(value: any): string {
+    if (value && typeof value === 'object' && 'operator' in value) {
+      const symbol = this.operatorSymbol((value as any).operator);
+      const val = (value as any).value;
+      const displayValue = typeof val === 'object' ? JSON.stringify(val) : String(val);
+      return [symbol, displayValue].filter(Boolean).join(' ');
+    }
+    return typeof value === 'object' ? JSON.stringify(value) : String(value);
+  }
+
+  private operatorSymbol(raw: any): string {
+    const upper = String(raw || '').toUpperCase();
+    if (upper === 'GT') {
+      return '>';
+    }
+    if (upper === 'LT') {
+      return '<';
+    }
+    if (upper === 'EQ') {
+      return '=';
+    }
+    return '';
   }
 }

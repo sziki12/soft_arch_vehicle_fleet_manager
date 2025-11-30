@@ -114,9 +114,16 @@ button[type="button"]:hover {
 
 .property-row {
     display: grid;
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: 220px auto 1fr;
     gap: 12px;
     align-items: center;
+}
+
+.operator-select {
+    width: 56px;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: center;
 }
 
 .prop-name {

@@ -13,6 +13,7 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./alarm-form.component.css']
 })
 export class AlarmFormComponent implements OnInit, OnChanges {
+  private readonly defaultOperator: ComparisonOperator = 'EQ';
   @Input() alarm!: Alarm;
   @Input() overrideFleetId: number | null = null;
   @Input() interfaceUserId: number | null = null;
@@ -22,7 +23,7 @@ export class AlarmFormComponent implements OnInit, OnChanges {
   form!: FormGroup;
   interfaces: string[] = [];
   interfaceProperties: string[] = [];
-  propertyValues: Record<string, string> = {};
+  propertyValues: Record<string, PropertyState> = {};
   selectedInterface = '';
 
   constructor(
@@ -37,7 +38,9 @@ export class AlarmFormComponent implements OnInit, OnChanges {
 
   ngOnChanges(): void {
     this.selectedInterface = this.alarmService.getInterfaceNameById(this.alarm.interfaceId, this.interfaceUserId ?? undefined) ?? this.selectedInterface;
-    const defaultFleetId = this.overrideFleetId ?? this.authService.currentUser?.fleetId ?? this.alarm.fleetId;
+    const defaultFleetId = (this.alarm.fleetId && this.alarm.fleetId > 0)
+      ? this.alarm.fleetId
+      : this.overrideFleetId ?? this.authService.currentUser?.fleetId ?? this.alarm.fleetId;
 
     this.form = this.fb.group({
       alarmId: [this.alarm.id],
@@ -84,9 +87,9 @@ export class AlarmFormComponent implements OnInit, OnChanges {
       if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
         this.interfaceProperties = Object.keys(parsed);
         this.propertyValues = Object.entries(parsed).reduce((acc, [key, value]) => {
-          acc[key] = this.stringifyValue(value);
+          acc[key] = this.normalizePropertyState(value);
           return acc;
-        }, {} as Record<string, string>);
+        }, {} as Record<string, PropertyState>);
         return;
       }
     } catch {
@@ -98,9 +101,9 @@ export class AlarmFormComponent implements OnInit, OnChanges {
   }
 
   private bootstrapPropertyValues(props: string[]): void {
-    const nextValues: Record<string, string> = {};
+    const nextValues: Record<string, PropertyState> = {};
     props.forEach(prop => {
-      nextValues[prop] = this.propertyValues[prop] ?? '';
+      nextValues[prop] = this.propertyValues[prop] ?? { value: '', operator: this.defaultOperator };
     });
     this.propertyValues = nextValues;
   }
@@ -109,11 +112,32 @@ export class AlarmFormComponent implements OnInit, OnChanges {
     if (typeof value === 'object') {
       return JSON.stringify(value);
     }
-    return String(value);
+    return value === undefined ? '' : String(value);
+  }
+
+  private normalizePropertyState(raw: unknown): PropertyState {
+    if (raw && typeof raw === 'object' && 'operator' in (raw as any)) {
+      const { operator, value } = raw as any;
+      return {
+        operator: this.parseOperator(operator),
+        value: this.stringifyValue(value)
+      };
+    }
+    return {
+      operator: this.defaultOperator,
+      value: this.stringifyValue(raw)
+    };
   }
 
   onPropertyValueChange(key: string, value: string): void {
-    this.propertyValues = { ...this.propertyValues, [key]: value };
+    const existing = this.propertyValues[key] ?? { value: '', operator: this.defaultOperator };
+    this.propertyValues = { ...this.propertyValues, [key]: { ...existing, value } };
+    this.syncAlarmJson();
+  }
+
+  onOperatorChange(key: string, operator: string): void {
+    const existing = this.propertyValues[key] ?? { value: '', operator: this.defaultOperator };
+    this.propertyValues = { ...this.propertyValues, [key]: { ...existing, operator: this.parseOperator(operator) } };
     this.syncAlarmJson();
   }
 
@@ -128,7 +152,12 @@ export class AlarmFormComponent implements OnInit, OnChanges {
     const keys = this.interfaceProperties.length ? this.interfaceProperties : Object.keys(this.propertyValues);
 
     keys.forEach(key => {
-      payload[key] = this.coerceValue(this.propertyValues[key]);
+      const current = this.propertyValues[key] ?? { value: '', operator: this.defaultOperator };
+      const operator = current.operator ?? this.defaultOperator;
+      payload[key] = {
+        operator,
+        value: this.coerceValue(current.value)
+      };
     });
 
     this.form.patchValue({
@@ -170,7 +199,22 @@ export class AlarmFormComponent implements OnInit, OnChanges {
       const resolvedInterfaceId = this.alarmService.getInterfaceIdByName(this.form.value.interfaceName, this.interfaceUserId ?? undefined) ?? this.alarm.interfaceId ?? 0;
       const interfaceId = resolvedInterfaceId;
       const id = this.form.value.alarmId ?? 0;
+      console.log('Submitting alarm payload', { id, fleetId, interfaceId, alarmJson });
       this.save.emit({ id, fleetId, interfaceId, alarmJson });
     }
   }
+  private parseOperator(raw: string): ComparisonOperator {
+    const upper = (raw || '').toUpperCase();
+    if (upper === 'GT' || upper === 'LT' || upper === 'EQ') {
+      return upper;
+    }
+    return this.defaultOperator;
+  }
 }
+
+type ComparisonOperator = 'GT' | 'LT' | 'EQ';
+
+type PropertyState = {
+  value: string;
+  operator: ComparisonOperator;
+};
