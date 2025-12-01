@@ -16,15 +16,22 @@ namespace SoftArchVehicleFleetManager.Controllers
             _telemetryService = telemetryService;
         }
 
-        [HttpGet("vehicle/{vehicleId}")]
-        public async Task<ActionResult<TelemetryReportDto>> GetVehicleReport(string vehicleId)
+        [HttpGet("report/{vehicleId}")]
+        public async Task<ActionResult<TelemetryReportDto>> GetVehicleReport(int vehicleId)
         {
-            var report = await _telemetryService.getVehiceleReport(vehicleId);
+            var report = await _telemetryService.GetVehiceleReport(vehicleId);
             if (string.IsNullOrEmpty(report.Data))
             {
                 return NotFound(report);
             }
             return Ok(report);
+        }
+
+        [HttpGet("alarms/{fleetId}")]
+        public async Task<ActionResult<List<TelemetryAlarmDto>>> GetFleetAlarms(int fleetId)
+        {
+            var alarms = await _telemetryService.GetFleetVehiclesUnderAlarm(fleetId);
+            return Ok(alarms);
         }
     }
 }

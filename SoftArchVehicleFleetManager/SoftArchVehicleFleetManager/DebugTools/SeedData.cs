@@ -5,6 +5,7 @@ using SoftArchVehicleFleetManager.Enums;
 using SoftArchVehicleFleetManager.Models;
 using System;
 using System.Linq;
+using System.Text.Json.Nodes;
 
 public static class SeedData
 {
@@ -20,6 +21,7 @@ public static class SeedData
         AddSeedFleets(db);
         AddSeedManufacturers(db);
         AddSeedInterfaces(db);
+        addSeedAlarms(db);
         AddSeedVehicles(db);
         AddSeedModules(db);
     }
@@ -119,12 +121,25 @@ public static class SeedData
     {
         var _interface = new Interface
         {
-            Name = "Interface numero uno",
+            Name = "InterfaceA",
             InterfaceFields = new List<string>() { "speed", "distance" },
             ManufacturerId = db.Manufacturers.Single().Id,
         };
 
         db.Interfaces.Add(_interface);
+        db.SaveChanges();
+    }
+
+    private static void addSeedAlarms(FleetDbContext db) 
+    {
+        var alertJson = new JsonObject { ["speed"] = "GT 100" };
+        var alarm1 = new Alarm
+        {
+             AlarmJSON = alertJson.ToString(),
+             FleetId = db.Fleets.Where(f => f.Name == "FleetA").SingleOrDefault().Id,
+             InterfaceId = db.Interfaces.Single().Id,
+        };
+        db.Alarms.Add(alarm1);
         db.SaveChanges();
     }
 

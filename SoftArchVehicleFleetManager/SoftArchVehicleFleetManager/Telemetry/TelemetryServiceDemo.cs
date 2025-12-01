@@ -16,12 +16,12 @@ namespace SoftArchVehicleFleetManager.Telemetry
             fleetServiceA.AddModuleTelemetrySubscripition("ManufacturerA", "ABC345");
 
             var alertJson = new JsonObject { ["speed"] = "GT 100" };
-            fleetServiceA.AddModuleAlertConstraint("Alert1", "ManufacturerA", alertJson.ToString());
+            fleetServiceA.AddModuleAlarmConstraint("Alert1", "ManufacturerA", alertJson.ToString());
 
             await Task.Delay(60000);
 
             // Check for modules under alert
-            var modulesUnderAlert = fleetServiceA.GetModulesUnderAlert();
+            var modulesUnderAlert = fleetServiceA.GetModulesUnderAlarm();
 
             try
             {
@@ -34,7 +34,7 @@ namespace SoftArchVehicleFleetManager.Telemetry
             }
 
             // Remove alert constraint
-            fleetServiceA.RemoveFleetAlertConstraint("Alert1");
+            fleetServiceA.RemoveFleetAlarmConstraint("Alert1");
 
         }
 
