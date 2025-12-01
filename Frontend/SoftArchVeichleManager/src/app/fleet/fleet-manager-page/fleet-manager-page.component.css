@@ -188,4 +188,16 @@
 
 .report-table td {
     color: var(--text-main);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.report-modal__message {
+    margin: 0 0 12px 0;
+    color: var(--text-main);
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-weight: 500;
 }

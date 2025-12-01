@@ -7,8 +7,7 @@
 
         <div *ngIf="loading">Loading...</div>
 
-        <app-card *ngFor="let v of vehicles" [isActive]="selectedVehicle?.id === v.id"
-            (click)="selectVehicle(v)">
+        <app-card *ngFor="let v of vehicles" [isActive]="selectedVehicle?.id === v.id" (click)="selectVehicle(v)">
 
             <div class="card-header">
                 <h3 class="card-title">{{ v.name }}</h3>
@@ -53,16 +52,18 @@
         <div class="report-modal__header">
             <div>
                 <p class="report-modal__eyebrow">Vehicle report</p>
-                <h3>Vehicle #{{ reportVehicleId }}</h3>
+                <h3>Vehicle {{ reportVehicleName || ('#' + reportVehicleId) }}</h3>
                 <small>{{ reportHeaderDate | date: 'medium' }}</small>
             </div>
             <button class="report-modal__close" (click)="closeReport()">×</button>
         </div>
 
+        <p class="report-modal__message" *ngIf="reportMessage">{{ reportMessage }}</p>
+
         <table class="report-table" *ngIf="reportPayloadEntries.length">
             <thead>
                 <tr>
-                    <th>Field</th>
+                    <th>HardverID</th>
                     <th>Value</th>
                 </tr>
             </thead>

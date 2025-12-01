@@ -10,6 +10,7 @@ import { DtoMappereService } from './dto-mapper.service';
 export class VehicleService {
 
     private apiBase = 'https://localhost:7172/api/vehicles';
+    private telemetryApiBase = 'https://localhost:7172/api/telemetry';
     private headers: HttpHeaders;
 
     constructor(
@@ -63,8 +64,21 @@ export class VehicleService {
         return this.http.delete<boolean>(`${this.apiBase}/${id}`, { headers: this.headers });
     }
 
-    generateVehicleReport(id: number): Observable<{ id: number; generatedAt: string; payload: unknown }> {
-        // TODO: Implement API-backed reports. Currently left as-is.
-        return this.http.get<{ id: number; generatedAt: string; payload: unknown }>(`${this.apiBase}/${id}/report`, { headers: this.headers });
+    generateVehicleReport(id: number): Observable<{ vehicleId: number; message: string; data: string | null }> {
+        const requestUrl = `${this.telemetryApiBase}/report/${id}`;
+        console.log('[VehicleService] GET', requestUrl);
+
+        return this.http.get<{ TELEMETRY_MESSAGE: string; TELEMETRY_DATA: string | null }>(requestUrl, { headers: this.headers })
+            .pipe(
+                map(response => ({
+                    vehicleId: id,
+                    message: response?.TELEMETRY_MESSAGE ?? 'Telemetry report',
+                    data: response?.TELEMETRY_DATA ?? null
+                })),
+                catchError(err => {
+                    console.error('[VehicleService] telemetry report failed', err);
+                    throw err;
+                })
+            );
     }
 }
