@@ -26,6 +26,13 @@
                 </select>
             </label>
         </div>
+        <div class="form-group" *ngIf="showModuleSelect">
+            <label>Manufacturer</label>
+            <select formControlName="manufacturerId">
+                <option [ngValue]="null">-- Válassz manufacturer-t --</option>
+                <option *ngFor="let manufacturer of manufacturers" [ngValue]="manufacturer.id">{{ manufacturer.name }} (#{{ manufacturer.id }})</option>
+            </select>
+    </div>
     </div>
 
     <div class="actions">

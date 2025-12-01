@@ -14,6 +14,14 @@
         </div>
     </div>
 
+    <div class="form-group" *ngIf="showInterfaceSelect">
+            <label>Manufacturer</label>
+            <select formControlName="manufacturerId">
+                <option [ngValue]="null">-- Válassz manufacturer-t --</option>
+                <option *ngFor="let manufacturer of manufacturers" [ngValue]="manufacturer.id">{{ manufacturer.name }} (#{{ manufacturer.id }})</option>
+            </select>
+    </div>
+
     <div class="actions">
         <button type="button" (click)="cancel.emit()">Mégse</button>
         <button type="submit" [disabled]="form.invalid">Mentés</button>

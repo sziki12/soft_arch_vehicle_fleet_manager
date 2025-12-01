@@ -3,10 +3,10 @@ import { Module } from '../../../models/module.model';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
-import { Manufacturer } from '../../../models/manufacturer.model';
 import { Vehicle } from '../../../models/vehicle.model';
 import { Fleet } from '../../../models/fleet.model';
 import { Interface } from '../../../models/interface.model';
+import { Manufacturer } from '../../../models/manufacturer.model';
 
 @Component({
   selector: 'app-module-form',
@@ -17,6 +17,8 @@ import { Interface } from '../../../models/interface.model';
 })
 export class ModuleFormComponent implements OnChanges, OnInit {
   @Input() module!: Module;
+  @Input() showModuleSelect = false;
+  @Input() manufacturers!: Manufacturer[];
   @Input() fleets!: Fleet[];
   @Input() vehicles!: Vehicle[];
   @Input() interfaces!: Interface[];
@@ -35,13 +37,15 @@ export class ModuleFormComponent implements OnChanges, OnInit {
   }
 
   ngOnChanges(): void {
-    const manufacturerId = this.module.manufacturerId || this.authService.currentUser?.manufacturerId || 0;
+    const defaultManufacturerId = this.showModuleSelect
+      ? (this.module.manufacturerId || this.manufacturers[0]?.id || null)
+      : (this.authService.currentUser?.manufacturerId || this.module.manufacturerId || null);
     this.selectedInterfaceId = this.module.interfaceId;
 
     this.form = this.fb.group({
       id: [this.module.id],
       hardwareId: [this.module.hardwareId, [Validators.required]],
-      manufacturerId: [manufacturerId, [Validators.required, Validators.min(1)]],
+      manufacturerId: [defaultManufacturerId, [Validators.required, Validators.min(1)]],
       interfaceId: [this.selectedInterfaceId, [Validators.required, Validators.min(1)]],
       vehicleId: [this.module.vehicleId ?? 0, [Validators.required, Validators.min(1)]],
     });
