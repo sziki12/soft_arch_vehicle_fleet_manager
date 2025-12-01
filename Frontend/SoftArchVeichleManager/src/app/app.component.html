@@ -4,7 +4,6 @@
         <header class="app-header">
             <div class="brand">
                 <div class="brand-title">Fleet Platform</div>
-                <div class="brand-caption">Mock data playground</div>
             </div>
 
             <div class="header-actions">
@@ -13,12 +12,16 @@
                     <small>{{ session.email }} &mdash; {{ session.role }}</small>
                 </div>
 
-                <div class="view-toggle" *ngIf="currentRole === 'manager'">
+                <div class="view-toggle" *ngIf="currentRole === 'fleet_operator'">
                     <button type="button" [class.active]="activeScreen === 'fleet'" (click)="setScreen('fleet')">
                         Vehicles
                     </button>
                     <button type="button" [class.active]="activeScreen === 'alarm'" (click)="setScreen('alarm')">
                         Alarms
+                    </button>
+                    <button type="button" [class.active]="activeScreen === 'activeAlarms'"
+                        (click)="setScreen('activeAlarms')">
+                        Active Alarms
                     </button>
                 </div>
                 <div class="view-toggle" *ngIf="currentRole === 'manufacturer'">
@@ -35,9 +38,10 @@
         </header>
 
         <main class="app-main">
-            <ng-container *ngIf="currentRole === 'manager'; else adminOrManufacturer">
+            <ng-container *ngIf="currentRole === 'fleet_operator'; else adminOrManufacturer">
                 <app-fleet-manager-page *ngIf="activeScreen === 'fleet'"></app-fleet-manager-page>
                 <app-alarm-manager-page *ngIf="activeScreen === 'alarm'"></app-alarm-manager-page>
+                <app-active-alarms-page *ngIf="activeScreen === 'activeAlarms'"></app-active-alarms-page>
             </ng-container>
             <ng-template #adminOrManufacturer>
                 <ng-container *ngIf="currentRole === 'manufacturer'; else adminView">

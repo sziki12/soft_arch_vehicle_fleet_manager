@@ -1,0 +1,49 @@
+<app-main-layout title="Active alarms" subtitle="Live telemetry polling every 10 seconds">
+
+    <div left-side>
+        <div class="polling-row">
+            <span class="status-dot" [class.pulsing]="loading"></span>
+            <span class="polling-title">{{ message || 'Awaiting alarms…' }}</span>
+            <span class="spacer"></span>
+            <small *ngIf="lastUpdated">Updated {{ lastUpdated | date: 'mediumTime' }}</small>
+        </div>
+
+        <div *ngIf="loading" class="loading">Refreshing alarms…</div>
+        <div *ngIf="!loading && !alarms.length" class="empty-state">
+            <p>No active alarms at the moment.</p>
+            <small>Feed refreshes automatically.</small>
+        </div>
+
+        <app-card *ngFor="let alarm of alarms" class="alarm-card">
+            <div class="alarm-row">
+                <div>
+                    <p class="alarm-label">{{ alarm.id }}</p>
+                    <p class="alarm-module" *ngIf="alarm.module">Module {{ alarm.module }}</p>
+                </div>
+                <pre class="alarm-details">{{ alarm.details }}</pre>
+            </div>
+        </app-card>
+    </div>
+
+    <div right-side>
+        <div class="summary-card">
+            <div class="summary-header">
+                <p class="summary-label">Active alarms</p>
+                <h2 class="summary-value">{{ alarms.length }}</h2>
+            </div>
+            <div class="summary-row">
+                <p class="summary-label">Fleet</p>
+                <p class="summary-text" *ngIf="fleetId; else noFleet">#{{ fleetId }}</p>
+                <ng-template #noFleet>
+                    <p class="summary-text muted">Not assigned</p>
+                </ng-template>
+            </div>
+            <div class="summary-row">
+                <p class="summary-label">Last update</p>
+                <p class="summary-text">{{ lastUpdated ? (lastUpdated | date: 'medium') : 'Polling…' }}</p>
+            </div>
+            <p class="summary-footnote">Auto-refresh every {{ pollIntervalMs / 1000 }}s.</p>
+        </div>
+    </div>
+
+</app-main-layout>

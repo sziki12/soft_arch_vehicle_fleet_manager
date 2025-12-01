@@ -12,7 +12,7 @@ interface LoginResponse {
     name?: string;
 }
 
-type AppRole = 'admin' | 'manager' | 'manufacturer';
+type AppRole = 'admin' | 'fleet_operator' | 'manufacturer';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -98,18 +98,21 @@ export class AuthService {
     private parseRoleFromToken(token: string): AppRole {
         try {
             const payload = JSON.parse(this.decodeBase64Url(token.split('.')[1] || '')) as Record<string, unknown>;
-            const roleClaim = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string | undefined;
+            const roleClaim = (payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] as string | undefined) ?? '';
+            const normalized = roleClaim.toLowerCase().replace('-', '_').replace(' ', '_');
             console.log('Parsed role from token:', roleClaim);
-            if (roleClaim === 'Admin') {
+            if (normalized === 'admin') {
                 return 'admin';
             }
-            if (roleClaim === 'Manufacturer') {
+            if (normalized === 'manufacturer') {
                 return 'manufacturer';
             }
+            // Treat anything else (including legacy "manager") as fleet operator.
+            return 'fleet_operator';
         } catch (err) {
             console.warn('Failed to parse role from token', err);
         }
-        return 'manager';
+        return 'fleet_operator';
     }
 
     private parseUserIdFromToken(token: string): number {

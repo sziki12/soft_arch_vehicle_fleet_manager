@@ -11,17 +11,18 @@ import { HttpClientModule } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { InterfaceManagerPageComponent } from './manufacturer/interface/interface-manager-page/interface-manager-page.component';
 import { ModuleManagerPageComponent } from './manufacturer/module/module-manager-page/module-manager-page.component';
+import { ActiveAlarmsPageComponent } from './alarm/active-alarms-page/active-alarms-page.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FleetManagerPageComponent, AlarmManagerPageComponent, InterfaceManagerPageComponent, ModuleManagerPageComponent, AdminDashboardComponent, LoginComponent, RegisterComponent],
+  imports: [CommonModule, HttpClientModule, FleetManagerPageComponent, AlarmManagerPageComponent, ActiveAlarmsPageComponent, InterfaceManagerPageComponent, ModuleManagerPageComponent, AdminDashboardComponent, LoginComponent, RegisterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'SoftArchVeichleManager';
-  currentRole: 'manager' | 'admin' | 'manufacturer' = 'manager';
-  activeScreen: 'fleet' | 'alarm' | 'interface' | 'module' = 'fleet';
+  currentRole: 'fleet_operator' | 'admin' | 'manufacturer' = 'fleet_operator';
+  activeScreen: 'fleet' | 'alarm' | 'activeAlarms' | 'interface' | 'module' = 'fleet';
   session: UserSession | null = null;
   authView: 'login' | 'register' = 'login';
   private sub?: Subscription;
@@ -43,7 +44,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.sub?.unsubscribe();
   }
 
-  setScreen(screen: 'fleet' | 'alarm' | 'interface' | 'module') {
+  setScreen(screen: 'fleet' | 'alarm' | 'activeAlarms' | 'interface' | 'module') {
     this.activeScreen = screen;
   }
 
