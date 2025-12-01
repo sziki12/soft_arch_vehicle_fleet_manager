@@ -185,17 +185,24 @@ namespace TelemetryServiceLib
         {    
             List<FleetModule> result = new List<FleetModule>();
 
-            foreach (var fleetModule in FleetModules)
+            try
             {
-                foreach (var fleetAlarmConstraint in FleetAlarmConstraints)
+                foreach (var fleetModule in FleetModules)
                 {
-                    if (ParseAlarmConstraintsFor(fleetModule.Value, fleetAlarmConstraint.Value))
+                    foreach (var fleetAlarmConstraint in FleetAlarmConstraints)
                     {
-                        result.Add(fleetModule.Value);
-                        break;
+                        if (ParseAlarmConstraintsFor(fleetModule.Value, fleetAlarmConstraint.Value))
+                        {
+                            result.Add(fleetModule.Value);
+                            break;
+                        }
                     }
                 }
-            } 
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"Error in GetModulesUnderAlarm: {exception.Message}");
+            }
 
             return result;
         }

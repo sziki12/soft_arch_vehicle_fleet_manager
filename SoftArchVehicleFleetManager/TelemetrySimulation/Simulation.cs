@@ -9,11 +9,11 @@
                 List<SimulatedModule> simulatedModules = new List<SimulatedModule>();
 
                 simulatedModules.Add(new SimulatedModule("FleetA", "ManufacturerA", "ABC123"));
-                simulatedModules.Add(new SimulatedModule("FleetA", "ManufacturerB", "ABC234"));
+                simulatedModules.Add(new SimulatedModule("FleetA", "ManufacturerA", "ABC234"));
                 simulatedModules.Add(new SimulatedModule("FleetA", "ManufacturerA", "ABC345"));
 
                 simulatedModules.Add(new SimulatedModule("FleetB", "ManufacturerA", "DEF123"));
-                simulatedModules.Add(new SimulatedModule("FleetB", "ManufacturerB", "DEF234"));
+                simulatedModules.Add(new SimulatedModule("FleetB", "ManufacturerA", "DEF234"));
 
                 for (int i = 0; i < 5; i++)
                 {
@@ -23,8 +23,6 @@
                         simulatedModule.GenerateSpeedTelemetry(true);
                     }
                 }
-
-               
             }
             catch (Exception exception)
             {

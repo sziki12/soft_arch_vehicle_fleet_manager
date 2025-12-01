@@ -21,7 +21,7 @@ public static class SeedData
         AddSeedFleets(db);
         AddSeedManufacturers(db);
         AddSeedInterfaces(db);
-        addSeedAlarms(db);
+        AddSeedAlarms(db);
         AddSeedVehicles(db);
         AddSeedModules(db);
     }
@@ -111,9 +111,14 @@ public static class SeedData
         {
             Name = "FleetB"
         };
+        var fleet3 = new Fleet
+        {
+            Name = "FleetC"
+        };
 
         db.Fleets.Add(fleet1);
         db.Fleets.Add(fleet2);
+        db.Fleets.Add(fleet3);
         db.SaveChanges();
     }
 
@@ -130,7 +135,7 @@ public static class SeedData
         db.SaveChanges();
     }
 
-    private static void addSeedAlarms(FleetDbContext db) 
+    private static void AddSeedAlarms(FleetDbContext db) 
     {
         var alertJson = new JsonObject { ["speed"] = "GT 100" };
         var alarm1 = new Alarm
