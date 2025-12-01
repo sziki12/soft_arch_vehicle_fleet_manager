@@ -3,6 +3,7 @@ using SoftArchVehicleFleetManager.Data;
 using SoftArchVehicleFleetManager.Dtos.Alarms;
 using SoftArchVehicleFleetManager.Dtos.Vehicles;
 using SoftArchVehicleFleetManager.Models;
+using SoftArchVehicleFleetManager.Telemetry;
 
 namespace SoftArchVehicleFleetManager.Services
 {
@@ -25,11 +26,13 @@ namespace SoftArchVehicleFleetManager.Services
     {
         private readonly FleetDbContext _db;
         private readonly UsersService _usersService;
+        private readonly TelemetryService _telemetryService;
 
-        public AlarmsService(FleetDbContext db, UsersService usersService)
+        public AlarmsService(FleetDbContext db, UsersService usersService, TelemetryService telemetryService)
         {
             _db = db;
             _usersService = usersService;
+            _telemetryService = telemetryService;
         }
 
         public async Task<List<AlarmDto>> GetAsync(int? fleetId = null)
@@ -103,6 +106,8 @@ namespace SoftArchVehicleFleetManager.Services
                 FleetId = createDto.fleetId,
                 InterfaceId = createDto.interfaceId
             };
+
+            await _telemetryService.ConfigureServiceForAlarm(alarm);
 
             await _db.Alarms.AddAsync(alarm);
             await _db.SaveChangesAsync();
