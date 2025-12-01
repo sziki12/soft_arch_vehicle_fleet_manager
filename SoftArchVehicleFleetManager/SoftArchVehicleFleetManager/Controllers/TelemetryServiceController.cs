@@ -19,14 +19,14 @@ namespace SoftArchVehicleFleetManager.Controllers
         [HttpGet("report/{vehicleId}")]
         public async Task<ActionResult<TelemetryReportDto>> GetVehicleReport(int vehicleId)
         {
-            var report = await _telemetryService.GetVehiceleReport(vehicleId);
+            var report = await _telemetryService.GetVehicleReport(vehicleId);
             return Ok(report);
         }
 
         [HttpGet("alarms/{fleetId}")]
         public async Task<ActionResult<TelemetryAlarmDto>> GetFleetAlarms(int fleetId)
         {
-            var alarms = await _telemetryService.GetFleetVehiclesUnderAlarm(fleetId);        
+            var alarms = await _telemetryService.GetFleetVehiclesUnderAlarm(fleetId);
             return Ok(alarms);
         }
     }

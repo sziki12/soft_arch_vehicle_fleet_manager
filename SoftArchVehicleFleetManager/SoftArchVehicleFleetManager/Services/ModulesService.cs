@@ -4,6 +4,7 @@ using SoftArchVehicleFleetManager.Data;
 using SoftArchVehicleFleetManager.Dtos.Manufacturers;
 using SoftArchVehicleFleetManager.Dtos.Modules;
 using SoftArchVehicleFleetManager.Models;
+using SoftArchVehicleFleetManager.Telemetry;
 
 namespace SoftArchVehicleFleetManager.Services
 {
@@ -31,12 +32,15 @@ namespace SoftArchVehicleFleetManager.Services
         private readonly FleetDbContext _db;
         private readonly UsersService _usersService;
         private readonly VehiclesService _vehiclesService;
+        private readonly TelemetryService _telemetryService;
 
-        public ModulesService(FleetDbContext db, UsersService usersService, VehiclesService vehiclesService)
+        public ModulesService(FleetDbContext db, UsersService usersService, 
+            VehiclesService vehiclesService, TelemetryService telemetryService)
         {
             _db = db;
             _usersService = usersService;
             _vehiclesService = vehiclesService;
+            _telemetryService = telemetryService;
         }
 
         public async Task<List<ModuleDto>> GetAllAsync()
@@ -141,6 +145,8 @@ namespace SoftArchVehicleFleetManager.Services
                 module.InterfaceId,
                 module.VehicleId
             );
+
+            await _telemetryService.ConfigureServiceForModule(module);
 
             return (ModuleCreateResult.Success, dto);
         }
