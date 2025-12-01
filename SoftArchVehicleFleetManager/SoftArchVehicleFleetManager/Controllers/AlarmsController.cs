@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SoftArchVehicleFleetManager.Dtos.Alarms;
 using SoftArchVehicleFleetManager.Services;
+using SoftArchVehicleFleetManager.Telemetry;
 
 namespace SoftArchVehicleFleetManager.Controllers
 {
@@ -12,9 +13,12 @@ namespace SoftArchVehicleFleetManager.Controllers
     {
         private readonly AlarmsService _alarmsService;
 
-        public AlarmsController(AlarmsService alarmsService)
+        private readonly TelemetryService _telemetryService;
+
+        public AlarmsController(AlarmsService alarmsService, TelemetryService telemetryService)
         {
             _alarmsService = alarmsService;
+            _telemetryService = telemetryService;
         }
 
         [HttpGet]
@@ -44,6 +48,11 @@ namespace SoftArchVehicleFleetManager.Controllers
         public async Task<ActionResult<AlarmDto>> Create(AlarmCreateDto createDto)
         {
             var (status, result) = await _alarmsService.CreateAsync(createDto);
+
+            if (status == AlarmCreateResult.Success) 
+            {
+                await _telemetryService.ConfigureServiceAlarms();
+            }
 
             return status switch
             {

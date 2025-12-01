@@ -10,7 +10,7 @@ namespace TelemetryServiceLib
 
         public ConcurrentDictionary<string, FleetModule> FleetModules { get; set; } = new ();
 
-        public ConcurrentDictionary<string, FleetAlertConstraint> FleetAlertConstraints { get; set; } = new ();
+        public ConcurrentDictionary<string, FleetAlarmConstraint> FleetAlarmConstraints { get; set; } = new ();
 
         private HiveClient hiveClient;
 
@@ -98,35 +98,35 @@ namespace TelemetryServiceLib
         }
 
 
-        // Removes alert constraint from FleetAlertConstraints
-        public bool RemoveFleetAlertConstraint(string alertId)
+        // Removes alarm constraint from FleetAlarmConstraints
+        public bool RemoveFleetAlarmConstraint(string alarmId)
         {
-            return FleetAlertConstraints.TryRemove(alertId, out _);
+            return FleetAlarmConstraints.TryRemove(alarmId, out _);
         }
 
 
-        // Gets alert constraints from DB and adds them to FleetAlertConstraints
-        public void AddModuleAlertConstraint(string alertId, string moduleManufacturer, string alertConstraint)
+        // Gets alarm constraints from DB and adds them to FleetAlarmConstraints
+        public void AddModuleAlarmConstraint(string alarmId, string moduleManufacturer, string alarmConstraint)
         {
-            FleetAlertConstraints.AddOrUpdate(alertId,
-                new FleetAlertConstraint
+            FleetAlarmConstraints.AddOrUpdate(alarmId,
+                new FleetAlarmConstraint
                 {
-                    AlertId = alertId,
+                    AlarmId = alarmId,
                     ModuleManufacturer = moduleManufacturer,
-                    AlertConstraint = alertConstraint
+                    AlarmConstraint = alarmConstraint
                 },
                 (key, existingConstraint) =>
                 {
                     existingConstraint.ModuleManufacturer = moduleManufacturer;
-                    existingConstraint.AlertConstraint = alertConstraint;
+                    existingConstraint.AlarmConstraint = alarmConstraint;
                     return existingConstraint;
                 }
             );
         }
 
 
-        // Checks if the telemetry value meets the alert constraint
-        private bool AlertForTelemetry(string telemetryValue, string constraint)
+        // Checks if the telemetry value meets the alarm constraint
+        private bool AlarmForTelemetry(string telemetryValue, string constraint)
         {
             string[] tokens = constraint.Split(' ');
             double telemetryDouble = double.Parse(telemetryValue);
@@ -142,8 +142,8 @@ namespace TelemetryServiceLib
         }
 
 
-        // Parses alert constraints and checks if the given FleetModule is under alert
-        private bool ParseAlertConstraintsFor(FleetModule fleetModule, FleetAlertConstraint fleetAlertConstraint) 
+        // Parses alarm constraints and checks if the given FleetModule is under alarm
+        private bool ParseAlarmConstraintsFor(FleetModule fleetModule, FleetAlarmConstraint fleetAlarmConstraint) 
         {
             JsonDocument? telemetryData = JsonDocument.Parse(fleetModule.TelemetryData);
             if (telemetryData == null)
@@ -151,25 +151,25 @@ namespace TelemetryServiceLib
                 return false;
             }
 
-            JsonDocument? alertConstraint = JsonDocument.Parse(fleetAlertConstraint.AlertConstraint);
-            if (alertConstraint == null) {
+            JsonDocument? alarmConstraint = JsonDocument.Parse(fleetAlarmConstraint.AlarmConstraint);
+            if (alarmConstraint == null) {
                 return false;
             }
 
-            if (fleetModule.ModuleManufacturer != fleetAlertConstraint.ModuleManufacturer)
+            if (fleetModule.ModuleManufacturer != fleetAlarmConstraint.ModuleManufacturer)
             {
                 return false;
             }
 
             foreach (var telemetryElement in telemetryData.RootElement.EnumerateObject())
             {
-                foreach (var constraintElement in alertConstraint.RootElement.EnumerateObject())
+                foreach (var constraintElement in alarmConstraint.RootElement.EnumerateObject())
                 {
                     if (telemetryElement.Name == constraintElement.Name)
                     {
                         string telemetryValue = telemetryElement.Value.ToString();
                         string constraintValue = constraintElement.Value.ToString();
-                        if (AlertForTelemetry(telemetryValue, constraintValue))
+                        if (AlarmForTelemetry(telemetryValue, constraintValue))
                         {
                             return true;
                         }
@@ -181,15 +181,15 @@ namespace TelemetryServiceLib
 
 
         // Returns a list of FleetModule instances so that web UI can display them
-        public List<FleetModule> GetModulesUnderAlert() 
+        public List<FleetModule> GetModulesUnderAlarm() 
         {    
             List<FleetModule> result = new List<FleetModule>();
 
             foreach (var fleetModule in FleetModules)
             {
-                foreach (var fleetAlertConstraint in FleetAlertConstraints)
+                foreach (var fleetAlarmConstraint in FleetAlarmConstraints)
                 {
-                    if (ParseAlertConstraintsFor(fleetModule.Value, fleetAlertConstraint.Value))
+                    if (ParseAlarmConstraintsFor(fleetModule.Value, fleetAlarmConstraint.Value))
                     {
                         result.Add(fleetModule.Value);
                         break;

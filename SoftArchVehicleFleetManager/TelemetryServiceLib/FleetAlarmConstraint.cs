@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace TelemetryServiceLib
 {
-    public class FleetAlertConstraint
+    public class FleetAlarmConstraint
     {
-        public string AlertId { get; set; } = "";
+        public string AlarmId { get; set; } = "";
 
         public string ModuleManufacturer { get; set; } = "";
 
-        public string AlertConstraint { get; set; } = "";
+        public string AlarmConstraint { get; set; } = "";
     }
 }
