@@ -99,7 +99,8 @@ export class AdminDashboardComponent implements OnInit {
 
     this.assignmentForm = this.fb.group({
       userId: [null, Validators.required],
-      id: [null, Validators.required]
+      fleetId: [null, Validators.required],
+      manufacturerId: [null, Validators.required],
     });
   }
 
@@ -321,25 +322,25 @@ export class AdminDashboardComponent implements OnInit {
       return;
     }
 
-    const { userId, id } = this.assignmentForm.value;
+    const { userId, fleetId, manufacturerId } = this.assignmentForm.value;
     const targetUserId = Number(userId);
     if (!targetUserId) {
       return;
     }
-    const normalizedFleetId = id === 0 || id === '0' ? null : Number(id);
-
+    const normalizedFleetId = fleetId === 0 || fleetId === '0' ? null : Number(fleetId);
+    const normalizedManufacturerId= manufacturerId === 0 || manufacturerId === '0' ? null : Number(manufacturerId);
     const user = this.users.find(u => u.id === targetUserId);
     if (!user) {
       return;
     }
 
-    this.adminService.assignUserToFleet(user, normalizedFleetId).subscribe({
+    this.adminService.assignUserToFleetOrManufacturer(user, normalizedFleetId, normalizedFleetId).subscribe({
       next: updatedUser => {
         const merged = updatedUser
-          ? { ...user, ...updatedUser, fleetId: updatedUser.fleetId ?? normalizedFleetId }
-          : { ...user, fleetId: normalizedFleetId };
+          ? { ...user, ...updatedUser, fleetId: updatedUser.fleetId ?? normalizedFleetId, manufacturerId: updatedUser.manufacturerId ?? normalizedManufacturerId }
+          : { ...user, fleetId: normalizedFleetId, manufacturerId: normalizedManufacturerId };
         this.users = this.users.map(u => u.id === merged.id ? merged : u);
-        this.assignmentForm.reset({ userId: null, id: 0 });
+        this.assignmentForm.reset({ userId: null, fleetId: 0, manufacturerId: 0 });
       },
       error: (err) => {
         console.error('Assign user to fleet failed', err);
@@ -361,6 +362,14 @@ export class AdminDashboardComponent implements OnInit {
     }
     const fleet = this.fleets.find(f => f.id === id);
     return fleet ? fleet.name : `#${id}`;
+  }
+
+  getManufacturertName(id: number | null | undefined): string {
+    if (id == null) {
+      return 'Unassigned';
+    }
+    const manufacturer = this.manufacturers.find(f => f.id === id);
+    return manufacturer ? manufacturer.name : `#${id}`;
   }
 
   statusBadgeClass(status: ReportSummary['status']): string {

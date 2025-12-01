@@ -118,12 +118,14 @@
                 <span>Name</span>
                 <span>Role</span>
                 <span>Fleet</span>
+                <span>Manufacturer</span>
                 <span></span>
             </div>
             <div class="table-row" *ngFor="let user of filteredUsers">
                 <span class="text-strong">{{ user.name }}</span>
                 <span class="badge">{{ user.role }}</span>
                 <span>{{ getFleetName(user.fleetId ?? null) }}</span>
+                <span>{{ getManufacturertName(user.manufacturerId ?? null) }}</span>
                 <button type="button" class="ghost-btn danger" (click)="deleteUser(user, $event)">Delete</button>
             </div>
         </div>
@@ -143,10 +145,20 @@
 
                 <label>
                     Fleet
-                    <select formControlName="id">
+                    <select formControlName="fleetId">
                         <option [ngValue]="0">Unassigned</option>
                         <option *ngFor="let fleet of fleets" [ngValue]="fleet.id">
                             {{ fleet.name }} ({{ fleet.id }})
+                        </option>
+                    </select>
+                </label>
+
+                 <label>
+                    Manufacturer
+                    <select formControlName="manufacturerId">
+                        <option [ngValue]="0">Unassigned</option>
+                        <option *ngFor="let manufacturer of manufacturers" [ngValue]="manufacturer.id">
+                            {{ manufacturer.name }} ({{ manufacturer.id }})
                         </option>
                     </select>
                 </label>

@@ -12,6 +12,10 @@ import { Subscription } from 'rxjs';
 import { InterfaceManagerPageComponent } from './manufacturer/interface/interface-manager-page/interface-manager-page.component';
 import { ModuleManagerPageComponent } from './manufacturer/module/module-manager-page/module-manager-page.component';
 import { ActiveAlarmsPageComponent } from './alarm/active-alarms-page/active-alarms-page.component';
+import { Fleet } from './models/fleet.model';
+import { Manufacturer } from './models/manufacturer.model';
+import { ManufacturerService } from './services/manufacturer.service';
+import { FleetService } from './services/fleet.service';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -27,8 +31,9 @@ export class AppComponent implements OnInit, OnDestroy {
   authView: 'login' | 'register' = 'login';
   private sub?: Subscription;
 
-  constructor(private authService: AuthService) { }
-
+  constructor(private authService: AuthService, private manufacturerService: ManufacturerService, private fleetService: FleetService) { }
+  manufacturers: Manufacturer[] = [];
+  fleets: Fleet[] = [];
   ngOnInit(): void {
     this.sub = this.authService.session$.subscribe(session => {
       this.session = session;
@@ -37,6 +42,14 @@ export class AppComponent implements OnInit, OnDestroy {
         this.activeScreen = session.role === 'manufacturer' ? 'interface' : 'fleet';
         this.authView = 'login';
       }
+      this.fleetService.getFleets().subscribe(
+        data => 
+          this.fleets = data
+      )
+      this.manufacturerService.getManufacturers().subscribe(
+        data => 
+          this.manufacturers = data
+      )
     });
   }
 
@@ -58,5 +71,31 @@ export class AppComponent implements OnInit, OnDestroy {
 
   switchToLogin(): void {
     this.authView = 'login';
+  }
+
+  getAssociationName()
+  {
+    var currentUser = this.authService.currentUser;
+    if(currentUser?.role == "fleet_operator" && currentUser.fleetId){
+      var fleet = this.fleets.filter(f => f.id == currentUser?.fleetId)[0]
+      return fleet.name
+    }
+
+    if(currentUser?.role == "manufacturer" && currentUser.manufacturerId){
+      var manufacturer = this.manufacturers.filter(f => f.id == currentUser?.manufacturerId)[0]
+      return manufacturer.name
+    }
+
+    if(currentUser?.role == "admin"){
+      return ""
+    }
+    return "No Association Status"
+  }
+
+  hasNoPageAccess()
+  {
+    var currentUser = this.authService.currentUser;
+    var noAccess = !(currentUser?.fleetId || currentUser?.manufacturerId || currentUser?.role == 'admin')
+    return noAccess
   }
 }

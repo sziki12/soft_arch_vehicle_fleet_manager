@@ -10,6 +10,7 @@
                 <div class="user-chip">
                     <div class="user-name">{{ session.name }}</div>
                     <small>{{ session.email }} &mdash; {{ session.role }}</small>
+                     <small>{{getAssociationName()}}</small>
                 </div>
 
                 <div class="view-toggle" *ngIf="currentRole === 'fleet_operator'">

@@ -78,7 +78,7 @@ export class AdminService {
         return this.userService.saveUser(newUser);
     }
 
-    assignUserToFleet(user: User, fleetId: number | null): Observable<User> {
-        return this.userService.saveUser({ ...user, fleetId });
+    assignUserToFleetOrManufacturer(user: User, fleetId: number | null, manufacturerId: number | null): Observable<User> {
+        return this.userService.saveUser({ ...user, fleetId, manufacturerId });
     }
 }
