@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SoftArchVehicleFleetManager.Dtos.Modules;
 using SoftArchVehicleFleetManager.Services;
+using SoftArchVehicleFleetManager.Telemetry;
 
 namespace SoftArchVehicleFleetManager.Controllers
 {
@@ -10,11 +11,14 @@ namespace SoftArchVehicleFleetManager.Controllers
     [Authorize]
     public class ModulesController : ControllerBase
     {
+        private readonly TelemetryService _telemetryService;
+
         private readonly ModulesService _modulesService;
 
-        public ModulesController(ModulesService modulesService)
+        public ModulesController(ModulesService modulesService, TelemetryService telemetryService)
         {
             _modulesService = modulesService;
+            _telemetryService = telemetryService;
         }
 
         [HttpGet]

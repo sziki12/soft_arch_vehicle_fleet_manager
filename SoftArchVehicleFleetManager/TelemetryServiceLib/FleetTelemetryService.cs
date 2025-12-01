@@ -61,7 +61,7 @@ namespace TelemetryServiceLib
 
 
         // Adds subscription for a specific module's telemetry topic
-        public void AddModuleTelemetrySubscripition(string moduleManufacturer, string hardwareAddress)
+        public void AddSingleModuleSubscripition(string moduleManufacturer, string hardwareAddress)
         {
             string topic = $"telemetry/{FleetName}/{moduleManufacturer}/{hardwareAddress}";
             hiveClient.SubscribeToTopic(topic);
@@ -69,13 +69,13 @@ namespace TelemetryServiceLib
 
 
         // Gets data from DB as in memory Lists and adds subscriptions to handle MQTT
-        public void AddModulTelemetrySubscripition(List<string> manufacturers, List<string> hardwares)
+        public void AddModuleTelemetrySubscripition(List<string> manufacturers, List<string> hardwares)
         {
             foreach (var manufacturer in manufacturers)
             {
                 foreach (var hardware in hardwares)
                 {
-                    AddModuleTelemetrySubscripition(manufacturer, hardware);
+                    AddSingleModuleSubscripition(manufacturer, hardware);
                 }
             }
         }
