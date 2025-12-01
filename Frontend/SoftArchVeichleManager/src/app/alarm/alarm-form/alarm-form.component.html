@@ -1,0 +1,54 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <h2>{{ alarm.id ? 'Edit alarm' : 'Create new alarm' }}</h2>
+
+    <div class="form-grid">
+
+        <div class="form-group">
+            <label>Fleet</label>
+            <input formControlName="alarmFleet" type="number" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>Interface</label>
+            <select #interfaceSelect formControlName="interfaceName"
+                (change)="onInterfaceSelect(interfaceSelect.value)">
+                <option value="">Select an interface</option>
+                <option *ngFor="let interfaceName of interfaces" [value]="interfaceName">
+                    {{ interfaceName }}
+                </option>
+            </select>
+            <small class="hint">Select to fetch properties and build the JSON automatically.</small>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Interface properties</label>
+            <div *ngIf="interfaceProperties.length; else chooseInterface" class="property-grid">
+                <div class="property-row" *ngFor="let prop of interfaceProperties">
+                    <span class="prop-name">{{ prop }}</span>
+                    <select class="operator-select" [value]="propertyValues[prop].operator || 'EQ'"
+                        (change)="onOperatorChange(prop, $any($event.target).value)">
+                        <option value="GT">&gt;</option>
+                        <option value="EQ">=</option>
+                        <option value="LT">&lt;</option>
+                    </select>
+                    <input [value]="propertyValues[prop].value || ''" (input)="onPropertyInput(prop, $event)"
+                        placeholder="Enter value for {{ prop }}">
+                </div>
+            </div>
+            <ng-template #chooseInterface>
+                <div class="empty-hint">Select an interface above to load its fields.</div>
+            </ng-template>
+        </div>
+
+        <div class="form-group full-width">
+            <label>Generated Alarm JSON</label>
+            <textarea formControlName="alarmJson" rows="6" readonly></textarea>
+        </div>
+
+    </div>
+
+    <div class="actions">
+        <button type="button" (click)="cancel.emit()">Cancel</button>
+        <button type="submit" [disabled]="form.invalid">Save</button>
+    </div>
+</form>

@@ -1,0 +1,40 @@
+<app-main-layout title="Interface manager" subtitle="Interfaces">
+
+    <div left-side>
+        <button (click)="createNew()" class="create-btn">
+            + ÚJ INTERFACE
+        </button>
+
+        <div *ngIf="loading">Betöltés...</div>
+
+        <app-card *ngFor="let i of interfaces" [isActive]="selectedInterface?.id === i.id"
+            (click)="selectInterface(i)">
+
+            <div class="Id">
+                <h3 class="interface-title">{{ i.name }}</h3>
+
+                <div class="card-actions">
+                    <button (click)="onDelete(i.id, $event)" class="btn-icon btn-delete" title="Delete">
+                        Delete
+                    </button>
+                </div>
+                <small class="card-meta">
+                Used in: {{ countModules(i) }} modules
+            </small>
+            </div>
+        </app-card>
+    </div>
+
+    <div right-side>
+        <app-interface-form *ngIf="selectedInterface" [interface]="selectedInterface!" (save)="onSave($event)"
+            (cancel)="selectedInterface = null">
+        </app-interface-form>
+
+        <div *ngIf="!selectedInterface" class="empty-state">
+            <h2>Válassz egy interface-t</h2>
+        </div>
+    </div>
+
+</app-main-layout>
+
+

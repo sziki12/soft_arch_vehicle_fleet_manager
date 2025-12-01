@@ -1,0 +1,308 @@
+<div class="admin-wrapper">
+    <section class="hero">
+        <div>
+            <p class="eyebrow">Admin console</p>
+            <h2>Full fleet visibility</h2>
+            <p class="lead">
+                Review users, fleets, vehicles, alarms and the latest generated reports from one place.
+            </p>
+            <div class="stat-row">
+                <div class="stat-card">
+                    <span>{{ users.length }}</span>
+                    <small>users</small>
+                </div>
+                <div class="stat-card">
+                    <span>{{ fleets.length }}</span>
+                    <small>fleets</small>
+                </div>
+                <div class="stat-card">
+                    <span>{{ vehicles.length }}</span>
+                    <small>vehicles</small>
+                </div>
+                <div class="stat-card">
+                    <span>{{ alarms.length }}</span>
+                    <small>alarms</small>
+                </div>
+                <div class="stat-card">
+                    <span>{{ interfaces.length }}</span>
+                    <small>interfaces</small>
+                </div>
+                <div class="stat-card">
+                    <span>{{ modules.length }}</span>
+                    <small>modules</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <nav class="section-nav">
+        <button type="button" [class.active]="activeSection === 'fleets'" (click)="setSection('fleets')">Fleets</button>
+        <button type="button" [class.active]="activeSection === 'users'" (click)="setSection('users')">Users</button>
+        <button type="button" [class.active]="activeSection === 'vehicles'" (click)="setSection('vehicles')">Vehicles</button>
+        <button type="button" [class.active]="activeSection === 'alarms'" (click)="setSection('alarms')">Alarms</button>
+        <button type="button" [class.active]="activeSection === 'interfaces'" (click)="setSection('interfaces')">Interfaces</button>
+        <button type="button" [class.active]="activeSection === 'modules'" (click)="setSection('modules')">Modules</button>
+    </nav>
+
+    <section class="panel" *ngIf="activeSection === 'fleets'">
+        <header class="panel-header">
+            <div>
+                <p class="eyebrow">Fleets</p>
+                <h3>Fleet inventory</h3>
+            </div>
+            <span class="muted" *ngIf="loadingFleets || loadingVehicles">Loading...</span>
+        </header>
+
+        <div class="filters">
+            <input type="search" placeholder="Search fleets" [(ngModel)]="fleetSearch">
+            <button type="button" class="ghost-btn" (click)="showAllFleets = !showAllFleets">
+                {{ showAllFleets ? 'Show less' : 'Show more' }}
+            </button>
+        </div>
+
+        <div class="fleet-grid">
+            <div class="fleet-card" *ngFor="let fleet of filteredFleets">
+                <div class="fleet-card__header">
+                    <h4>{{ fleet.name }}</h4>
+                    <span class="fleet-tag">#{{ fleet.id }}</span>
+                </div>
+                <div class="fleet-meta">
+                    <span>{{ getFleetVehicleCount(fleet.id) }} vehicles</span>
+                    <span>{{ getUsersForFleet(fleet.id).length }} managers</span>
+                </div>
+                <div class="fleet-users" *ngIf="getUsersForFleet(fleet.id).length">
+                    <span *ngFor="let user of getUsersForFleet(fleet.id)">{{ user.name }}</span>
+                </div>
+            </div>
+        </div>
+
+        <form class="inline-form" [formGroup]="fleetForm" (ngSubmit)="createFleet()">
+            <div>
+                <label>Fleet name</label>
+                <input type="text" formControlName="name" placeholder="e.g. West Coast Ops">
+            </div>
+            <button type="submit">Create fleet</button>
+        </form>
+    </section>
+
+    <section class="panel" *ngIf="activeSection === 'users'">
+        <header class="panel-header">
+            <div>
+                <p class="eyebrow">People</p>
+                <h3>Users & access</h3>
+            </div>
+            <span class="muted" *ngIf="loadingUsers">Loading...</span>
+        </header>
+
+        <div class="filters">
+            <input type="search" placeholder="Search by name or email" [(ngModel)]="userSearch">
+            <select [(ngModel)]="userRoleFilter">
+                <option value="all">All roles</option>
+                <option value="admin">Admin</option>
+                <option value="manager">Manager</option>
+                <option value="fleet_operator">Fleet operator</option>
+                <option value="manufacturer">Manufacturer</option>
+            </select>
+            <button type="button" class="ghost-btn" (click)="showAllUsers = !showAllUsers">
+                {{ showAllUsers ? 'Show less' : 'Show more' }}
+            </button>
+        </div>
+
+        <div class="table">
+            <div class="table-head">
+                <span>Name</span>
+                <span>Role</span>
+                <span>Fleet</span>
+                <span></span>
+            </div>
+            <div class="table-row" *ngFor="let user of filteredUsers">
+                <span class="text-strong">{{ user.name }}</span>
+                <span class="badge">{{ user.role }}</span>
+                <span>{{ getFleetName(user.fleetId ?? null) }}</span>
+                <button type="button" class="ghost-btn danger" (click)="deleteUser(user, $event)">Delete</button>
+            </div>
+        </div>
+
+        <div class="assignment">
+            <h4>Assign fleet</h4>
+            <form class="stacked-form" [formGroup]="assignmentForm" (ngSubmit)="assignFleet()">
+                <label>
+                    Team member
+                    <select formControlName="userId">
+                        <option [ngValue]="null">Select a user</option>
+                        <option *ngFor="let user of users" [ngValue]="user.id">
+                            {{ user.name }} ({{ user.role }})
+                        </option>
+                    </select>
+                </label>
+
+                <label>
+                    Fleet
+                    <select formControlName="id">
+                        <option [ngValue]="0">Unassigned</option>
+                        <option *ngFor="let fleet of fleets" [ngValue]="fleet.id">
+                            {{ fleet.name }} ({{ fleet.id }})
+                        </option>
+                    </select>
+                </label>
+
+                <button type="submit">Update assignment</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="panel" *ngIf="activeSection === 'vehicles'">
+        <header class="panel-header">
+            <div>
+                <p class="eyebrow">Vehicles</p>
+                <h3>All vehicles</h3>
+            </div>
+            <span class="muted" *ngIf="loadingVehicles">Loading...</span>
+        </header>
+
+        <div class="filters">
+            <input type="search" placeholder="Search vehicle or model" [(ngModel)]="vehicleSearch">
+            <select [(ngModel)]="vehicleFleetFilter">
+                <option value="all">Any fleet</option>
+                <option *ngFor="let fleet of fleets" [ngValue]="fleet.id">
+                    {{ fleet.name }} ({{ fleet.id }})
+                </option>
+            </select>
+            <button type="button" class="ghost-btn" (click)="showAllVehicles = !showAllVehicles">
+                {{ showAllVehicles ? 'Show less' : 'Show more' }}
+            </button>
+            <button type="button" class="ghost-btn" (click)="createVehicle()">+ New vehicle</button>
+        </div>
+
+        <ul class="list">
+            <li *ngFor="let vehicle of filteredVehicles">
+                <div>
+                    <div class="text-strong">{{ vehicle.name }}</div>
+                    <small class="muted">{{ vehicle.model }} &bull; {{ vehicle.year }}</small>
+                </div>
+                <div class="flex gap">
+                    <span class="fleet-chip">Fleet #{{ vehicle.fleetId }}</span>
+                    <button type="button" class="ghost-btn" (click)="selectVehicle(vehicle)">Edit</button>
+                    <button type="button" class="ghost-btn danger" (click)="onDeleteVehicle(vehicle.id, $event)">Delete</button>
+                </div>
+            </li>
+        </ul>
+
+        <div *ngIf="selectedVehicle" class="form-wrapper">
+            <app-vehicle-form [vehicle]="selectedVehicle" [fleets]="fleets" [showFleetSelect]="true" (save)="onSaveVehicle($event)"
+                (cancel)="selectedVehicle = null"></app-vehicle-form>
+        </div>
+    </section>
+
+    <section class="panel" *ngIf="activeSection === 'alarms'">
+        <header class="panel-header">
+            <div>
+                <p class="eyebrow">Alarms</p>
+                <h3>Active alarms</h3>
+            </div>
+            <span class="muted" *ngIf="loadingAlarms">Loading...</span>
+        </header>
+
+        <div class="filters">
+            <input type="search" placeholder="Search alarm json or ID" [(ngModel)]="alarmSearch">
+            <button type="button" class="ghost-btn" (click)="showAllAlarms = !showAllAlarms">
+                {{ showAllAlarms ? 'Show less' : 'Show more' }}
+            </button>
+            <select [(ngModel)]="selectedAlarmUserId" (ngModelChange)="onAlarmUserChange($event)">
+                <option [ngValue]="null">Válassz fleet operátort</option>
+                <option *ngFor="let user of alarmOperators" [ngValue]="user.id">
+                    {{ user.name }} (Fleet #{{ user.fleetId || 'n/a' }})
+                </option>
+            </select>
+            <button type="button" class="ghost-btn" (click)="createAlarm()">+ New alarm</button>
+        </div>
+
+        <ul class="list">
+            <li *ngFor="let alarm of filteredAlarms">
+                <div>
+                    <div class="text-strong">Alarm #{{ alarm.id }}</div>
+                    <small class="muted">Fleet #{{ alarm.fleetId }}</small>
+                </div>
+                <div class="flex">
+                    <div class="alarm-json">
+                        <div class="alarm-line" *ngFor="let entry of getAlarmEntries(alarm)">
+                            <span class="alarm-key">{{ entry.key }}</span>
+                            <span class="alarm-value">{{ entry.value }}</span>
+                        </div>
+                    </div>
+                    <div class="flex">
+                        <button type="button" class="ghost-btn" (click)="selectAlarm(alarm)">Edit</button>
+                        <button type="button" class="ghost-btn danger" (click)="onDeleteAlarm(alarm.id, $event)">Delete</button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        <div *ngIf="selectedAlarm" class="form-wrapper">
+            <app-alarm-form [alarm]="selectedAlarm" [overrideFleetId]="getFleetIdForUser(selectedAlarmUserId)"
+                [interfaceUserId]="selectedAlarmUserId" (save)="onSaveAlarm($event)"
+                (cancel)="selectedAlarm = null"></app-alarm-form>
+        </div>
+    </section>
+
+    <section class="panel" *ngIf="activeSection === 'interfaces'">
+        <header class="panel-header">
+            <div>
+                <p class="eyebrow">Interfaces</p>
+                <h3>Interfaces</h3>
+            </div>
+            <span class="muted" *ngIf="loadingInterfaces">Loading...</span>
+        </header>
+
+        <div class="filters">
+            <input type="search" placeholder="Search interfaces" [(ngModel)]="interfaceSearch">
+            <button type="button" class="ghost-btn" (click)="showAllInterfaces = !showAllInterfaces">
+                {{ showAllInterfaces ? 'Show less' : 'Show more' }}
+            </button>
+        </div>
+
+        <ul class="list">
+            <li *ngFor="let interface of filteredInterfaces">
+                <div>
+                    <div class="text-strong">Name: {{ interface.name }}</div>
+                    <small class="muted">Interface #{{ interface.id }}</small>
+                    <br/>
+                    <small class="muted">Manufacturer #{{ interface.manufacturerId }}</small>
+                </div>
+                <pre class="interface-fields">{{ interface.interfaceFields }}</pre>
+            </li>
+        </ul>
+    </section>
+
+    <section class="panel" *ngIf="activeSection === 'modules'">
+        <header class="panel-header">
+            <div>
+                <p class="eyebrow">Modules</p>
+                <h3>Modules</h3>
+            </div>
+            <span class="muted" *ngIf="loadingModules">Loading...</span>
+        </header>
+
+        <div class="filters">
+            <input type="search" placeholder="Search module Names or Id" [(ngModel)]="moduleSearch">
+            <button type="button" class="ghost-btn" (click)="showAllAlarms = !showAllAlarms">
+                {{ showAllAlarms ? 'Show less' : 'Show more' }}
+            </button>
+        </div>
+
+        <ul class="list">
+            <li *ngFor="let module of filteredModules">
+                <div>
+                    <div class="text-strong">HWD ID: {{ module.hardwareId }}</div>
+                    <small class="muted">Module #{{ module.id }}</small>
+                    <br/>
+                    <small class="muted">Interface #{{ module.interfaceId }}</small>
+                    <br/>
+                    <small class="muted">Manufacturer #{{ module.manufacturerId }}</small>
+                    <br/>
+                    <small class="muted">Vehicle #{{ module.vehicleId }}</small>
+                </div>
+            </li>
+        </ul>
+    </section>
+</div>

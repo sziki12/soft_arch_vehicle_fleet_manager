@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SoftArchVehicleFleetManager.Data;
+using SoftArchVehicleFleetManager.Dtos.Modules;
 using SoftArchVehicleFleetManager.Dtos.Vehicles;
 using SoftArchVehicleFleetManager.Models;
 
@@ -21,10 +22,12 @@ namespace SoftArchVehicleFleetManager.Services
     public class VehiclesService
     {
         private readonly FleetDbContext _db;
+        private readonly UsersService _usersService;
 
-        public VehiclesService(FleetDbContext db)
+        public VehiclesService(FleetDbContext db, UsersService usersService)
         {
             _db = db;
+            _usersService = usersService;
         }
 
         public async Task<List<VehicleDto>> GetAsync(int? fleetId)
@@ -77,6 +80,23 @@ namespace SoftArchVehicleFleetManager.Services
                 vehicle.Year,
                 vehicle.FleetId
             );
+        }
+
+        public async Task<List<VehicleDto>> GetAllByUserIdAsync(int userId)
+        {
+            var user = await _usersService.GetOneAsync(userId);
+            if (user is null)
+                return [];
+            if (user.Role == Enums.UserRole.FleetOperator && user.FleetId != null)
+            {
+                var vehicles = await GetAsync(user.FleetId);
+                var resultVehicles = vehicles.Where(m => m.FleetId == user.FleetId.Value).ToList();
+                return resultVehicles;
+            }
+            else
+            {
+                return await GetAsync(null);
+            }
         }
 
         public async Task<(VehicleCreateResult Result, VehicleDto? Vehicle)> CreateAsync(

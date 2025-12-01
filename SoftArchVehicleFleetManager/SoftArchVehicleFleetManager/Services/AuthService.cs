@@ -98,11 +98,23 @@ namespace SoftArchVehicleFleetManager.Services
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            IEnumerable<Claim> claims = new[]
             {
                 new Claim(ClaimTypes.Name, user.Username),
+                new Claim("id", user.Id.ToString()),
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
+            var manufacturerId = user.ManufacturerId;
+
+            if (user.FleetId != null)
+            {
+                claims = claims.Append(new Claim("fleet_id", user.FleetId.ToString()));
+            }
+
+            if (user.ManufacturerId != null)
+            {
+                claims = claims.Append(new Claim("manufacturer_id", user.ManufacturerId.ToString()));
+            }
 
             var token = new JwtSecurityToken(
                 issuer: jwtIssuer,

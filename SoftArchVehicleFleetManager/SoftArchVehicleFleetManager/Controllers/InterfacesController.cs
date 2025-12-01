@@ -24,6 +24,14 @@ namespace SoftArchVehicleFleetManager.Controllers
             return Ok(interfaces);
         }
 
+        [HttpGet("byuser")]
+        public async Task<ActionResult<IEnumerable<InterfaceDto>>> GetAllByUserId(
+            [FromQuery(Name = "user_id")] int userId)
+        {
+            var interfaces = await _interfacesService.GetAllByUserIdAsync(userId);
+            return Ok(interfaces);
+        }
+
         [HttpGet("{id:int}")]
         public async Task<ActionResult<InterfaceDto>> GetOne(int id)
         {

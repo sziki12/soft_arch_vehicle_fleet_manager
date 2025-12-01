@@ -1,0 +1,46 @@
+<app-main-layout title="Module manager" subtitle="Modules">
+
+    <div left-side>
+        <button (click)="createNew()" class="create-btn">
+            + ÚJ MODUL
+        </button>
+
+        <div *ngIf="loading">Betöltés...</div>
+
+        <app-card *ngFor="let m of modules" [isActive]="selectedModule?.id === m.id"
+            (click)="selectModule(m)">
+
+            <div class="id">
+                <h3 class="module-title">{{ m.hardwareId }}</h3>
+
+                <div class="card-actions">
+                    <button (click)="onDelete(m.id, $event)" class="btn-icon btn-delete" title="Delete">
+                        Delete
+                    </button>
+                </div>
+            </div>
+
+            <p class="module-subtitle">
+                
+            </p>
+
+            <small class="card-meta">
+                Interface Name: {{ findInterfaceName(m.interfaceId) }} <br>
+                Is Assigned To Vehicle: {{ (m.vehicleId == null)?('No'):(`Yes, with Id: ${m.vehicleId}`) }}
+            </small>
+
+        </app-card>
+    </div>
+
+    <div right-side>
+        <app-module-form *ngIf="selectedModule" [module]="selectedModule!" [interfaces]="interfaces!" [fleets]="fleets!" [vehicles]="vehicles!" (save)="onSave($event)"
+            (cancel)="selectedModule = null">
+        </app-module-form>
+
+        <div *ngIf="!selectedModule" class="empty-state">
+            <h2>Válassz egy moudlt</h2>
+        </div>
+    </div>
+
+</app-main-layout>
+

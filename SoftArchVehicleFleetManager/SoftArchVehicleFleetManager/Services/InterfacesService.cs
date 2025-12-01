@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SoftArchVehicleFleetManager.Data;
 using SoftArchVehicleFleetManager.Dtos.Interfaces;
 using SoftArchVehicleFleetManager.Models;
@@ -21,10 +22,14 @@ namespace SoftArchVehicleFleetManager.Services
     public class InterfacesService
     {
         private readonly FleetDbContext _db;
+        private readonly UsersService _usersService;
+        private readonly ModulesService _moduleService;
 
-        public InterfacesService(FleetDbContext db)
+        public InterfacesService(FleetDbContext db, UsersService usersService, ModulesService moduleService)
         {
             _db = db;
+            _usersService = usersService;
+            _moduleService = moduleService;
         }
 
         public async Task<List<InterfaceDto>> GetAllAsync()
@@ -54,6 +59,31 @@ namespace SoftArchVehicleFleetManager.Services
                 iface.InterfaceFields,
                 iface.ManufacturerId
             );
+        }
+
+        public async Task<List<InterfaceDto>> GetAllByUserIdAsync(int userId)
+        {
+            var user = await _usersService.GetOneAsync(userId);
+            if(user is null) 
+                return [];
+            if(user.Role == Enums.UserRole.Manufacturer && user.ManufacturerId != null)
+            {
+                var interfaces = await GetAllAsync();
+                var resultInterfaces = interfaces.Where(i => i.ManufacturerId == user.ManufacturerId.Value).ToList();
+                return resultInterfaces;
+            }
+            else if(user.Role == Enums.UserRole.Admin)
+            {
+                return await GetAllAsync();
+            }
+            else if(user.Role == Enums.UserRole.FleetOperator)
+            {
+                var interfaces = await GetAllAsync();
+                var ownModules = await _moduleService.GetAllByUserIdAsync(userId);
+                var ownInterfacesId = ownModules.Select(m => m.InterfaceId).ToList();
+                return interfaces.Where(i => ownInterfacesId.Contains(i.Id)).ToList();
+            }
+            return [];
         }
 
         public async Task<(InterfaceCreateResult status, InterfaceDto? result)> CreateAsync(InterfaceCreateDto createDto)

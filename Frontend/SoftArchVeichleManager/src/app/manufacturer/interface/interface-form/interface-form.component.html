@@ -1,0 +1,21 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <h2>{{ interface.id ? 'Interface Szerkesztése' : 'Új Interface Rögzítése' }}</h2>
+
+    <div class="form-grid">
+
+        <div class="form-group full-width">
+            <label>Interface Neve</label>
+            <input formControlName="name" type="text" placeholder="pl. Speed Meter Interface">
+        </div>
+
+        <div class="form-group">
+            <label>Interface Tulajdonságok</label>
+            <app-list-editor [list]="interface.interfaceFields!" (save)="saveList($event)" formControlName="interfaceFields"></app-list-editor>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button type="button" (click)="cancel.emit()">Mégse</button>
+        <button type="submit" [disabled]="form.invalid">Mentés</button>
+    </div>
+</form>

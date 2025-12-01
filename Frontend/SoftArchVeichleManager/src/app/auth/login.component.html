@@ -1,0 +1,36 @@
+<div class="login-shell">
+    <div class="login-card">
+        <div class="login-head">
+            <h2>Sign in</h2>
+            <p>Authenticate to access the fleet manager.</p>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" class="login-form">
+            <div class="form-field">
+                <label>Username</label>
+                <input type="text" formControlName="username" placeholder="USERNAME">
+                <small class="field-error" *ngIf="submitted && form.controls['username'].invalid">
+                    Username is required.
+                </small>
+            </div>
+
+            <div class="form-field">
+                <label>Password</label>
+                <input type="password" formControlName="password" placeholder="********">
+                <small class="field-error" *ngIf="submitted && form.controls['password'].invalid">
+                    Password must be at least 6 characters.
+                </small>
+            </div>
+
+            <div class="error" *ngIf="error">{{ error }}</div>
+
+            <button type="submit" [disabled]="loading">
+                {{ loading ? 'Please wait...' : 'Sign in' }}
+            </button>
+
+            <button type="button" class="ghost-btn" (click)="switchToRegister.emit()" [disabled]="loading">
+                Create account
+            </button>
+        </form>
+    </div>
+</div>

@@ -1,1 +1,48 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+
+    --primary: #4f46e5;
+
+    --primary-hover: #4338ca;
+    --bg-app: #f3f4f6;
+
+    --bg-card: #ffffff;
+    --text-main: #111827;
+
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --radius: 12px;
+
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+
+    margin: 0;
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+}
+
+button {
+    font-family: inherit;
+}
+
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

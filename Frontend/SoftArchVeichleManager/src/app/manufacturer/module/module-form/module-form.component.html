@@ -1,0 +1,35 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <h2>{{ module.id ? 'Modul Szerkesztése' : 'Új Modul Rögzítése' }}</h2>
+
+    <div class="form-grid">
+
+        <div class="form-group">
+            <label>Hardware Azonositó</label>
+            <input formControlName="hardwareId" type="text" placeholder="pl.SPMD-559">
+            <label>
+            Interface:
+            <select
+                formControlName="interfaceId">
+                <option [ngValue]="null" selected>-- Select interface --</option>
+                <option *ngFor="let i of interfaces" [ngValue]="i.id">
+                {{ i.name }}
+                </option>
+            </select>
+            </label>
+            <label>
+                Vehicle:
+                <select formControlName="vehicleId">
+                    <option [ngValue]="null">-- Select vehicle --</option>
+                    <option *ngFor="let v of vehicles" [ngValue]="v.id">
+                        {{ v.name || 'Vehicle' }} (ID: {{ v.id }})
+                    </option>
+                </select>
+            </label>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button type="button" (click)="cancel.emit()">Mégse</button>
+        <button type="submit" [disabled]="form.invalid">Mentés</button>
+    </div>
+</form>

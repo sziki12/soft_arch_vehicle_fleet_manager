@@ -1,0 +1,30 @@
+ 
+<div class="list-editor">
+ <div
+    class="list-row"
+    *ngFor="let entry of entries; let i = index; trackBy: trackByIndex"
+  >
+    <!-- Value textbox -->
+    <input
+      type="text"
+      placeholder="Value"
+      [(ngModel)]="entries[i]"
+      [ngModelOptions]="{ standalone: true }"
+    />
+
+    <!-- Remove button -->
+    <button type="button" (click)="removeEntry(i)">✕</button>
+  </div>
+
+  <!-- Add new key-value pair -->
+  <button type="button" (click)="addEntry()">
+    + Add Value
+  </button>
+
+  <!-- Live List preview -->
+  <h4>Resulting List</h4>
+  <pre>{{ entries }}</pre>
+  <button type="button" (click)="saveList()">
+    Save List
+  </button>
+</div>

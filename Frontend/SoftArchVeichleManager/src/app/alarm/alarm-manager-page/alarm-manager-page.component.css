@@ -1,0 +1,132 @@
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.card-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.4;
+}
+
+.card-subtitle {
+    margin: 0 0 12px 0;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-icon {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.btn-icon:hover {
+    background-color: #e5e7eb;
+    transform: scale(1.1);
+}
+
+.btn-delete {
+    background-color: #fee2e2;
+    border: 1px solid #fecdd3;
+    color: #b91c1c;
+}
+
+.btn-delete:hover {
+    background-color: #fecdd3;
+    color: #991b1b;
+}
+
+.create-btn {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 16px;
+    background-color: white;
+    color: var(--primary);
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.create-btn:hover {
+    border-color: var(--primary);
+    background-color: #eff6ff;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.empty-state h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: var(--text-main);
+}
+
+.json-list {
+    margin: 0;
+    padding: 12px 16px;
+    background-color: #0f172a;
+    border-radius: 8px;
+    border: 1px solid rgba(15, 23, 42, 0.3);
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 0.85rem;
+    color: #e0f2fe;
+}
+
+.json-list-row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.1);
+}
+
+.json-list-row:last-child {
+    border-bottom: none;
+}
+
+.json-list-row dt {
+    margin: 0;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: #c7d2fe;
+}
+
+.json-list-row dd {
+    margin: 0;
+    color: #e0f2fe;
+    word-break: break-word;
+}
