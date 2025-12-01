@@ -39,18 +39,23 @@
         </header>
 
         <main class="app-main">
-            <ng-container *ngIf="currentRole === 'fleet_operator'; else adminOrManufacturer">
-                <app-fleet-manager-page *ngIf="activeScreen === 'fleet'"></app-fleet-manager-page>
-                <app-alarm-manager-page *ngIf="activeScreen === 'alarm'"></app-alarm-manager-page>
-                <app-active-alarms-page *ngIf="activeScreen === 'activeAlarms'"></app-active-alarms-page>
+            <ng-container *ngIf="hasNoAccess === true; else hasAccess">
+                
             </ng-container>
-            <ng-template #adminOrManufacturer>
-                <ng-container *ngIf="currentRole === 'manufacturer'; else adminView">
-                    <app-interface-manager-page *ngIf="activeScreen === 'interface'"></app-interface-manager-page>
-                    <app-module-manager-page *ngIf="activeScreen === 'module'"></app-module-manager-page>
+            <ng-template #hasAccess>
+                <ng-container *ngIf="currentRole === 'fleet_operator'; else adminOrManufacturer">
+                    <app-fleet-manager-page *ngIf="activeScreen === 'fleet'"></app-fleet-manager-page>
+                    <app-alarm-manager-page *ngIf="activeScreen === 'alarm'"></app-alarm-manager-page>
+                    <app-active-alarms-page *ngIf="activeScreen === 'activeAlarms'"></app-active-alarms-page>
                 </ng-container>
-                <ng-template #adminView>
-                    <app-admin-dashboard></app-admin-dashboard>
+                <ng-template #adminOrManufacturer>
+                    <ng-container *ngIf="currentRole === 'manufacturer'; else adminView">
+                        <app-interface-manager-page *ngIf="activeScreen === 'interface'"></app-interface-manager-page>
+                        <app-module-manager-page *ngIf="activeScreen === 'module'"></app-module-manager-page>
+                    </ng-container>
+                    <ng-template #adminView>
+                        <app-admin-dashboard></app-admin-dashboard>
+                    </ng-template>
                 </ng-template>
             </ng-template>
         </main>

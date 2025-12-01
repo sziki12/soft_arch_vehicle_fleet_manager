@@ -29,6 +29,7 @@ export class AppComponent implements OnInit, OnDestroy {
   activeScreen: 'fleet' | 'alarm' | 'activeAlarms' | 'interface' | 'module' = 'fleet';
   session: UserSession | null = null;
   authView: 'login' | 'register' = 'login';
+  hasNoAccess:boolean = true
   private sub?: Subscription;
 
   constructor(private authService: AuthService, private manufacturerService: ManufacturerService, private fleetService: FleetService) { }
@@ -41,6 +42,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.currentRole = session.role;
         this.activeScreen = session.role === 'manufacturer' ? 'interface' : 'fleet';
         this.authView = 'login';
+        this.hasNoAccess = !(session?.fleetId || session?.manufacturerId || session?.role == 'admin')
       }
       this.fleetService.getFleets().subscribe(
         data => 
@@ -90,12 +92,5 @@ export class AppComponent implements OnInit, OnDestroy {
       return ""
     }
     return "No Association Status"
-  }
-
-  hasNoPageAccess()
-  {
-    var currentUser = this.authService.currentUser;
-    var noAccess = !(currentUser?.fleetId || currentUser?.manufacturerId || currentUser?.role == 'admin')
-    return noAccess
   }
 }
