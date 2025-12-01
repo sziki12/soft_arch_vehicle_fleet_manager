@@ -4,6 +4,7 @@ using SoftArchVehicleFleetManager.Data;
 using SoftArchVehicleFleetManager.Dtos.Telemetry;
 using SoftArchVehicleFleetManager.Models;
 using System.Collections.Concurrent;
+using System.Formats.Asn1;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using TelemetryServiceLib;
@@ -23,6 +24,47 @@ namespace SoftArchVehicleFleetManager.Telemetry
 
         public async Task InitTelemetryService()
         {
+            await InitServiceModules();
+            await InitServiceAlarms();
+        }
+
+        public async Task ConfigureModuleForService(Module module)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<FleetDbContext>();
+
+            var vehicle = await db.Vehicles
+                .AsNoTracking()
+                .FirstOrDefaultAsync(v => v.Id == module.VehicleId);
+            if (vehicle == null)
+            {
+                throw new Exception($"Cannot configure module {module.Id} for service.");
+            }
+            else 
+            {
+                var fleet = await db.Fleets
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(f => f.Id == vehicle.FleetId);
+
+                if (fleet == null) 
+                {
+                    throw new Exception($"Cannot configure module {module.Id} for service.");
+                }
+
+                if (_fleetTelemetryServices.TryGetValue(fleet.Name, out var fleetTelemetryService))
+                {
+                    fleetTelemetryService.AddSingleModuleSubscripition(module.Manufacturer.Name, module.HardwareId.ToString());
+                }
+                else
+                {
+                    var newFleetTelemetryService = new FleetTelemetryService(fleet.Name);
+                    newFleetTelemetryService.AddSingleModuleSubscripition(module.Manufacturer.Name, module.HardwareId.ToString());
+                    _fleetTelemetryServices.TryAdd(fleet.Name, newFleetTelemetryService);
+                }
+            }   
+        }
+
+        public async Task InitServiceModules() {
             using var scope = _scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<FleetDbContext>();
 
@@ -61,12 +103,41 @@ namespace SoftArchVehicleFleetManager.Telemetry
                 var fleetTelemetryService = new FleetTelemetryService(fleet.Name);
                 if (manufacturers.Count > 0 && hardwares.Count > 0)
                 {
-                    fleetTelemetryService.AddModulTelemetrySubscripition(manufacturers.ToList(), hardwares.ToList());
+                    fleetTelemetryService.AddModuleTelemetrySubscripition(manufacturers.ToList(), hardwares.ToList());
                 }
                 _fleetTelemetryServices.TryAdd(fleet.Name, fleetTelemetryService);
             }
+        }
 
-            await ConfigureServiceAlarms();
+        public async Task InitServiceAlarms()
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<FleetDbContext>();
+
+            // load alarms
+            var alarms = await db.Alarms
+                .Include(a => a.Interface)
+                    .ThenInclude(i => i.Manufacturer)
+                .Include(a => a.Fleet)
+                .AsNoTracking()
+                .ToListAsync();
+
+            // add alarms to fleet telemetry service
+            foreach (var alarm in alarms)
+            {
+                var fleetName = alarm.Fleet.Name;
+                var manufacturerName = alarm.Interface.Manufacturer.Name;
+
+                if (_fleetTelemetryServices.TryGetValue(fleetName, out var fleetTelemetryService))
+                {
+                    fleetTelemetryService.AddModuleAlarmConstraint(alarm.Id.ToString(), manufacturerName, alarm.AlarmJSON);
+                }
+                else
+                {
+                    throw new Exception($"No mqtt service found for Fleet {fleetName}.");
+                }
+
+            }
         }
 
         public async Task<TelemetryReportDto> GetVehiceleReport(int vehicleId)
@@ -134,35 +205,6 @@ namespace SoftArchVehicleFleetManager.Telemetry
                 $"Telemetry report for Vehicle ID {vehicleId} retrieved successfully.",
                 root.ToJsonString(new JsonSerializerOptions { WriteIndented = true })
             );
-        }
-
-        public async Task ConfigureServiceAlarms() {
-            using var scope = _scopeFactory.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<FleetDbContext>();
-
-            // load alarms
-            var alarms = await db.Alarms
-                .Include(a => a.Interface)
-                    .ThenInclude(i => i.Manufacturer)
-                .Include(a => a.Fleet)        
-                .AsNoTracking()
-                .ToListAsync();
-
-            // add alarms to fleet telemetry service
-            foreach (var alarm in alarms) {
-                var fleetName = alarm.Fleet.Name;
-                var manufacturerName = alarm.Interface.Manufacturer.Name;
-
-                if (_fleetTelemetryServices.TryGetValue(fleetName, out var fleetTelemetryService))
-                {
-                    fleetTelemetryService.AddModuleAlarmConstraint(alarm.Id.ToString(), manufacturerName, alarm.AlarmJSON);
-                }
-                else
-                {
-                    throw new Exception($"No mqtt service found for Fleet {fleetName}.");
-                }
-
-            }
         }    
         
         public async Task<TelemetryAlarmDto> GetFleetVehiclesUnderAlarm(int fleetId)
@@ -172,15 +214,54 @@ namespace SoftArchVehicleFleetManager.Telemetry
 
             // retrieve fleet
             var fleet = await db.Fleets
+                .Include(f => f.Vehicles)
+                    .ThenInclude(v => v.Modules)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(f => f.Id == fleetId);
-
             if (fleet == null) 
             {
                 return new TelemetryAlarmDto($"There is no fleet with Id: {fleetId}", "");
             }
 
-            return new TelemetryAlarmDto("", "");
-        }
+            // get alarms from fleet telemetry service
+            if (_fleetTelemetryServices.TryGetValue(fleet.Name, out var fleetTelemetryService))
+            {
+                var fleetModules = fleetTelemetryService.GetModulesUnderAlarm();
+
+                if (fleetModules.Count == 0)
+                {
+                    return new TelemetryAlarmDto($"No alarm to report for Fleet ID {fleetId}.", "");
+                }
+                else 
+                {
+                    int alarmCount = 1;
+                    Dictionary<string, string> alarmReports = new Dictionary<string, string>();
+                    foreach (var fleetModul in fleetModules)
+                    {
+                        var alarmName = $"alarm_{alarmCount}";
+                        var alarmJson = new JsonObject()
+                        {
+                            ["modul"] = fleetModul.HardwareAddress,
+                            ["data"] = fleetModul.TelemetryData
+                        };
+
+                        alarmReports.Add(alarmName, alarmJson.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+                        alarmCount++;
+                    }
+
+                    var root = new JsonObject();
+                    foreach (var kv in alarmReports)
+                    {
+                        root[kv.Key] = kv.Value;
+                    }
+                    return new TelemetryAlarmDto($"Alarms for Fleet ID {fleetId} retrieved successfully.", 
+                        root.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+                }   
+            }
+            else
+            {
+                return new TelemetryAlarmDto($"No mqtt service found for Fleet {fleet.Name}.", "");
+            }
+        } 
     }
 }

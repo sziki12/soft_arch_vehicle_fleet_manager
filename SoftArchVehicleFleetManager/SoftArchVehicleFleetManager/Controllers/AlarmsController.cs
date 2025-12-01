@@ -49,11 +49,6 @@ namespace SoftArchVehicleFleetManager.Controllers
         {
             var (status, result) = await _alarmsService.CreateAsync(createDto);
 
-            if (status == AlarmCreateResult.Success) 
-            {
-                await _telemetryService.ConfigureServiceAlarms();
-            }
-
             return status switch
             {
                 AlarmCreateResult.Success => CreatedAtAction(nameof(GetOne), new { id = result!.id }, result),

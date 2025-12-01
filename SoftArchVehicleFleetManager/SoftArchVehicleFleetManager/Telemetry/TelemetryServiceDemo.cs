@@ -11,9 +11,9 @@ namespace SoftArchVehicleFleetManager.Telemetry
         {
             // Initialize Fleet Service
             var fleetServiceA = new FleetTelemetryService("FleetA");
-            fleetServiceA.AddModuleTelemetrySubscripition("ManufacturerA", "ABC123");
-            fleetServiceA.AddModuleTelemetrySubscripition("ManufacturerA", "ABC234");
-            fleetServiceA.AddModuleTelemetrySubscripition("ManufacturerA", "ABC345");
+            fleetServiceA.AddSingleModuleSubscripition("ManufacturerA", "ABC123");
+            fleetServiceA.AddSingleModuleSubscripition("ManufacturerA", "ABC234");
+            fleetServiceA.AddSingleModuleSubscripition("ManufacturerA", "ABC345");
 
             var alertJson = new JsonObject { ["speed"] = "GT 100" };
             fleetServiceA.AddModuleAlarmConstraint("Alert1", "ManufacturerA", alertJson.ToString());
