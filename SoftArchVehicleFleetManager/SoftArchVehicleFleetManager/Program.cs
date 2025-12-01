@@ -7,8 +7,11 @@ using SoftArchVehicleFleetManager.Converters;
 using SoftArchVehicleFleetManager.Data;
 using SoftArchVehicleFleetManager.Models;
 using SoftArchVehicleFleetManager.Services;
+using SoftArchVehicleFleetManager.TelemetryService;
 using System.Text;
 using System.Text.Json.Serialization;
+
+TelemetryServiceDemo.RunAsync();
 
 var builder = WebApplication.CreateBuilder(args);
 
