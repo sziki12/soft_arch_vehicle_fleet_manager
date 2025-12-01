@@ -16,7 +16,7 @@
                     <small>fleets</small>
                 </div>
                 <div class="stat-card">
-                    <span>{{ manufacturers.length }}</span>f
+                    <span>{{ manufacturers.length }}</span>
                     <small>manufacturers</small>
                 </div>
                 <div class="stat-card">
@@ -41,12 +41,16 @@
 
     <nav class="section-nav">
         <button type="button" [class.active]="activeSection === 'fleets'" (click)="setSection('fleets')">Fleets</button>
-        <button type="button" [class.active]="activeSection === 'manufacturers'" (click)="setSection('manufacturers')">Manufacturers</button>
+        <button type="button" [class.active]="activeSection === 'manufacturers'"
+            (click)="setSection('manufacturers')">Manufacturers</button>
         <button type="button" [class.active]="activeSection === 'users'" (click)="setSection('users')">Users</button>
-        <button type="button" [class.active]="activeSection === 'vehicles'" (click)="setSection('vehicles')">Vehicles</button>
+        <button type="button" [class.active]="activeSection === 'vehicles'"
+            (click)="setSection('vehicles')">Vehicles</button>
         <button type="button" [class.active]="activeSection === 'alarms'" (click)="setSection('alarms')">Alarms</button>
-        <button type="button" [class.active]="activeSection === 'interfaces'" (click)="setSection('interfaces')">Interfaces</button>
-        <button type="button" [class.active]="activeSection === 'modules'" (click)="setSection('modules')">Modules</button>
+        <button type="button" [class.active]="activeSection === 'interfaces'"
+            (click)="setSection('interfaces')">Interfaces</button>
+        <button type="button" [class.active]="activeSection === 'modules'"
+            (click)="setSection('modules')">Modules</button>
     </nav>
 
     <section class="panel" *ngIf="activeSection === 'fleets'">
@@ -153,7 +157,7 @@
                     </select>
                 </label>
 
-                 <label>
+                <label>
                     Manufacturer
                     <select formControlName="manufacturerId">
                         <option [ngValue]="0">Unassigned</option>
@@ -200,14 +204,15 @@
                 <div class="flex gap">
                     <span class="fleet-chip">Fleet #{{ vehicle.fleetId }}</span>
                     <button type="button" class="ghost-btn" (click)="selectVehicle(vehicle)">Edit</button>
-                    <button type="button" class="ghost-btn danger" (click)="onDeleteVehicle(vehicle.id, $event)">Delete</button>
+                    <button type="button" class="ghost-btn danger"
+                        (click)="onDeleteVehicle(vehicle.id, $event)">Delete</button>
                 </div>
             </li>
         </ul>
 
         <div *ngIf="selectedVehicle" class="form-wrapper">
-            <app-vehicle-form [vehicle]="selectedVehicle" [fleets]="fleets" [showFleetSelect]="true" (save)="onSaveVehicle($event)"
-                (cancel)="selectedVehicle = null"></app-vehicle-form>
+            <app-vehicle-form [vehicle]="selectedVehicle" [fleets]="fleets" [showFleetSelect]="true"
+                (save)="onSaveVehicle($event)" (cancel)="selectedVehicle = null"></app-vehicle-form>
         </div>
     </section>
 
@@ -249,7 +254,8 @@
                     </div>
                     <div class="flex">
                         <button type="button" class="ghost-btn" (click)="selectAlarm(alarm)">Edit</button>
-                        <button type="button" class="ghost-btn danger" (click)="onDeleteAlarm(alarm.id, $event)">Delete</button>
+                        <button type="button" class="ghost-btn danger"
+                            (click)="onDeleteAlarm(alarm.id, $event)">Delete</button>
                     </div>
                 </div>
             </li>
@@ -277,27 +283,29 @@
                 {{ showAllInterfaces ? 'Show less' : 'Show more' }}
             </button>
             <button type="button" class="ghost-btn" (click)="createInterface()">+ New interface</button>
-        </div> 
+        </div>
 
         <ul class="list">
             <li *ngFor="let interface of filteredInterfaces">
                 <div>
                     <div class="text-strong">Name: {{ interface.name }}</div>
                     <small class="muted">Interface #{{ interface.id }}</small>
-                    <br/>
+                    <br />
                     <small class="muted">Manufacturer #{{ interface.manufacturerId }}</small>
-                    <br/>
+                    <br />
                     <small class="interface-fields">{{ interface.interfaceFields }}</small>
                 </div>
-                
+
                 <div class="flex gap">
                     <button type="button" class="ghost-btn" (click)="selectInterface(interface)">Edit</button>
-                    <button type="button" class="ghost-btn danger" (click)="onDeleteInterface(interface.id, $event)">Delete</button>
+                    <button type="button" class="ghost-btn danger"
+                        (click)="onDeleteInterface(interface.id, $event)">Delete</button>
                 </div>
             </li>
         </ul>
         <div *ngIf="selectedInterface" class="form-wrapper">
-            <app-interface-form [interface]="selectedInterface!" [manufacturers]="manufacturers" [showInterfaceSelect]="true" (save)="onSaveInterface($event)"
+            <app-interface-form [interface]="selectedInterface!" [manufacturers]="manufacturers"
+                [showInterfaceSelect]="true" (save)="onSaveInterface($event)"
                 (cancel)="selectedInterface = null"></app-interface-form>
         </div>
     </section>
@@ -324,21 +332,23 @@
                 <div>
                     <div class="text-strong">HWD ID: {{ module.hardwareId }}</div>
                     <small class="muted">Module #{{ module.id }}</small>
-                    <br/>
+                    <br />
                     <small class="muted">Interface #{{ module.interfaceId }}</small>
-                    <br/>
+                    <br />
                     <small class="muted">Manufacturer #{{ module.manufacturerId }}</small>
-                    <br/>
+                    <br />
                     <small class="muted">Vehicle #{{ module.vehicleId }}</small>
                 </div>
-                 <div class="flex gap">
+                <div class="flex gap">
                     <button type="button" class="ghost-btn" (click)="selectModule(module)">Edit</button>
-                    <button type="button" class="ghost-btn danger" (click)="onDeleteModule(module.id, $event)">Delete</button>
+                    <button type="button" class="ghost-btn danger"
+                        (click)="onDeleteModule(module.id, $event)">Delete</button>
                 </div>
             </li>
         </ul>
         <div *ngIf="selectedModule" class="form-wrapper">
-            <app-module-form [module]="selectedModule" [interfaces]="interfaces" [manufacturers]="manufacturers" [vehicles]="vehicles" [fleets]="fleets" [showModuleSelect]="true" (save)="onSaveModule($event)"
+            <app-module-form [module]="selectedModule" [interfaces]="interfaces" [manufacturers]="manufacturers"
+                [vehicles]="vehicles" [fleets]="fleets" [showModuleSelect]="true" (save)="onSaveModule($event)"
                 (cancel)="selectedModule = null"></app-module-form>
         </div>
     </section>
@@ -364,7 +374,7 @@
                 <div>
                     <div class="text-strong">Name: {{ manufacturer.name }}</div>
                     <small class="muted">Manufacturer #{{ manufacturer.id }}</small>
-                    <br/>
+                    <br />
                     <small class="muted">User Count #{{ manufacturer.id }}</small>
                 </div>
             </li>
