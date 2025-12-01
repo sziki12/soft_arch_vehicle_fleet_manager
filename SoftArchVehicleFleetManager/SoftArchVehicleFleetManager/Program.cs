@@ -7,11 +7,9 @@ using SoftArchVehicleFleetManager.Converters;
 using SoftArchVehicleFleetManager.Data;
 using SoftArchVehicleFleetManager.Models;
 using SoftArchVehicleFleetManager.Services;
-using SoftArchVehicleFleetManager.TelemetryService;
+using SoftArchVehicleFleetManager.Telemetry;
 using System.Text;
 using System.Text.Json.Serialization;
-
-TelemetryServiceDemo.RunAsync();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +51,8 @@ builder.Services.AddScoped<ManufacturersService>();
 builder.Services.AddScoped<ModulesService>();
 builder.Services.AddScoped<VehiclesService>();
 builder.Services.AddScoped<AuthService>();
+
+builder.Services.AddSingleton<TelemetryService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -109,6 +109,8 @@ var app = builder.Build();
 
 // Try to apply seed data and migrate database
 SeedData.Initialize(app.Services.CreateScope().ServiceProvider.GetRequiredService<FleetDbContext>());
+
+await app.Services.GetRequiredService<TelemetryService>().InitTelemetryService();
 
 
 // Configure the HTTP request pipeline.

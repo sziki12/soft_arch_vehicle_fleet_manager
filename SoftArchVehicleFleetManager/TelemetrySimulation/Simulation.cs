@@ -12,14 +12,19 @@
                 simulatedModules.Add(new SimulatedModule("FleetA", "ManufacturerB", "ABC234"));
                 simulatedModules.Add(new SimulatedModule("FleetA", "ManufacturerA", "ABC345"));
 
-                //simulatedModules.Add(new SimulatedModule("FleetB", "ManufacturerA", "ABC456"));
-                //simulatedModules.Add(new SimulatedModule("FleetB", "ManufacturerB", "ABC567"));
-                //simulatedModules.Add(new SimulatedModule("FleetB", "ManufacturerA", "ABC678"));
+                simulatedModules.Add(new SimulatedModule("FleetB", "ManufacturerA", "DEF123"));
+                simulatedModules.Add(new SimulatedModule("FleetB", "ManufacturerB", "DEF234"));
 
-                foreach (var simulatedModule in simulatedModules) {
-                    Thread.Sleep(10000);
-                    simulatedModule.GenerateSpeedTelemetry(true);
+                for (int i = 0; i < 5; i++)
+                {
+                    foreach (var simulatedModule in simulatedModules)
+                    {
+                        Thread.Sleep(15000);
+                        simulatedModule.GenerateSpeedTelemetry(true);
+                    }
                 }
+
+               
             }
             catch (Exception exception)
             {

@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 namespace TelemetryServiceLib
 {
     // Manages a fleet of modules under a specific fleet name
-    public class FleetService
+    public class FleetTelemetryService
     {
         public string FleetName { get; set; }
 
@@ -15,13 +15,13 @@ namespace TelemetryServiceLib
         private HiveClient hiveClient;
 
         // Constructor initializes HiveClient and sets up message handling
-        public FleetService(string fleetName)
+        public FleetTelemetryService(string fleetName)
         {
             FleetName = fleetName;
 
             try
             {
-                hiveClient = new HiveClient("FleetServiceClient");
+                hiveClient = new HiveClient("FleetTelemetryServiceClient");
 
                 hiveClient.ClientInstance.OnMessageReceived += (sender, args) =>
                 {
