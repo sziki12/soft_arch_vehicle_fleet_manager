@@ -26,41 +26,92 @@ public static class SeedData
 
     private static void AddSeedVehicles(FleetDbContext db)
     {
-        var vehicle = new Vehicle
+        var vehicle1 = new Vehicle
         {
-            Name = "Vehicle numero uno",
-            LicensePlate = "ASD-1337",
+            Name = "VehicleA",
+            LicensePlate = "VEHA-123",
             Model = "string",
             Year = 2003,
-            FleetId = db.Fleets.Single().Id,
+            FleetId = db.Fleets.Where(f => f.Name == "FleetA").SingleOrDefault().Id,
         };
 
-        db.Vehicles.Add(vehicle);
+        var vehicle2 = new Vehicle
+        {
+            Name = "VehicleB",
+            LicensePlate = "VEHB-123",
+            Model = "string",
+            Year = 2003,
+            FleetId = db.Fleets.Where(f => f.Name == "FleetB").SingleOrDefault().Id,
+        };
+
+        db.Vehicles.Add(vehicle1);
+        db.Vehicles.Add(vehicle2);
         db.SaveChanges();
     }
 
     private static void AddSeedModules(FleetDbContext db)
     {
-        var module = new Module
+        var module1A = new Module
         {
-            HardwareId = "XYZ",
+            HardwareId = "ABC123",
             ManufacturerId = db.Manufacturers.Single().Id,
             InterfaceId = db.Interfaces.Single().Id,
-            VehicleId = db.Vehicles.Single().Id
+            VehicleId = db.Vehicles.Where(v => v.Name == "VehicleA").SingleOrDefault().Id
         };
 
-        db.Modules.Add(module);
+        var module2A = new Module
+        {
+            HardwareId = "ABC234",
+            ManufacturerId = db.Manufacturers.Single().Id,
+            InterfaceId = db.Interfaces.Single().Id,
+            VehicleId = db.Vehicles.Where(v => v.Name == "VehicleA").SingleOrDefault().Id
+        };
+
+        var module3A = new Module
+        {
+            HardwareId = "ABC345",
+            ManufacturerId = db.Manufacturers.Single().Id,
+            InterfaceId = db.Interfaces.Single().Id,
+            VehicleId = db.Vehicles.Where(v => v.Name == "VehicleA").SingleOrDefault().Id
+        };
+
+        var module1B = new Module
+        {
+            HardwareId = "DEF123",
+            ManufacturerId = db.Manufacturers.Single().Id,
+            InterfaceId = db.Interfaces.Single().Id,
+            VehicleId = db.Vehicles.Where(v => v.Name == "VehicleB").SingleOrDefault().Id
+        };
+
+        var module2B = new Module
+        {
+            HardwareId = "DEF234",
+            ManufacturerId = db.Manufacturers.Single().Id,
+            InterfaceId = db.Interfaces.Single().Id,
+            VehicleId = db.Vehicles.Where(v => v.Name == "VehicleB").SingleOrDefault().Id
+        };
+
+        db.Modules.Add(module1A);
+        db.Modules.Add(module2A);
+        db.Modules.Add(module3A);
+        db.Modules.Add(module1B);
+        db.Modules.Add(module2B);
         db.SaveChanges();
     }
 
     private static void AddSeedFleets(FleetDbContext db)
     {
-        var fleet = new Fleet
+        var fleet1 = new Fleet
         {
-            Name = "Fleet numero uno"
+            Name = "FleetA"
+        };
+        var fleet2 = new Fleet
+        {
+            Name = "FleetB"
         };
 
-        db.Fleets.Add(fleet);
+        db.Fleets.Add(fleet1);
+        db.Fleets.Add(fleet2);
         db.SaveChanges();
     }
 
@@ -81,7 +132,7 @@ public static class SeedData
     {
         var manufacturer = new Manufacturer
         {
-            Name = "Manufactorer numero uno",
+            Name = "ManufacturerA",
         };
 
         db.Manufacturers.Add(manufacturer);

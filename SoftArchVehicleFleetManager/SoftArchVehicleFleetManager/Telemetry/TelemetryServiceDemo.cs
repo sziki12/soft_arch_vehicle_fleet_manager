@@ -3,16 +3,16 @@ using SoftArchVehicleFleetManager.Services;
 using System.Text.Json.Nodes;
 using TelemetryServiceLib;
 
-namespace SoftArchVehicleFleetManager.TelemetryService
+namespace SoftArchVehicleFleetManager.Telemetry
 {
     public class TelemetryServiceDemo
     {
         public static async Task InitDemoAsync()
         {
             // Initialize Fleet Service
-            var fleetServiceA = new FleetService("FleetA");
+            var fleetServiceA = new FleetTelemetryService("FleetA");
             fleetServiceA.AddModuleTelemetrySubscripition("ManufacturerA", "ABC123");
-            fleetServiceA.AddModuleTelemetrySubscripition("ManufacturerB", "ABC234");
+            fleetServiceA.AddModuleTelemetrySubscripition("ManufacturerA", "ABC234");
             fleetServiceA.AddModuleTelemetrySubscripition("ManufacturerA", "ABC345");
 
             var alertJson = new JsonObject { ["speed"] = "GT 100" };
