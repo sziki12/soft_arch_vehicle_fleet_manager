@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Interface } from '../models/interface.model';
-import { BehaviorSubject, delay, map, Observable, of, tap } from 'rxjs';
+import { delay, map, Observable, of, tap } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { DtoMappereService } from './dto-mapper.service';

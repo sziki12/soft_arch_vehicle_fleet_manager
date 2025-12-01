@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
 import { User } from '../models/admin-user.model';
 import { Fleet } from '../models/fleet.model';
-import { ReportSummary } from '../models/report.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { DtoMappereService } from './dto-mapper.service';
