@@ -334,7 +334,7 @@ export class AdminDashboardComponent implements OnInit {
       return;
     }
 
-    this.adminService.assignUserToFleetOrManufacturer(user, normalizedFleetId, normalizedFleetId).subscribe({
+    this.adminService.assignUserToFleetOrManufacturer(user, normalizedFleetId, normalizedManufacturerId).subscribe({
       next: updatedUser => {
         const merged = updatedUser
           ? { ...user, ...updatedUser, fleetId: updatedUser.fleetId ?? normalizedFleetId, manufacturerId: updatedUser.manufacturerId ?? normalizedManufacturerId }
