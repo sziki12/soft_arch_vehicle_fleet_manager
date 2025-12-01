@@ -15,13 +15,16 @@
                 simulatedModules.Add(new SimulatedModule("FleetB", "ManufacturerA", "DEF123"));
                 simulatedModules.Add(new SimulatedModule("FleetB", "ManufacturerB", "DEF234"));
 
-                for (int i = 0; i < 5; i++) {
+                for (int i = 0; i < 5; i++)
+                {
                     foreach (var simulatedModule in simulatedModules)
                     {
                         Thread.Sleep(15000);
                         simulatedModule.GenerateSpeedTelemetry(true);
                     }
                 }
+
+               
             }
             catch (Exception exception)
             {

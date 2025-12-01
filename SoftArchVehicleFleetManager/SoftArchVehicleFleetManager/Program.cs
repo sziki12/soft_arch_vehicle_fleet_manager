@@ -11,6 +11,8 @@ using SoftArchVehicleFleetManager.Telemetry;
 using System.Text;
 using System.Text.Json.Serialization;
 
+TelemetryServiceDemo.RunAsync();
+
 var builder = WebApplication.CreateBuilder(args);
 
 var jwtKey = builder.Configuration["Jwt:Key"];
