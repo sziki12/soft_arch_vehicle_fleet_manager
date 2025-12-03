@@ -143,7 +143,6 @@ public static class SeedData
             {
                 ["operator"] = "GT",
                 ["value"] = "100",
-
             }
         };
         var alarm1 = new Alarm

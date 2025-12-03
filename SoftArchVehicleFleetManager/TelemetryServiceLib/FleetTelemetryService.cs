@@ -166,15 +166,17 @@ namespace TelemetryServiceLib
                 {
                     if (telemetryElement.Name == constraintElement.Name)
                     {
+                        string telemetry = telemetryElement.Value.ToString();
+                        double telemetryDouble = Convert.ToDouble(telemetry);
+
                         var element = constraintElement.Value;
-                        string? _operator = element.GetProperty("operator").GetString();
-                        double? constraint = element.GetProperty("value").GetDouble();
+                        string oper = element.GetProperty("operator").ToString();
+                        string constraint = element.GetProperty("value").ToString();
+                        double constraintDouble = Convert.ToDouble(constraint);
 
-                        double measurementValue = telemetryElement.Value.GetDouble();
-
-                        if (constraint is not null)
+                        if (oper is not null)
                         {
-                            if (AlarmForTelemetry(measurementValue, constraint ?? 0d, _operator))
+                            if (AlarmForTelemetry(telemetryDouble, constraintDouble, oper))
                             {
                                 return true;
                             }
