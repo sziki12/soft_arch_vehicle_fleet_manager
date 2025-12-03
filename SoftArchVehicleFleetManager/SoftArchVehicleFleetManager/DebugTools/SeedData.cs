@@ -135,14 +135,22 @@ public static class SeedData
         db.SaveChanges();
     }
 
-    private static void AddSeedAlarms(FleetDbContext db) 
+    private static void AddSeedAlarms(FleetDbContext db)
     {
-        var alertJson = new JsonObject { ["speed"] = "GT 100" };
+        var alertJson = new JsonObject
+        {
+            ["speed"] = new JsonObject
+            {
+                ["operator"] = "GT",
+                ["value"] = "100",
+
+            }
+        };
         var alarm1 = new Alarm
         {
-             AlarmJSON = alertJson.ToString(),
-             FleetId = db.Fleets.Where(f => f.Name == "FleetA").SingleOrDefault().Id,
-             InterfaceId = db.Interfaces.Single().Id,
+            AlarmJSON = alertJson.ToString(),
+            FleetId = db.Fleets.Where(f => f.Name == "FleetA").SingleOrDefault().Id,
+            InterfaceId = db.Interfaces.Single().Id,
         };
         db.Alarms.Add(alarm1);
         db.SaveChanges();

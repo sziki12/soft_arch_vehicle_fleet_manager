@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Collections.Concurrent;
+using System.Reflection.Metadata.Ecma335;
 
 namespace TelemetryServiceLib
 {
@@ -8,9 +9,9 @@ namespace TelemetryServiceLib
     {
         public string FleetName { get; set; }
 
-        public ConcurrentDictionary<string, FleetModule> FleetModules { get; set; } = new ();
+        public ConcurrentDictionary<string, FleetModule> FleetModules { get; set; } = new();
 
-        public ConcurrentDictionary<string, FleetAlarmConstraint> FleetAlarmConstraints { get; set; } = new ();
+        public ConcurrentDictionary<string, FleetAlarmConstraint> FleetAlarmConstraints { get; set; } = new();
 
         private HiveClient hiveClient;
 
@@ -82,16 +83,17 @@ namespace TelemetryServiceLib
 
 
         // Get specific module telemetry data
-        public string GetModuleTelemetry(string hardwareAddress) {
+        public string GetModuleTelemetry(string hardwareAddress)
+        {
             FleetModule? fleetModule = null;
 
             FleetModules.TryGetValue(hardwareAddress, out fleetModule);
 
-            if(fleetModule != null) 
+            if (fleetModule != null)
             {
                 return fleetModule.TelemetryData;
             }
-            else 
+            else
             {
                 return "";
             }
@@ -126,24 +128,20 @@ namespace TelemetryServiceLib
 
 
         // Checks if the telemetry value meets the alarm constraint
-        private bool AlarmForTelemetry(string telemetryValue, string constraint)
+        private bool AlarmForTelemetry(double telemetryValue, double constraintValue, string constraint)
         {
-            string[] tokens = constraint.Split(' ');
-            double telemetryDouble = double.Parse(telemetryValue);
-            if (tokens[0] == "GT") { 
-                double constraintDouble = double.Parse(tokens[1]);
-                return telemetryDouble > constraintDouble;
-            }
-            if (tokens[0] == "LT") {
-                double constraintDouble = double.Parse(tokens[1]);
-                return telemetryDouble < constraintDouble;
-            }
-            return false;
+            return constraint switch
+            {
+                "GT" => telemetryValue > constraintValue,
+                "LT" => telemetryValue < constraintValue,
+                "EQ" => telemetryValue == constraintValue,
+                _ => false
+            };
         }
 
 
         // Parses alarm constraints and checks if the given FleetModule is under alarm
-        private bool ParseAlarmConstraintsFor(FleetModule fleetModule, FleetAlarmConstraint fleetAlarmConstraint) 
+        private bool ParseAlarmConstraintsFor(FleetModule fleetModule, FleetAlarmConstraint fleetAlarmConstraint)
         {
             JsonDocument? telemetryData = JsonDocument.Parse(fleetModule.TelemetryData);
             if (telemetryData == null)
@@ -152,7 +150,8 @@ namespace TelemetryServiceLib
             }
 
             JsonDocument? alarmConstraint = JsonDocument.Parse(fleetAlarmConstraint.AlarmConstraint);
-            if (alarmConstraint == null) {
+            if (alarmConstraint == null)
+            {
                 return false;
             }
 
@@ -167,11 +166,18 @@ namespace TelemetryServiceLib
                 {
                     if (telemetryElement.Name == constraintElement.Name)
                     {
-                        string telemetryValue = telemetryElement.Value.ToString();
-                        string constraintValue = constraintElement.Value.ToString();
-                        if (AlarmForTelemetry(telemetryValue, constraintValue))
+                        var element = constraintElement.Value;
+                        string? _operator = element.GetProperty("operator").GetString();
+                        double? constraint = element.GetProperty("value").GetDouble();
+
+                        double measurementValue = telemetryElement.Value.GetDouble();
+
+                        if (constraint is not null)
                         {
-                            return true;
+                            if (AlarmForTelemetry(measurementValue, constraint ?? 0d, _operator))
+                            {
+                                return true;
+                            }
                         }
                     }
                 }
@@ -181,8 +187,8 @@ namespace TelemetryServiceLib
 
 
         // Returns a list of FleetModule instances so that web UI can display them
-        public List<FleetModule> GetModulesUnderAlarm() 
-        {    
+        public List<FleetModule> GetModulesUnderAlarm()
+        {
             List<FleetModule> result = new List<FleetModule>();
 
             try
